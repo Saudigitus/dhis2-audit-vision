@@ -14,6 +14,7 @@ import Documentation from './pages/Documentation';
 import NotificationsPage from './pages/Notifications';
 import ProfilePage from './pages/Profile';
 import SettingsPage from './pages/Settings';
+import './index.css';
 
 const pageTitles: Record<Page, string> = {
   dashboard: 'Dashboard',
@@ -74,7 +75,6 @@ function App() {
     <div className="flex h-screen overflow-hidden">
       <Sidebar activePage={activePage} onNavigate={setActivePage} />
       <div className="flex-1 ml-[236px] flex flex-col overflow-hidden">
-        <Header title={pageTitles[activePage]} />
         <main className="flex-1 overflow-y-auto bg-[#f8fafc] p-6">
           <div className="mb-6 flex justify-end">
             <GlobalAuditFilter value={auditFilter} onChange={setAuditFilter} />

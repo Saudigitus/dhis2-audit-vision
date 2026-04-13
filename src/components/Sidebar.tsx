@@ -40,7 +40,7 @@ interface SidebarProps {
 
 export default function Sidebar({ activePage, onNavigate }: SidebarProps) {
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-[236px] bg-[#0f172a] flex flex-col z-50">
+    <aside className="fixed left-0 w-[236px] bg-[#0f172a] flex flex-col z-50">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5">
         {/* <div className="w-9 h-9 rounded-lg bg-[#3b82f6] flex items-center justify-center">
