@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Groups - DHIS2 Audit Vision</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .prose h2 { color: #0f172a; font-weight: 700; margin-top: 2em; margin-bottom: 1em; }
+        .prose p { color: #475569; line-height: 1.7; margin-bottom: 1.5em; }
+        .prose ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1.5em; color: #475569; }
+        .prose li { margin-bottom: 0.5em; }
+        .prose strong { color: #0f172a; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <a href="index.html" class="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span class="font-medium">Voltar para Central</span>
+                </a>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-lg tracking-tight">DHIS2 Audit Vision</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 py-12">
+        <div class="max-w-3xl mx-auto px-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-600 text-sm font-bold mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                View Groups
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-4">Grupos de Visualização</h1>
+            <p class="text-xl text-slate-600">Agrupe Programas e DataSets para monitorar alterações de forma conjunta e organizada, rastreando também suas dependências.</p>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-3xl mx-auto px-4 py-12">
+        <div class="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-200 prose prose-slate max-w-none">
+            <h2>O que são View Groups?</h2>
+            <p>
+                Os <strong>View Groups</strong> (Grupos de Visualização) permitem que você organize seus metadados do DHIS2 em categorias lógicas, como por exemplo "HIV/SIDA" ou "Malaria". 
+                Ao invés de procurar por alterações em programas individuais espalhados por toda a instância, você pode agrupar os <strong>Programas</strong> e <strong>DataSets</strong> relevantes em um único grupo e aplicar esse filtro no <em>Change Explorer</em>.
+            </p>
+
+            <h2>Criando um Novo Grupo</h2>
+            <p>
+                Para criar um grupo, acesse a aba <strong>View Groups</strong> no menu lateral e clique no botão <strong>Novo Grupo</strong>.
+            </p>
+            <ul>
+                <li><strong>Nome do Grupo:</strong> Dê um nome claro (ex: Monitoramento de Vacinas).</li>
+                <li><strong>Descrição:</strong> Adicione detalhes sobre o propósito deste grupo.</li>
+                <li><strong>Seleção de Itens:</strong> Busque e adicione os Programas e DataSets que pertencem a este contexto.</li>
+            </ul>
+            <p>
+                Uma vez salvo, o grupo estará disponível para ser utilizado como filtro global em toda a aplicação.
+            </p>
+
+            <h2>Rastreamento de Dependências</h2>
+            <p>
+                Uma das funcionalidades mais poderosas do Audit Vision é o rastreamento automático de dependências. Quando você monitora um Programa dentro de um grupo, o sistema não apenas audita as mudanças no próprio Programa, mas também em todos os seus componentes dependentes.
+            </p>
+            <p>O rastreamento de dependências inclui:</p>
+            <ul>
+                <li><strong>Para Programas:</strong> DataElements, Attributes, ProgramRules, ProgramIndicators, e ProgramStages.</li>
+                <li><strong>Para DataSets:</strong> DataElements associados, CategoryCombos, e Custom Forms.</li>
+            </ul>
+            <p>
+                No <em>Change Explorer</em>, as alterações em dependências aparecem agrupadas sob a alteração do objeto principal, permitindo uma visão hierárquica e limpa. Basta clicar na seta para expandir as alterações dependentes.
+            </p>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mt-8">
+                <h3 class="text-lg font-bold text-blue-900 mb-2 mt-0">Dica de Ouro</h3>
+                <p class="text-blue-800 mb-0">
+                    Crie grupos baseados nas responsabilidades da sua equipe. Se um time é responsável apenas por dados de Maternidade, crie um grupo contendo apenas os metadados relevantes para eles. Isso reduz o "ruído" e foca a auditoria no que realmente importa.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-12 border-t border-slate-200 bg-white">
+        <p class="text-slate-400 text-sm">&copy; 2026 DHIS2 Audit Vision. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>

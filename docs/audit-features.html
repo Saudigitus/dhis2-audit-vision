@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DHIS2 Audit Vision - Change Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-white text-slate-900 leading-relaxed">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 group-hover:-translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span class="font-bold text-lg tracking-tight">Voltar para Central</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-16">
+        <article class="prose prose-slate lg:prose-lg max-w-none">
+            <header class="mb-12">
+                <div class="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full uppercase tracking-widest mb-4">Categoria: Change Explorer</div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6">Change Explorer: O Rastreador de Mudanças</h1>
+                <p class="text-xl text-slate-600 leading-relaxed">Entenda como o DHIS2 Audit Vision rastreia cada modificação nos seus metadados, oferecendo uma visão clara de "antes e depois" para cada objeto.</p>
+            </header>
+
+            <section class="space-y-12">
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-slate-900 border-b pb-4">O Change Explorer</h2>
+                    <p>O Change Explorer é o coração da nossa ferramenta. Ele permite que você navegue por uma lista cronológica de todas as ações (CREATE, UPDATE, DELETE) realizadas no sistema.</p>
+                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-200">
+                        <h4 class="font-bold mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Visualização em Diff
+                        </h4>
+                        <p class="text-sm text-slate-600 mb-4">Quando você clica no ícone de visualização em uma mudança de UPDATE, o Audit Vision abre um painel lateral mostrando exatamente quais campos foram alterados:</p>
+                        <ul class="list-disc pl-6 text-sm text-slate-600 space-y-2">
+                            <li><strong class="text-slate-900">Campo Alterado:</strong> O nome do atributo (ex: `name`, `shortName`, `categoryCombo`).</li>
+                            <li><strong class="text-red-600">Antes:</strong> O valor anterior ao salvamento.</li>
+                            <li><strong class="text-emerald-600">Depois:</strong> O novo valor que está agora no sistema.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-slate-900 border-b pb-4">Auditoria de Usuários</h2>
+                    <p>Além dos metadados, auditamos quem está fazendo o quê. Na página de <strong>User Audit</strong>, você pode filtrar por um usuário específico para ver todo o seu histórico de ações.</p>
+                    <div class="p-6 bg-blue-50 rounded-2xl border border-blue-200">
+                        <p class="text-blue-900 font-medium">Isso é vital para depurar alterações acidentais ou investigar possíveis acessos não autorizados.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-slate-900 border-b pb-4">Sistema de Filtros Inteligentes</h2>
+                    <p>Você pode refinar sua busca usando nossos filtros globais:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                            <h5 class="font-bold mb-2">Por Tipo</h5>
+                            <p class="text-xs text-slate-500 italic">Ex: Filtrar apenas por Data Elements ou Programas.</p>
+                        </div>
+                        <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                            <h5 class="font-bold mb-2">Por Período</h5>
+                            <p class="text-xs text-slate-500 italic">Ex: Ver mudanças ocorridas apenas nas últimas 24 horas.</p>
+                        </div>
+                        <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                            <h5 class="font-bold mb-2">Por Risco</h5>
+                            <p class="text-xs text-slate-500 italic">Ex: Filtrar apenas por ações de DELETE (Alta Prioridade).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-900 text-white p-10 rounded-[2rem] relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-bold mb-4">Exportação de Relatórios</h3>
+                        <p class="text-indigo-100 mb-6 max-w-lg">Precisa apresentar os resultados para uma auditoria externa? Você pode exportar qualquer visualização em formato PDF ou CSV com apenas um clique.</p>
+                        <button class="bg-white text-indigo-900 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">Experimentar Agora</button>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-48 w-48 absolute -right-12 -bottom-12 text-white/10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                </div>
+
+                <div class="pt-12 flex justify-between items-center border-t">
+                    <div class="text-sm text-slate-500 italic">Última atualização: 11 de Abril de 2026</div>
+                </div>
+            </section>
+        </article>
+    </main>
+
+    <footer class="bg-slate-50 py-16 mt-20 border-t border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="flex justify-center gap-4">
+                <a href="getting-started.html" class="bg-white border border-slate-200 px-8 py-3 rounded-xl font-bold hover:bg-slate-50 transition">Voltar: Início</a>
+                <a href="security-audit.html" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">Próximo: Segurança</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
