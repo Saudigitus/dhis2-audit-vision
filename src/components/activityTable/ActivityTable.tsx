@@ -7,17 +7,20 @@ const statusStyles = {
     failed: { bg: 'bg-[#fef2f2]', text: 'text-[#dc2626]', border: 'border-[#fecaca]', icon: <XCircle size={16} /> },
 };
 
-export default function ActivityTable({ auditChecks }: { auditChecks: ActivityTableCheck[] }) {
+export default function ActivityTable(props: ActivityTableCheck) {
+    const { action, items, title } = props
 
     return (
 
         <div className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#e2e8f0] flex items-center justify-between">
-                <h3 className="font-bold text-[15px] text-[#0f172a]">System Audit Checklist</h3>
-                <button className="text-sm font-semibold text-[#3b82f6] hover:underline cursor-pointer">Run New Audit</button>
-            </div>
+            {
+                (title || action) && <div className="px-6 py-4 border-b border-[#e2e8f0] flex items-center justify-between">
+                    <h3 className="font-bold text-[15px] text-[#0f172a]">{title}</h3>
+                    {action && <button onClick={() => action.onClick()} className="text-sm font-semibold text-[#3b82f6] hover:underline cursor-pointer">{action.label}</button>}
+                </div>
+            }
             <div className="divide-y divide-[#f1f5f9]">
-                {auditChecks.map((check) => {
+                {items.map((check) => {
                     const style = statusStyles[check.status as keyof typeof statusStyles];
                     return <div key={check.id} className="p-6 hover:bg-[#f8fafc] transition-colors">
                         <div className="flex items-start justify-between">
