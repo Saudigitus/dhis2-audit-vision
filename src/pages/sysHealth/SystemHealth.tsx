@@ -1,11 +1,13 @@
-import ActivityTable from '../components/activityTable/ActivityTable';
+import useGetSysInfo from '../../hooks/sysInfo/useGetSysInfo';
+import ActivityTable from '../../components/activityTable/ActivityTable';
 import { Activity, Server, Database, Globe } from 'lucide-react';
+import { CircularLoader } from '@dhis2/ui';
 
-const systemStatus = [
-  { label: 'DHIS2 Version', value: '2.40.1', status: 'success', icon: <Server size={18} /> },
-  { label: 'Database Type', value: 'PostgreSQL 15.3', status: 'success', icon: <Database size={18} /> },
-  { label: 'Web Server', value: 'Tomcat 9.0.75', status: 'success', icon: <Globe size={18} /> },
-  { label: 'Uptime', value: '14 days, 6 hours', status: 'success', icon: <Activity size={18} /> },
+const systemStatus = (sysInfo: any) => [
+  { label: 'DHIS2 Version', value: sysInfo?.version, status: 'success', icon: <Server size={18} /> },
+  { label: 'Database Type', value: sysInfo?.databaseInfo?.databaseVersion, status: 'success', icon: <Database size={18} /> },
+  { label: 'Web Server', value: '--', status: 'success', icon: <Globe size={18} /> },
+  { label: 'Uptime', value: '--', status: 'success', icon: <Activity size={18} /> },
 ];
 
 const auditChecks = [
@@ -17,11 +19,15 @@ const auditChecks = [
 ];
 
 export default function SystemHealth() {
+  const { loading: loadingSysInfo, sysInfo } = useGetSysInfo()
+
+  console.log(sysInfo)
+
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
       <div className="grid grid-cols-4 gap-5">
-        {systemStatus.map((s, i) => (
+        {systemStatus(sysInfo).map((s, i) => (
           <div key={i} className="bg-white rounded-xl border border-[#e2e8f0] p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 rounded-lg bg-[#f1f5f9] flex items-center justify-center text-[#64748b]">
@@ -29,7 +35,7 @@ export default function SystemHealth() {
               </div>
               <span className="text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">{s.label}</span>
             </div>
-            <div className="text-xl font-bold text-[#0f172a]">{s.value}</div>
+            <div className="text-xl font-bold text-[#0f172a]">{loadingSysInfo ? <CircularLoader small /> : s.value}</div>
           </div>
         ))}
       </div>
