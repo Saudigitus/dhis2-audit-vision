@@ -1,4 +1,4 @@
-import { ActivityTableCheck } from "@/types/activity table/activityTable";
+import { ActivityTableCheck } from "../../types/activity table/activityTable";
 import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 
 const statusStyles = {
