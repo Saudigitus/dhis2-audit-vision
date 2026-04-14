@@ -1,3 +1,4 @@
+import CardContainer from '../components/card/CardContainer';
 import { TrendingUp, AlertTriangle, Eye, ShieldCheck, Activity } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -57,21 +58,32 @@ export default function Dashboard() {
       {/* Stat Cards */}
       <div className="grid grid-cols-4 gap-5">
         {stats.map((s, i) => (
-          <div
-            key={i}
-            className={`rounded-xl border p-5 flex items-start justify-between ${
-              s.cardBg || 'bg-white border-[#e2e8f0]'
-            }`}
-          >
-            <div>
-              <div className="text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">{s.label}</div>
-              <div className="text-3xl font-bold text-[#0f172a] mt-1">{s.value}</div>
-              {s.change && <div className={`text-xs mt-1 ${s.changeColor}`}>{s.change}</div>}
-            </div>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${s.iconBg}`}>
-              {s.icon}
-            </div>
-          </div>
+          <>
+            <CardContainer
+              key={i}
+              icon={s.icon}
+              variant='dashboard-card'
+              indicator={s.change}
+              label={s.label}
+              value={s.value}
+              iconBgColor={s.iconBg}
+              indicatorColor={s.changeColor}
+            />
+            {/* <div
+              key={i}
+              className={`rounded-xl border p-5 flex items-start justify-between ${s.cardBg || 'bg-white border-[#e2e8f0]'
+                }`}
+            >
+              <div>
+                <div className="text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">{s.label}</div>
+                <div className="text-3xl font-bold text-[#0f172a] mt-1">{s.value}</div>
+                {s.change && <div className={`text-xs mt-1 ${s.changeColor}`}>{s.change}</div>}
+              </div>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${s.iconBg}`}>
+                {s.icon}
+              </div>
+            </div> */}
+          </>
         ))}
       </div>
 
