@@ -17,10 +17,6 @@
 
     /* Path mapping */
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
