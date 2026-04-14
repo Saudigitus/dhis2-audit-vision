@@ -90,31 +90,6 @@ export default function SystemHealth() {
           </tbody>
         </table>
       </div>
-
-      {/* Security Score */}
-      <div className="grid grid-cols-3 gap-5">
-        <div className="col-span-1 bg-white rounded-xl border border-[#e2e8f0] p-6 flex flex-col items-center justify-center text-center">
-          <h3 className="font-bold text-[15px] text-[#0f172a] mb-4 w-full text-left">Security Score</h3>
-          <div className="relative w-32 h-32 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle cx="64" cy="64" r="58" stroke="#f1f5f9" strokeWidth="8" fill="transparent" />
-              <circle cx="64" cy="64" r="58" stroke="#3b82f6" strokeWidth="8" fill="transparent" strokeDasharray="364.4" strokeDashoffset="36.4" strokeLinecap="round" />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-bold text-[#0f172a]">90%</span>
-              <span className="text-[10px] font-bold text-[#64748b] uppercase">Healthy</span>
-            </div>
-          </div>
-          <p className="text-xs text-[#64748b] mt-4">Your instance is 15% more secure than the global average.</p>
-        </div>
-
-        <div className="col-span-2 bg-white rounded-xl border border-[#e2e8f0] p-6">
-          <h3 className="font-bold text-[15px] text-[#0f172a] mb-4">Instance Health Trends</h3>
-          <div className="h-[180px] w-full bg-[#f8fafc] rounded-lg border border-dashed border-[#e2e8f0] flex items-center justify-center">
-            <span className="text-sm text-[#94a3b8]">Health metrics chart will be displayed here</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

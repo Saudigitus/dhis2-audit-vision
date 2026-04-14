@@ -30,11 +30,11 @@ export default function RouteList() {
             layout: SideBarLayout,
             component: () => <ChangeExplorer />
         },
-        {
-            path: "/system-health",
-            layout: SideBarLayout,
-            component: () => <SystemHealth />
-        },
+        // {
+        //     path: "/system-health",
+        //     layout: SideBarLayout,
+        //     component: () => <SystemHealth />
+        // },
         {
             path: "/security-audit",
             layout: SideBarLayout,
