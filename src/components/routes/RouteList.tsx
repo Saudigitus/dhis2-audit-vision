@@ -2,7 +2,6 @@ import Dashboard from "../../pages/Dashboard";
 import { SideBarLayout, SimpleLayout } from "../../layout";
 import { Navigate } from "react-router-dom";
 import ChangeExplorer from "../../pages/ChangeExplorer";
-import SystemHealth from "../../pages/SystemHealth";
 import SecurityAudit from "../../pages/SecurityAudit";
 import Documentation from "../../pages/Documentation";
 import Alerts from "../../pages/Alerts";
@@ -11,6 +10,7 @@ import UsersPage from "../../pages/Users";
 import NotificationsPage from "../../pages/Notifications";
 import ProfilePage from "../../pages/Profile";
 import SettingsPage from "../../pages/Settings";
+import SystemHealth from "../../pages/sysHealth/SystemHealth";
 
 export default function RouteList() {
 
