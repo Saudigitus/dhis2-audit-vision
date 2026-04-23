@@ -1,5 +1,5 @@
 import { ShieldCheck, Key, AlertCircle, FileText, Lock } from 'lucide-react';
-import SharingAuditTable from '../components/SharingAuditTable';
+import AuditTable from '../components/AuditTable';
 
 const accessLogs = [
   { time: '2026-04-11 11:20', user: 'admin', object: 'Organisation Unit Level 1', action: 'Update Sharing', risk: 'high' },
@@ -53,13 +53,62 @@ export default function SecurityAudit() {
       </div>
 
       {/* Sharing Settings Audit */}
-      <SharingAuditTable
+      <AuditTable
         title="Metadata Sharing Audit"
         data={sharingAudit}
-        onExportReport={() => console.log('Export Report clicked')}
-        onScanPermissions={() => console.log('Scan Permissions clicked')}
-        showExportButton
-        showScanButton
+        actions={
+          <>
+            <button
+              onClick={() => console.log('Export Report clicked')}
+              className="px-3 py-1.5 text-xs font-bold bg-[#f1f5f9] text-[#475569] rounded-lg hover:bg-[#e2e8f0] cursor-pointer"
+            >
+              Export Report
+            </button>
+            <button
+              onClick={() => console.log('Scan Permissions clicked')}
+              className="px-3 py-1.5 text-xs font-bold bg-[#3b82f6] text-white rounded-lg hover:bg-[#2563eb] cursor-pointer"
+            >
+              Scan Permissions
+            </button>
+          </>
+        }
+        columns={[
+          {
+            header: 'Object Name',
+            render: (row) => <span className="text-sm font-semibold text-[#0f172a]">{row.name}</span>,
+          },
+          {
+            header: 'Type',
+            render: (row) => <span className="text-sm text-[#64748b]">{row.type}</span>,
+          },
+          {
+            header: 'Public Access',
+            render: (row) => (
+              <span
+                className={`text-xs font-bold px-2 py-0.5 rounded ${
+                  row.publicAccess === 'None'
+                    ? 'bg-[#f1f5f9] text-[#64748b]'
+                    : 'bg-[#fff7ed] text-[#ea580c] border border-[#fdba74]'
+                }`}
+              >
+                {row.publicAccess}
+              </span>
+            ),
+          },
+          {
+            header: 'Users / Groups',
+            render: (row) => (
+              <span className="text-sm text-[#64748b]">
+                <span className="font-bold text-[#0f172a]">{row.users}</span> users,{' '}
+                <span className="font-bold text-[#0f172a]">{row.groups}</span> groups
+              </span>
+            ),
+          },
+          {
+            header: '',
+            render: () => <AlertCircle size={16} className="text-[#94a3b8] hover:text-[#64748b] cursor-pointer" />,
+          },
+        ]}
       />
 
       {/* Access Logs Audit */}

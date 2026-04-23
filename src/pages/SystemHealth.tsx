@@ -1,4 +1,5 @@
 import ActivityTable from '../components/activityTable/ActivityTable';
+import AuditTable from '../components/AuditTable';
 import { Activity, Server, Database, Globe } from 'lucide-react';
 
 const systemStatus = [
@@ -15,6 +16,17 @@ const auditChecks = [
   { id: 4, category: 'Performance', check: 'Slow queries audit', status: 'failed', description: '5 queries exceeded the 2s threshold in the last 24h.' },
   { id: 5, category: 'Modules', check: 'Legacy modules check', status: 'warning', description: '2 legacy modules are still enabled but unused.' },
 ];
+
+const datasetCompleteness = [
+  { datasetName: 'ANC Monthly Report', period: 'March 2026', expected: 450, actual: 412, completeness: 91.5 },
+  { datasetName: 'Immunization Daily Log', period: 'April 2026', expected: 1200, actual: 850, completeness: 70.8 },
+];
+
+const getProgressColor = (completeness: number) => {
+  if (completeness >= 90) return 'bg-[#3b82f6] text-[#3b82f6]';
+  if (completeness >= 75) return 'bg-[#f59e0b] text-[#f59e0b]';
+  return 'bg-[#ef4444] text-[#ef4444]';
+};
 
 export default function SystemHealth() {
   return (
@@ -38,52 +50,47 @@ export default function SystemHealth() {
       <ActivityTable auditChecks={auditChecks} />
 
       {/* Dataset Completeness Audit */}
-      <div className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#e2e8f0]">
-          <h3 className="font-bold text-[15px] text-[#0f172a]">Dataset Completeness Audit</h3>
-        </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-              <th className="text-left px-6 py-3 font-semibold text-[#64748b] uppercase tracking-wider text-[11px]">Dataset Name</th>
-              <th className="text-left px-6 py-3 font-semibold text-[#64748b] uppercase tracking-wider text-[11px]">Period</th>
-              <th className="text-left px-6 py-3 font-semibold text-[#64748b] uppercase tracking-wider text-[11px]">Expected</th>
-              <th className="text-left px-6 py-3 font-semibold text-[#64748b] uppercase tracking-wider text-[11px]">Actual</th>
-              <th className="text-left px-6 py-3 font-semibold text-[#64748b] uppercase tracking-wider text-[11px]">Completeness</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#f1f5f9]">
-            <tr>
-              <td className="px-6 py-4 font-medium text-[#0f172a]">ANC Monthly Report</td>
-              <td className="px-6 py-4 text-[#64748b]">March 2026</td>
-              <td className="px-6 py-4 text-[#64748b]">450</td>
-              <td className="px-6 py-4 text-[#64748b]">412</td>
-              <td className="px-6 py-4">
+      <AuditTable
+        title="Dataset Completeness Audit"
+        data={datasetCompleteness}
+        columns={[
+          {
+            header: 'Dataset Name',
+            render: (row) => <span className="font-medium text-[#0f172a]">{row.datasetName}</span>,
+            cellClassName: 'px-6 py-4',
+          },
+          {
+            header: 'Period',
+            render: (row) => <span className="text-[#64748b]">{row.period}</span>,
+            cellClassName: 'px-6 py-4',
+          },
+          {
+            header: 'Expected',
+            render: (row) => <span className="text-[#64748b]">{row.expected}</span>,
+            cellClassName: 'px-6 py-4',
+          },
+          {
+            header: 'Actual',
+            render: (row) => <span className="text-[#64748b]">{row.actual}</span>,
+            cellClassName: 'px-6 py-4',
+          },
+          {
+            header: 'Completeness',
+            render: (row) => {
+              const progressColor = getProgressColor(row.completeness);
+              return (
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-2 bg-[#f1f5f9] rounded-full max-w-[100px]">
-                    <div className="h-full bg-[#3b82f6] rounded-full" style={{ width: '91.5%' }} />
+                    <div className={`h-full rounded-full ${progressColor}`} style={{ width: `${row.completeness}%` }} />
                   </div>
-                  <span className="font-bold text-[#3b82f6]">91.5%</span>
+                  <span className={`font-bold ${progressColor}`}>{row.completeness}%</span>
                 </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 font-medium text-[#0f172a]">Immunization Daily Log</td>
-              <td className="px-6 py-4 text-[#64748b]">April 2026</td>
-              <td className="px-6 py-4 text-[#64748b]">1200</td>
-              <td className="px-6 py-4 text-[#64748b]">850</td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-2 bg-[#f1f5f9] rounded-full max-w-[100px]">
-                    <div className="h-full bg-[#f59e0b] rounded-full" style={{ width: '70.8%' }} />
-                  </div>
-                  <span className="font-bold text-[#f59e0b]">70.8%</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              );
+            },
+            cellClassName: 'px-6 py-4',
+          },
+        ]}
+      />
 
       {/* Security Score */}
       <div className="grid grid-cols-3 gap-5">

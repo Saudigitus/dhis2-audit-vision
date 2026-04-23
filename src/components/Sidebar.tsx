@@ -11,11 +11,11 @@ export default function Sidebar({ navItems }: SidebarProps) {
 
   return (
     <aside className="w-60 bg-[#0f172a] text-white flex flex-col shrink-0">
-      <div className="flex items-center gap-3 px-5 py-5">
+      {/* <div className="flex items-center gap-3 px-5 py-5">
         <div>
           <div className="text-white font-semibold text-[15px] leading-tight">DHIS2 Audit Vision</div>
         </div>
-      </div>
+      </div> */}
 
       {/* Navigation */}
       <nav className="flex-1 mt-2 px-3 space-y-1 overflow-y-auto custom-scrollbar">
@@ -38,12 +38,12 @@ export default function Sidebar({ navItems }: SidebarProps) {
       </nav>
 
       {/* Connect Button */}
-      <div className="px-3 py-4 border-t border-[#1e293b]">
+      {/* <div className="px-3 py-4 border-t border-[#1e293b]">
         <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#3b82f6] text-white rounded-xl text-sm font-bold hover:bg-[#2563eb] transition-all cursor-pointer shadow-lg shadow-[#3b82f6]/20">
           <Activity size={16} />
           Connect Instance
         </button>
-      </div>
+      </div> */}
 
       {/* Collapse button */}
       <div className="px-3 py-4">

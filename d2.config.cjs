@@ -1,7 +1,7 @@
 const config = {
     type: 'app',
-    name: 'EMUSA Payment',
-    description: "EMUSA Payment",
+    name: 'DHIS2 Audit Vision',
+    description: "DHIS2 Audit Vision",
     entryPoints: {
         app: './src/app/App.tsx',
     },
