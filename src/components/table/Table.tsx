@@ -15,7 +15,9 @@ interface TableProps {
         total: number
         page: number
         pageSize: number
-        totalPages: number
+        pageCount: number,
+        setPage: (page: number) => void
+        setPageSize: (pageSize: number) => void
     }
     onRowClick?: (data: Record<string, any>) => void
 }
