@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search, SlidersHorizontal, RotateCcw, Eye, X, User, Calendar, FileText, History, ChevronRight, Layers, ChevronDown, ChevronUp, ChevronLeft } from 'lucide-react';
+import Table from '../components/table/Table';
 
 const allChanges = [
   {
@@ -67,9 +68,40 @@ const changeHistory = [
   { action: 'UPDATE', user: 'admin', date: '2026-04-08 10:05', fields: 2, desc: '' },
 ];
 
+const columns = [
+  {
+    id: "collapse",
+    displayName: "",
+  },
+  {
+    id: "time",
+    displayName: "Timestamp",
+  },
+  {
+    id: "user",
+    displayName: "User",
+  },
+  {
+    id: "type",
+    displayName: "Type",
+  },
+  {
+    id: "object",
+    displayName: "Object Name",
+  },
+  {
+    id: "action",
+    displayName: "Action",
+  },
+  {
+    id: "view",
+    displayName: "",
+  }
+];
+
 export default function ChangeExplorer() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [selectedChange, setSelectedChange] = useState<typeof allChanges[0] | any | null>(null);
   const [parentChange, setParentChange] = useState<typeof allChanges[0] | any | null>(null);
   const [detailTab, setDetailTab] = useState<'diff' | 'dependencies' | 'raw'>('diff');
@@ -231,106 +263,12 @@ export default function ChangeExplorer() {
         )}
 
         {/* Results Table */}
-        <div className="flex-1 bg-white rounded-xl border border-[#e2e8f0]">
-          <div className="px-6 py-3 flex items-center justify-between border-b border-[#e2e8f0]">
-            <span className="text-sm text-[#64748b]">50 results</span>
-            <span className="text-xs font-medium text-[#0f172a] border border-[#e2e8f0] rounded px-2.5 py-1">Metadata</span>
-          </div>
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[#e2e8f0]">
-                <th className="w-10"></th>
-                <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Timestamp</th>
-                <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">User</th>
-                <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Type</th>
-                <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Object Name</th>
-                <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Action</th>
-                <th className="w-12"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {allChanges.map((row) => (
-                <React.Fragment key={row.id}>
-                  <tr className={`border-b border-[#f1f5f9] hover:bg-[#f8fafc] ${expandedRows.has(row.id) ? 'bg-[#f8fafc]' : ''}`}>
-                    <td className="px-4 py-3.5 text-center">
-                      {row.dependencies && row.dependencies.length > 0 ? (
-                        <button onClick={() => toggleRow(row.id)} className="text-[#64748b] hover:text-[#0f172a] cursor-pointer">
-                          {expandedRows.has(row.id) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                        </button>
-                      ) : null}
-                    </td>
-                    <td className="px-6 py-3.5 text-sm text-[#64748b]">{row.time}</td>
-                    <td className="px-6 py-3.5 text-sm font-semibold text-[#0f172a]">{row.user}</td>
-                    <td className="px-6 py-3.5">
-                      <span className="text-sm font-mono bg-[#f1f5f9] px-2 py-0.5 rounded text-[#475569]">{row.type}</span>
-                    </td>
-                    <td className="px-6 py-3.5">
-                      <div className="flex flex-col items-start">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-[#0f172a]">{row.object}</span>
-                          {row.dependencies && row.dependencies.length > 0 && (
-                            <span className="text-[10px] font-bold bg-[#f1f5f9] text-[#64748b] px-2 py-0.5 rounded-full">
-                              {row.dependencies.length} dependências
-                            </span>
-                          )}
-                        </div>
-                        {row.group && (
-                          <span className="text-[10px] text-[#64748b] flex items-center gap-1 mt-1 bg-[#f8fafc] border border-[#e2e8f0] px-1.5 py-0.5 rounded w-fit">
-                            <Layers size={10} className="text-[#3b82f6]" /> Grupo: {row.group}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-3.5">
-                      <span className={`text-xs font-bold px-3 py-1 rounded ${actionColors[row.action]}`}>
-                        {row.action}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <button onClick={() => { setSelectedChange(row); setDetailTab('diff'); }} className="cursor-pointer">
-                        <Eye size={16} className="text-[#94a3b8] hover:text-[#64748b]" />
-                      </button>
-                    </td>
-                  </tr>
-
-                  {/* Dependent Rows */}
-                  {expandedRows.has(row.id) && row.dependencies && row.dependencies.map((dep: any, index: number) => (
-                    <tr key={dep.id} className="border-b border-[#e2e8f0] bg-[#fafafa]">
-                      <td className="px-4 py-3.5"></td>
-                      <td className="px-6 py-3.5 text-sm text-[#64748b] pl-10 relative">
-                        {/* Vertical line connecting to parent */}
-                        <div className={`absolute left-6 top-0 w-px bg-[#cbd5e1] ${index === row.dependencies.length - 1 ? 'bottom-1/2' : 'bottom-0'}`}></div>
-                        {/* Horizontal branch */}
-                        <div className="absolute left-6 top-1/2 w-3 h-px bg-[#cbd5e1]"></div>
-                        {dep.time}
-                      </td>
-                      <td className="px-6 py-3.5 text-sm font-semibold text-[#0f172a]">{dep.user}</td>
-                      <td className="px-6 py-3.5">
-                        <span className="text-xs font-mono bg-[#e2e8f0] px-2 py-0.5 rounded text-[#475569]">{dep.type}</span>
-                      </td>
-                      <td className="px-6 py-3.5 text-sm text-[#0f172a]">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] uppercase font-bold text-[#94a3b8] border border-[#cbd5e1] px-1 rounded">Dep</span>
-                          {dep.object}
-                        </div>
-                      </td>
-                      <td className="px-6 py-3.5">
-                        <span className={`text-[10px] font-bold px-2 py-1 rounded ${actionColors[dep.action]}`}>
-                          {dep.action}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <button onClick={() => { setSelectedChange(dep); setDetailTab('diff'); }} className="cursor-pointer">
-                          <Eye size={16} className="text-[#94a3b8] hover:text-[#64748b]" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          pagination={{ total: 430, page: 2, pageSize: 50, totalPages: 10 }}
+          setDetailTab={setDetailTab}
+          setSelectedChange={setSelectedChange}
+          header={columns}
+          tabledata={allChanges} />
       </div>
 
       {/* Change Detail Slide-out Panel */}
