@@ -1,7 +1,7 @@
 import Dashboard from "../../pages/Dashboard";
 import { SideBarLayout, SimpleLayout } from "../../layout";
 import { Navigate } from "react-router-dom";
-import ChangeExplorer from "../../pages/ChangeExplorer";
+import ChangeExplorer from "../../pages/changeExplorer/ChangeExplorer";
 import SecurityAudit from "../../pages/SecurityAudit";
 import Documentation from "../../pages/Documentation";
 import Alerts from "../../pages/Alerts";

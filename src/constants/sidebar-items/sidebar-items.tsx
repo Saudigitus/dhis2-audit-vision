@@ -12,7 +12,7 @@ const navItems: { id: string; label: string; icon: React.ReactNode; path: string
   // { id: 'alerts', label: 'Alerts', icon: <Bell size={20} />, path: '/alerts' },
   // { id: 'trends', label: 'Trends', icon: <TrendingUp size={20} />, path: '/trends' },
   // { id: 'users', label: 'Users', icon: <Users size={20} />, path: '/users' },
-  { id: 'user-audit', label: 'User Audit', icon: <Shield size={20} />, path: '/users' },
+  { id: 'users', label: 'User Audit', icon: <Shield size={20} />, path: '/users' },
   { id: 'notifications', label: 'Notifications', icon: <MessageSquare size={20} />, path: '/notifications' },
   // { id: 'profile', label: 'Profile', icon: <UserCircle size={20} />, path: '/profile' },
   { id: 'settings', label: 'Settings', icon: <Settings size={20} />, path: '/settings' },
