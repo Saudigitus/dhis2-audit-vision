@@ -87,7 +87,7 @@ const columns = [
 
 export default function ChangeExplorer() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [selectedChange, setSelectedChange] = useState<any | null>(null);
   const [parentChange, setParentChange] = useState<any | null>(null);
   const [page, setPage] = useState<number>(1)
@@ -162,8 +162,6 @@ export default function ChangeExplorer() {
       <CircularLoader />
     </Center>
   }
-
-  console.log(data, "dssd")
 
   return (
     <div className="space-y-5 relative">
