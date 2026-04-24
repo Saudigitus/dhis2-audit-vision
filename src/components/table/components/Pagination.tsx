@@ -6,18 +6,32 @@ interface PaginationProps {
     total: number
     page: number
     pageSize: number
-    totalPages: number
+    pageCount: number
+    setPage: (page: number) => void
+    setPageSize: (pageSize: number) => void
   }
 }
 
 const Pagination: FC<PaginationProps> = ({ pagination }) => {
-  // const { page, pageSize, total, totalPages } = pagination
+  const { page, pageSize, total, pageCount, setPage, setPageSize } = pagination
+
+  const handlePageChange = (e: any) => {
+    setPage(e)
+  }
+
+  const handlePageChangeSize = (e: any) => {
+    setPage(1)
+    setPageSize(e)
+  }
+
   return (
     <Dhis2Pagination
-      page={pagination.page}
-      pageCount={pagination.totalPages}
-      pageSize={pagination.pageSize}
-      total={pagination.total}
+      onPageSizeChange={handlePageChangeSize}
+      onPageChange={handlePageChange}
+      page={page}
+      pageCount={pageCount}
+      pageSize={pageSize}
+      total={total}
     />
   )
 }
