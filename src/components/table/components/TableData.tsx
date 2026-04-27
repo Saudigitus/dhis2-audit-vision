@@ -30,13 +30,17 @@ const TableData = (props: TableDataProps) => {
             {data.map((row: any) => (
                 <>
                     <tr>
-                        <td className="px-4 py-3.5 text-center">
-                            {row.dependencies && row.dependencies.length > 0 ? (
-                                <button onClick={() => toggleRow(row.id)} className="text-[#64748b] hover:text-[#0f172a] cursor-pointer">
-                                    {expandedRows.has(row.id) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                </button>
-                            ) : null}
-                        </td>
+                        {
+                            row.dependencies && row.dependencies.length > 0 ?
+                                <td className="px-4 py-3.5 text-center">
+                                    {row.dependencies && row.dependencies.length > 0 ? (
+                                        <button onClick={() => toggleRow(row.id)} className="text-[#64748b] hover:text-[#0f172a] cursor-pointer">
+                                            {expandedRows.has(row.id) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                        </button>
+                                    ) : null}
+                                </td> : null
+                        }
+
                         {header.map((column: any) => {
                             if (column.id === 'collapse' || column.id === 'view') {
                                 return null

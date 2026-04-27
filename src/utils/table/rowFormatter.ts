@@ -1,6 +1,6 @@
 import { DataProps } from "../../hooks/audit/useGetudit";
 
-function rowsFormater(data: DataProps[]) {
+function rowsFormatter(data: DataProps[]) {
     const formattedData = data.map((item) => ({
         id: item.uid,
         action: item.auditType,
@@ -11,4 +11,4 @@ function rowsFormater(data: DataProps[]) {
     }))
     return formattedData
 }
-export { rowsFormater }
+export { rowsFormatter }
