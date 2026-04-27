@@ -11,6 +11,7 @@ import NotificationsPage from "../../pages/Notifications";
 import ProfilePage from "../../pages/Profile";
 import SettingsPage from "../../pages/Settings";
 import SystemHealth from "../../pages/sysHealth/SystemHealth";
+import MonitoringGroups from "../../pages/metadataGrouping/MonitoringGroups";
 
 export default function RouteList() {
 
@@ -30,11 +31,11 @@ export default function RouteList() {
             layout: SideBarLayout,
             component: () => <ChangeExplorer />
         },
-        // {
-        //     path: "/system-health",
-        //     layout: SideBarLayout,
-        //     component: () => <SystemHealth />
-        // },
+        {
+            path: "/metadata-grouping",
+            layout: SideBarLayout,
+            component: () => <MonitoringGroups />
+        },
         {
             path: "/security-audit",
             layout: SideBarLayout,
@@ -50,7 +51,7 @@ export default function RouteList() {
             layout: SideBarLayout,
             component: () => <Alerts />
         },
-                {
+        {
             path: "/trends",
             layout: SideBarLayout,
             component: () => <Trends />

@@ -1,10 +1,12 @@
 import {
   LayoutDashboard, Search, Bell, TrendingUp, Users, Settings, Shield, MessageSquare, UserCircle, Activity, Lock, BookOpen, Layers,
+  Group,
 } from 'lucide-react';
 
 const navItems: { id: string; label: string; icon: React.ReactNode; path: string }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
   { id: 'change-explorer', label: 'Change Explorer', icon: <Search size={20} />, path: '/change-explorer' },
+  { id: 'metadata-grouping', label: 'Metadata Grouping', icon: <Group size={20} />, path: '/metadata-grouping' },
   // { id: 'monitoring-groups', label: 'Monitoring Groups', icon: <Layers size={20} />, path: '/monitoring-groups' },
   // { id: 'system-health', label: 'System Health', icon: <Activity size={20} />, path: '/system-health' },
   // { id: 'security-audit', label: 'Security Audit', icon: <Lock size={20} />, path: '/security-audit' },
