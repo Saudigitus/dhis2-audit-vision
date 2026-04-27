@@ -5,6 +5,8 @@ import TableHeader from "./components/TableHeader"
 import { SelectedAuditProps } from "../../pages/changeExplorer/ChangeExplorer"
 
 interface TableProps {
+    title?: string
+    description?: string
     header: Array<{
         id: string,
         displayName: string
@@ -24,14 +26,18 @@ interface TableProps {
 }
 
 const Table: FC<TableProps> = (props) => {
-    const { header, tabledata, setDetailTab, setSelectedChange, pagination } = props
+    const { header, tabledata, setDetailTab, setSelectedChange, pagination, title, description } = props
 
     return (
         <div className="flex-1 bg-white rounded-xl border border-[#e2e8f0]">
-            <div className="px-6 py-3 flex items-center justify-between border-b border-[#e2e8f0]">
-                <span className="text-sm text-[#64748b]">50 results</span>
-                <span className="text-xs font-medium text-[#0f172a] border border-[#e2e8f0] rounded px-2.5 py-1">Metadata</span>
+            <div className="px-6 py-4 flex items-center justify-between border-b border-[#e2e8f0]">
+                <div className="flex gap-2 items-center">
+                    <h3 className="font-bold text-[15px] text-[#0f172a]">{title}</h3>
+                    <span className="text-sm text-[#64748b]">{description}</span>
+                </div>
+                {/* <span className="text-xs font-medium text-[#0f172a] border border-[#e2e8f0] rounded px-2.5 py-1">Metadata</span> */}
             </div>
+
             <table className="w-full">
                 <TableHeader header={header} />
                 <TableData data={tabledata} header={header} setSelectedChange={setSelectedChange} setDetailTab={setDetailTab} />

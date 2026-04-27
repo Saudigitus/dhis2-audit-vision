@@ -11,6 +11,7 @@ import NotificationsPage from "../../pages/Notifications";
 import ProfilePage from "../../pages/Profile";
 import SettingsPage from "../../pages/Settings";
 import SystemHealth from "../../pages/sysHealth/SystemHealth";
+import MonitoringGroups from "../../pages/metadataGrouping/MonitoringGroups";
 import SeverityRules from "../../pages/SeverityRules";
 
 export default function RouteList() {
@@ -30,6 +31,11 @@ export default function RouteList() {
             path: "/change-explorer",
             layout: SideBarLayout,
             component: () => <ChangeExplorer />
+        },
+        {
+            path: "/metadata-grouping",
+            layout: SideBarLayout,
+            component: () => <MonitoringGroups />
         },
 
         // {

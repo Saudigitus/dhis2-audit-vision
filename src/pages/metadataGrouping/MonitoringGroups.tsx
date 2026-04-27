@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, FolderGit2, Layers, X, Check, Activity } from 'lucide-react';
+import MonitoringGroupsModal from '../../components/modal/MonitoringGroupModal';
+import { Plus, Search, Edit2, Trash2, FolderGit2, Layers, X, Check, Activity, Group } from 'lucide-react';
 
 interface GroupItem {
   id: string;
@@ -55,7 +56,7 @@ export default function MonitoringGroups() {
   const [groups, setGroups] = useState<ViewGroup[]>(initialGroups);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // Form state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [groupName, setGroupName] = useState('');
@@ -63,12 +64,12 @@ export default function MonitoringGroups() {
   const [selectedItems, setSelectedItems] = useState<GroupItem[]>([]);
   const [itemSearch, setItemSearch] = useState('');
 
-  const filteredGroups = groups.filter(g => 
-    g.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredGroups = groups.filter(g =>
+    g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     g.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredAvailableItems = availableItems.filter(item => 
+  const filteredAvailableItems = availableItems.filter(item =>
     item.name.toLowerCase().includes(itemSearch.toLowerCase()) &&
     !selectedItems.find(si => si.id === item.id)
   );
@@ -125,30 +126,29 @@ export default function MonitoringGroups() {
   return (
     <div className="space-y-6">
       {/* Header Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-[#0f172a]">Grupos de Visualização</h1>
-          <p className="text-sm text-[#64748b] mt-1">Agrupe Programas e DataSets para monitorar alterações de forma conjunta.</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Group size={20} className="text-[#3b82f6]" />
+            <span className="text-lg font-bold text-[#0f172a]">Metadata Grouping</span>
+          </div>
         </div>
-        <button
-          onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-[#3b82f6] text-white rounded-xl text-sm font-bold hover:bg-[#2563eb] transition-all cursor-pointer shadow-lg shadow-[#3b82f6]/20"
-        >
-          <Plus size={18} />
-          Novo Grupo
-        </button>
+        <div className="flex items-center gap-3">  </div>
       </div>
 
       {/* Search Bar */}
-      <div className="relative max-w-md">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
-        <input
-          type="text"
-          placeholder="Buscar grupos..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
-        />
+      <div className="flex items-center gap-3">
+        <div className="flex-1 relative">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
+          <input
+            type="text"
+            placeholder="Search by object name or user..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent"
+          />
+        </div>
+        <MonitoringGroupsModal />
       </div>
 
       {/* Groups Grid */}
@@ -166,8 +166,8 @@ export default function MonitoringGroups() {
                 </button>
               </div>
             </div>
-            <p className="text-sm text-[#64748b] mb-4 line-clamp-2 min-h-[40px]">{group.description}</p>
-            
+            <p className="text-sm text-[#64748b] mb-4 line-clamp-2 min-h-10">{group.description}</p>
+
             <div className="space-y-2 mb-4">
               <div className="flex items-center gap-2 text-sm text-[#475569]">
                 <FolderGit2 size={16} className="text-[#3b82f6]" />
@@ -178,7 +178,7 @@ export default function MonitoringGroups() {
                 <span className="font-medium">{group.items.filter(i => i.type === 'dataSet').length} DataSets</span>
               </div>
             </div>
-            
+
             <div className="pt-4 border-t border-[#e2e8f0] flex justify-between items-center text-xs text-[#94a3b8]">
               <span>Criado em {group.createdAt}</span>
               <button className="text-[#3b82f6] font-medium hover:underline cursor-pointer flex items-center gap-1">
@@ -199,7 +199,7 @@ export default function MonitoringGroups() {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto flex-1 flex flex-col md:flex-row gap-8">
               {/* Form Info */}
               <div className="flex-1 space-y-4">
@@ -261,8 +261,8 @@ export default function MonitoringGroups() {
                 </div>
                 <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar min-h-[300px]">
                   {filteredAvailableItems.map(item => (
-                    <div 
-                      key={item.id} 
+                    <div
+                      key={item.id}
                       onClick={() => toggleItemSelection(item)}
                       className="flex justify-between items-center p-3 border border-[#e2e8f0] rounded-lg cursor-pointer hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-colors"
                     >
@@ -284,13 +284,13 @@ export default function MonitoringGroups() {
             </div>
 
             <div className="p-6 border-t border-[#e2e8f0] flex justify-end gap-3 bg-[#f8fafc] rounded-b-2xl">
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="px-5 py-2.5 text-sm font-medium text-[#64748b] bg-white border border-[#e2e8f0] rounded-xl hover:bg-[#f1f5f9] transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
-              <button 
+              <button
                 onClick={handleSaveGroup}
                 disabled={!groupName.trim()}
                 className="px-5 py-2.5 text-sm font-bold text-white bg-[#3b82f6] rounded-xl hover:bg-[#2563eb] disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-2"
