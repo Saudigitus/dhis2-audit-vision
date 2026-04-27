@@ -1,9 +1,8 @@
 import axios from "axios"
 import { useState } from "react"
-import { rowsFormater } from "../../utils/table/rowFormater"
 
 export interface DataProps {
-    id: number
+    uid: number
     auditType: string
     createdBy: string
     updated_at: string

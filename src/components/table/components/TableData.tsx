@@ -2,11 +2,12 @@ import { ChevronDown, ChevronUp, Eye } from "lucide-react";
 import { useState } from "react";
 import { Column } from "./TableHeader";
 import TableCell, { actionColors } from "./TableCell";
+import { SelectedAuditProps } from "../../../pages/changeExplorer/ChangeExplorer";
 
 interface TableDataProps {
     data: Record<string, any>[],
     header: Column[]
-    setSelectedChange: (selectedChange: string) => void
+    setSelectedChange: (selectedChange: SelectedAuditProps) => void
     setDetailTab: (detailTab: 'diff' | 'dependencies' | 'raw') => void
 }
 
@@ -45,7 +46,7 @@ const TableData = (props: TableDataProps) => {
                             )
                         })}
                         <td className="px-4 py-3.5">
-                            <button onClick={() => { setSelectedChange(row?.id); setDetailTab('diff'); }} className="cursor-pointer">
+                            <button onClick={() => { setSelectedChange({ date: row?.time, type: row?.type, user: row?.user, id: row?.id }); setDetailTab('diff'); }} className="cursor-pointer">
                                 <Eye size={16} className="text-[#94a3b8] hover:text-[#64748b]" />
                             </button>
                         </td>
