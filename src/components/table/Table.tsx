@@ -2,6 +2,7 @@ import { FC } from "react"
 import Pagination from "./components/Pagination"
 import TableData from "./components/TableData"
 import TableHeader from "./components/TableHeader"
+import { SelectedAuditProps } from "../../pages/changeExplorer/ChangeExplorer"
 
 interface TableProps {
     header: Array<{
@@ -9,7 +10,7 @@ interface TableProps {
         displayName: string
     }>
     tabledata: Record<string, any>[]
-    setSelectedChange: (selectedChange: string) => void
+    setSelectedChange: (selectedChange: SelectedAuditProps) => void
     setDetailTab: (detailTab: 'diff' | 'dependencies' | 'raw') => void
     pagination?: {
         total: number

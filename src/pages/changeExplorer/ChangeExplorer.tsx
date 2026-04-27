@@ -5,6 +5,7 @@ import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
 import { Center, CircularLoader } from '@dhis2/ui';
 import { rowsFormater } from '../../utils/table/rowFormater';
+import { useGetuditDetails } from '../../hooks/audit/useGetAuditDetails';
 
 // const allChanges = [
 //   {
@@ -85,16 +86,24 @@ const columns = [
   }
 ];
 
+export interface SelectedAuditProps {
+  user: string
+  date: string
+  type: string
+  id: string
+}
+
 export default function ChangeExplorer() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(true);
-  const [selectedChange, setSelectedChange] = useState<any | null>(null);
+  const [selectedChange, setSelectedChange] = useState<SelectedAuditProps | null>(null);
   const [parentChange, setParentChange] = useState<any | null>(null);
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
   // const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [detailTab, setDetailTab] = useState<'diff' | 'dependencies' | 'raw'>('diff');
   const { getAudit, data, loading } = useGetudit();
+  const { getAuditDetails, auditDetails, loadingDetails } = useGetuditDetails()
   // Filter states
   // const [filterGroup, setFilterGroup] = useState('All Groups');
   // const [filterMetadataType, setFilterMetadataType] = useState('All');
@@ -106,6 +115,12 @@ export default function ChangeExplorer() {
   useEffect(() => {
     getAudit(page, pageSize)
   }, [page, pageSize])
+
+  useEffect(() => {
+    if (selectedChange) {
+      getAuditDetails(selectedChange.id)
+    }
+  }, [selectedChange])
 
   // const filteredChanges = allChanges.filter(change => {
   //   // Filter by search query
@@ -271,6 +286,7 @@ export default function ChangeExplorer() {
 
       {/* Change Detail Slide-out Panel */}
       {selectedChange && <ChangeExplorerDrawer
+        loading={loadingDetails}
         changeHistory={changeHistory}
         diffData={diffData}
         parentChange={parentChange}
