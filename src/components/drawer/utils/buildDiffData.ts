@@ -37,17 +37,50 @@ function serialize(value: unknown): string {
     return String(value);
 }
 
-export function buildDiff(arr: AuditRecord[], action?: string | null | undefined): DiffEntry[] {
+function reconstructNested(
+    flat: Record<string, unknown>,
+    topKey: string
+): unknown {
+    const prefix = `${topKey}.`;
+    const children = Object.entries(flat).filter(([k]) => k.startsWith(prefix));
+
+    // Primitive — no children
+    if (children.length === 0) {
+        return flat[topKey];
+    }
+
+    // Reconstruct nested object from dot-notation children
+    const result: Record<string, unknown> = {};
+    for (const [flatKey, value] of children) {
+        const parts = flatKey.slice(prefix.length).split('.');
+        let cursor = result;
+        for (let i = 0; i < parts.length - 1; i++) {
+            if (!(parts[i] in cursor)) cursor[parts[i]] = {};
+            cursor = cursor[parts[i]] as Record<string, unknown>;
+        }
+        cursor[parts[parts.length - 1]] = value;
+    }
+    return result;
+}
+
+export function buildDiff(arr: AuditRecord[], action?: string | null): DiffEntry[] {
     if (arr?.length === 0) return [];
 
-    const a = actions.DELETE == action ? {} : flattenObject(arr?.[0]?.objectData ?? {});
-    const b = action == actions.DELETE ? flattenObject(arr?.[0]?.objectData) : arr?.[1] ? flattenObject(arr?.[1]?.objectData ?? {}) : {};
+    const a = actions.DELETE === action ? {} : flattenObject(arr?.[0]?.objectData ?? {});
+    const b = actions.DELETE === action
+        ? flattenObject(arr?.[0]?.objectData ?? {})
+        : arr?.[1] ? flattenObject(arr?.[1]?.objectData ?? {}) : {};
 
-    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    const topLevelKeys = new Set(Array.from(allKeys).map(k => k.split('.')[0]));
 
-    return Array.from(keys).sort().map((field): DiffEntry => {
-        const before = field in b ? serialize(b[field]) : '—';
-        const after = field in a ? serialize(a[field]) : '—';
-        return { field, before, after, changed: before !== after };
+    return Array.from(topLevelKeys).sort().map((topKey): DiffEntry => {
+        const beforeValue = topKey in b ? reconstructNested(b, topKey) : undefined;
+        const afterValue  = topKey in a ? reconstructNested(a, topKey) : undefined;
+
+        const before = beforeValue !== undefined ? serialize(beforeValue) : '—';
+        const after  = afterValue  !== undefined ? serialize(afterValue)  : '—';
+
+        return { field: topKey, before, after, changed: before !== after };
     });
 }

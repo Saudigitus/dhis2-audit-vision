@@ -32,7 +32,7 @@ export default function ChangeExplorerDrawer({ setSelectedChange, setParentChang
             {/* Backdrop */}
             <div className="fixed inset-0 bg-black/20 z-50 h-[100vh]" onClick={() => setSelectedChange(null)} />
             {/* Panel */}
-            <div className="fixed top-12 right-0 bottom-0 w-[560px] bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
+            <div className="fixed top-12 right-0 bottom-0 w-[46vw] bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
                 {
                     loadingDetails ? <CircularLoader /> :
                         <>

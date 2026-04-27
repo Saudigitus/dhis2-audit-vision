@@ -1,7 +1,9 @@
 import { DataProps } from "../../hooks/audit/useGetudit";
 
 function rowsFormatter(data: DataProps[]) {
-    const formattedData = data.map((item) => ({
+    if (!data) return []
+    
+    const formattedData = data?.map((item) => ({
         id: item.uid,
         action: item.auditType,
         user: item.createdBy,

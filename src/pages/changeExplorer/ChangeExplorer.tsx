@@ -27,7 +27,7 @@ export default function ChangeExplorer() {
   const [pageSize, setPageSize] = useState<number>(10)
   const [detailTab, setDetailTab] = useState<'diff' | 'dependencies' | 'raw'>('diff');
   const { getAudit, data, loading } = useGetudit();
-
+console.log(data,'asasas')
   useEffect(() => {
     getAudit(page, pageSize)
   }, [page, pageSize])
@@ -75,7 +75,7 @@ export default function ChangeExplorer() {
           header={changeExplorerHeader}
           title='Change History'
           description='Explore the history of changes made to your DHIS2 objects, including who made the change and when.'
-          tabledata={rowsFormatter(data?.audits!)} />
+          tabledata={rowsFormatter(data?.data!)} />
       </div>
 
       {/* Change Detail Slide-out Panel */}

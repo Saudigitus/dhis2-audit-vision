@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dhis2/data-engine": "^3.17.0",
     "@tailwindcss/postcss": "^4.1.18",
     "axios": "^1.15.2",
     "classnames": "^2.5.1",
