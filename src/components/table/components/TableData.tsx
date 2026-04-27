@@ -46,7 +46,7 @@ const TableData = (props: TableDataProps) => {
                             )
                         })}
                         <td className="px-4 py-3.5">
-                            <button onClick={() => { setSelectedChange({ date: row?.time, type: row?.type, user: row?.user, id: row?.id }); setDetailTab('diff'); }} className="cursor-pointer">
+                            <button onClick={() => { setSelectedChange({ date: row?.time, type: row?.type, user: row?.user, id: row?.id, action: row?.action }); setDetailTab('diff'); }} className="cursor-pointer">
                                 <Eye size={16} className="text-[#94a3b8] hover:text-[#64748b]" />
                             </button>
                         </td>

@@ -3,12 +3,9 @@ import Pagination from "./components/Pagination"
 import TableData from "./components/TableData"
 import TableHeader from "./components/TableHeader"
 import { SelectedAuditProps } from "../../pages/changeExplorer/ChangeExplorer"
+import { columns } from "../../constants/common/auditTableHeaders"
 
 interface TableProps {
-    header: Array<{
-        id: string,
-        displayName: string
-    }>
     tabledata: Record<string, any>[]
     setSelectedChange: (selectedChange: SelectedAuditProps) => void
     setDetailTab: (detailTab: 'diff' | 'dependencies' | 'raw') => void
@@ -24,7 +21,7 @@ interface TableProps {
 }
 
 const Table: FC<TableProps> = (props) => {
-    const { header, tabledata, setDetailTab, setSelectedChange, pagination } = props
+    const { tabledata, setDetailTab, setSelectedChange, pagination } = props
 
     return (
         <div className="flex-1 bg-white rounded-xl border border-[#e2e8f0]">
@@ -33,8 +30,8 @@ const Table: FC<TableProps> = (props) => {
                 <span className="text-xs font-medium text-[#0f172a] border border-[#e2e8f0] rounded px-2.5 py-1">Metadata</span>
             </div>
             <table className="w-full">
-                <TableHeader header={header} />
-                <TableData data={tabledata} header={header} setSelectedChange={setSelectedChange} setDetailTab={setDetailTab} />
+                <TableHeader header={columns} />
+                <TableData data={tabledata} header={columns} setSelectedChange={setSelectedChange} setDetailTab={setDetailTab} />
             </table>
             <div className="py-5 px-10">
                 {pagination && <Pagination pagination={pagination} />}
