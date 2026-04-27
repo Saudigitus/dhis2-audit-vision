@@ -2,7 +2,6 @@ import { Calendar, FileText, User } from "lucide-react";
 import { SelectedAuditProps } from "../../../pages/changeExplorer/ChangeExplorer";
 
 export default function HeaderDetails({ selectedRow }: { selectedRow: SelectedAuditProps }) {
-
     return (
         <div className="space-y-2 mb-6">
             <div className="flex items-center gap-2 text-sm">
@@ -13,7 +12,7 @@ export default function HeaderDetails({ selectedRow }: { selectedRow: SelectedAu
             <div className="flex items-center gap-2 text-sm">
                 <Calendar size={16} className="text-[#94a3b8]" />
                 <span className="text-[#64748b]">Date:</span>
-                <span className="font-semibold text-[#0f172a]">{selectedRow.date}</span>
+                <span className="font-semibold text-[#0f172a]">{selectedRow.time}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
                 <FileText size={16} className="text-[#94a3b8]" />
