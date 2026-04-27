@@ -2,8 +2,21 @@ import CardContainer from '../components/card/CardContainer';
 import { TrendingUp, AlertTriangle, Eye, ShieldCheck, Activity } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend,
+  PieChart, Pie, Cell, Legend, BarChart, Bar, Rectangle,
 } from 'recharts';
+
+const userActivityData = [
+  { name: 'Alice', CREATE: 30, UPDATE: 50, DELETE: 20 },
+  { name: 'Bob', CREATE: 40, UPDATE: 30, DELETE: 30 },
+  { name: 'Charlie', CREATE: 25, UPDATE: 45, DELETE: 30 },
+  { name: 'David', CREATE: 50, UPDATE: 20, DELETE: 30 },
+  { name: 'Eve', CREATE: 35, UPDATE: 40, DELETE: 25 },
+  { name: 'Frank', CREATE: 20, UPDATE: 60, DELETE: 20 },
+  { name: 'Grace', CREATE: 45, UPDATE: 25, DELETE: 30 },
+  { name: 'Heidi', CREATE: 30, UPDATE: 30, DELETE: 40 },
+  { name: 'Ivan', CREATE: 55, UPDATE: 30, DELETE: 15 },
+  { name: 'Judy', CREATE: 25, UPDATE: 55, DELETE: 20 },
+];
 
 const lineData = [
   { name: 'Mar 27', value: 42 },
@@ -46,10 +59,10 @@ const actionColors: Record<string, string> = {
 };
 
 const stats = [
-  { label: 'TOTAL CHANGES', value: '50', change: '+12% vs last week', changeColor: 'text-[#22c55e]', icon: <TrendingUp size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
-  { label: 'SYSTEM HEALTH', value: '92%', change: 'Healthy', changeColor: 'text-[#22c55e]', icon: <Activity size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
-  { label: 'SECURITY SCORE', value: '88/100', change: '8 high risk issues', changeColor: 'text-[#ef4444]', icon: <ShieldCheck size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
-  { label: 'HIGH RISK CHANGES', value: '21', change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
+  { label: 'TOTAL CHANGES TODAY', value: '15', change: '+5% vs yesterday', changeColor: 'text-[#22c55e]', icon: <TrendingUp size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
+  { label: 'TOTAL CHANGES', value: '50', change: '+12% vs last week', changeColor: 'text-[#22c55e]', icon: <Activity size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
+  { label: 'TOTAL UPDATES', value: '25', change: '+8% vs last week', changeColor: 'text-[#f59e0b]', icon: <ShieldCheck size={20} className="text-[#f59e0b]" />, iconBg: 'bg-[#fffbeb]' },
+  { label: 'TOTAL RISK CHANGES', value: '21', change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
 ];
 
 export default function Dashboard() {
@@ -133,41 +146,29 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-xl border border-[#e2e8f0]">
-        <div className="px-6 py-4 border-b border-[#e2e8f0]">
-          <h3 className="font-bold text-[15px] text-[#0f172a]">Recent Activity</h3>
-        </div>
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[#e2e8f0]">
-              <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Time</th>
-              <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">User</th>
-              <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Metadata Type</th>
-              <th className="text-left px-6 py-3 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Action</th>
-              <th className="w-12"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentActivity.map((row, i) => (
-              <tr key={i} className="border-b border-[#f1f5f9] hover:bg-[#f8fafc]">
-                <td className="px-6 py-3.5 text-sm text-[#64748b]">{row.time}</td>
-                <td className="px-6 py-3.5 text-sm font-semibold text-[#0f172a]">{row.user}</td>
-                <td className="px-6 py-3.5">
-                  <span className="text-sm font-mono bg-[#f1f5f9] px-2 py-0.5 rounded text-[#475569]">{row.type}</span>
-                </td>
-                <td className="px-6 py-3.5">
-                  <span className={`text-xs font-bold px-3 py-1 rounded ${actionColors[row.action]}`}>
-                    {row.action}
-                  </span>
-                </td>
-                <td className="px-4 py-3.5">
-                  <Eye size={16} className="text-[#94a3b8] cursor-pointer hover:text-[#64748b]" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Most Active Users Actions */}
+      <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
+        <h3 className="font-bold text-[15px] text-[#0f172a] mb-4">Most Active Users Actions</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            layout="vertical"
+            data={userActivityData}
+            stackOffset="expand"
+            barCategoryGap="20%"
+            margin={{
+              top: 5, right: 30, left: 20, bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" tickFormatter={(tick) => `${tick * 100}%`} />
+            <YAxis dataKey="name" type="category" />
+            <Tooltip formatter={(value: number) => `${(value * 100).toFixed(1)}%`} />
+            <Legend />
+            <Bar dataKey="CREATE" fill="#3b82f6" stackId="a" />
+            <Bar dataKey="UPDATE" fill="#f59e0b" stackId="a" />
+            <Bar dataKey="DELETE" fill="#ef4444" stackId="a" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

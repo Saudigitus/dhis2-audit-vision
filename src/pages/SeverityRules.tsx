@@ -110,7 +110,7 @@ const SeverityRules = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-12">
+    <div className="max-w-12xl mx-auto space-y-2 pb-12">
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Severity Rules Section */}
