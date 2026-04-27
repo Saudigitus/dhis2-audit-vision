@@ -11,15 +11,14 @@ export interface DataProps {
 }
 
 export const useGetuditDetails = () => {
-    const [data, setData] = useState<any | null>(null)
+    const [data, setData] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(false)
 
     const getAuditDetails = async (objectId: string) => {
         setLoading(true)
         try {
             const response = await axios.get(`https://agro.desinglab.org/audit-api/api/auditObjects?objectId=${objectId}`)
-            console.log(response, "response")
-            setData(response?.data)
+            setData(response?.data?.auditObjects)
             return response
         } catch (error) {
             throw error

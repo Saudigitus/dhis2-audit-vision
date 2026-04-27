@@ -1,4 +1,4 @@
-const changeExplorerHeader = [
+export const changeExplorerHeader = [
     {
         id: "time",
         displayName: "Timestamp",
@@ -24,5 +24,3 @@ const changeExplorerHeader = [
         displayName: "",
     }
 ];
-
-export { changeExplorerHeader }

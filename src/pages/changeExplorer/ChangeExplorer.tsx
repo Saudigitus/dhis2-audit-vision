@@ -5,32 +5,17 @@ import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
 import { Center, CircularLoader } from '@dhis2/ui';
 import { rowsFormatter } from '../../utils/table/rowFormatter';
-import { useGetuditDetails } from '../../hooks/audit/useGetAuditDetails';
 import TableFilter from '../../components/filter/TableFilter';
-import { changeExplorerHeader } from '../../utils/table/headerFormatter';
-
-const diffData = [
-  { field: 'name', before: 'ANC 1st Visit', after: 'ANC 1st Visit (Updated)', changed: true },
-  { field: 'shortName', before: 'ANC1', after: 'ANC1_v2', changed: true },
-  { field: 'aggregationType', before: 'SUM', after: 'AVERAGE', changed: true },
-  { field: 'valueType', before: 'NUMBER', after: 'NUMBER', changed: false },
-  { field: 'domainType', before: 'AGGREGATE', after: 'AGGREGATE', changed: false },
-  { field: 'categoryCombo', before: '{"id":"bjDvmb4bfuf"}', after: '{"id":"bjDvmb4bfuf"}', changed: true },
-  { field: 'description', before: 'Number of first antenatal care visits', after: 'Average number of first antenatal care visits per facility', changed: true },
-];
-
-const changeHistory = [
-  { action: 'CREATE', user: 'admin', date: '2026-01-10 09:00', fields: 4, desc: 'Initial creation' },
-  { action: 'UPDATE', user: 'jdoe', date: '2026-02-14 11:23', fields: 2, desc: 'Updated aggregationType and description' },
-  { action: 'UPDATE', user: 'asmith', date: '2026-03-01 15:47', fields: 3, desc: 'Description and categoryCombo revised' },
-  { action: 'UPDATE', user: 'admin', date: '2026-04-08 10:05', fields: 2, desc: '' },
-];
+import { changeExplorerHeader } from '../../constants/common/auditTableHeaders';
 
 export interface SelectedAuditProps {
-  user: string
-  date: string
-  type: string
-  id: string
+  id: string;
+  action: string;
+  user: string;
+  date: string;
+  object?: string;
+  type: string;
+  dependencies?: any[];
 }
 
 export default function ChangeExplorer() {
@@ -42,18 +27,10 @@ export default function ChangeExplorer() {
   const [pageSize, setPageSize] = useState<number>(10)
   const [detailTab, setDetailTab] = useState<'diff' | 'dependencies' | 'raw'>('diff');
   const { getAudit, data, loading } = useGetudit();
-  const { getAuditDetails, auditDetails, loadingDetails } = useGetuditDetails()
 
   useEffect(() => {
     getAudit(page, pageSize)
   }, [page, pageSize])
-
-  useEffect(() => {
-    if (selectedChange) {
-      getAuditDetails(selectedChange.id)
-    }
-  }, [selectedChange])
-
 
   if (loading) {
     return <Center>
@@ -103,9 +80,6 @@ export default function ChangeExplorer() {
 
       {/* Change Detail Slide-out Panel */}
       {selectedChange && <ChangeExplorerDrawer
-        loading={loadingDetails}
-        changeHistory={changeHistory}
-        diffData={diffData}
         parentChange={parentChange}
         selectedChange={selectedChange}
         setParentChange={setParentChange}
