@@ -4,9 +4,10 @@ import Table from '../../components/table/Table';
 import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
 import { Center, CircularLoader } from '@dhis2/ui';
-import { rowsFormater } from '../../utils/table/rowFormater';
+import { rowsFormatter } from '../../utils/table/rowFormatter';
 import { useGetuditDetails } from '../../hooks/audit/useGetAuditDetails';
 import TableFilter from '../../components/filter/TableFilter';
+import { changeExplorerHeader } from '../../utils/table/headerFormatter';
 
 const diffData = [
   { field: 'name', before: 'ANC 1st Visit', after: 'ANC 1st Visit (Updated)', changed: true },
@@ -23,33 +24,6 @@ const changeHistory = [
   { action: 'UPDATE', user: 'jdoe', date: '2026-02-14 11:23', fields: 2, desc: 'Updated aggregationType and description' },
   { action: 'UPDATE', user: 'asmith', date: '2026-03-01 15:47', fields: 3, desc: 'Description and categoryCombo revised' },
   { action: 'UPDATE', user: 'admin', date: '2026-04-08 10:05', fields: 2, desc: '' },
-];
-
-const columns = [
-  {
-    id: "time",
-    displayName: "Timestamp",
-  },
-  {
-    id: "user",
-    displayName: "User",
-  },
-  {
-    id: "type",
-    displayName: "Type",
-  },
-  {
-    id: "object",
-    displayName: "Object Name",
-  },
-  {
-    id: "action",
-    displayName: "Action",
-  },
-  {
-    id: "view",
-    displayName: "",
-  }
 ];
 
 export interface SelectedAuditProps {
@@ -121,8 +95,8 @@ export default function ChangeExplorer() {
           pagination={{ ...data?.pager!, setPage, setPageSize }}
           setDetailTab={setDetailTab}
           setSelectedChange={setSelectedChange}
-          header={columns}
-          tabledata={rowsFormater(data?.audits!)} />
+          header={changeExplorerHeader}
+          tabledata={rowsFormatter(data?.audits!)} />
       </div>
 
       {/* Change Detail Slide-out Panel */}
