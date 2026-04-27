@@ -96,6 +96,8 @@ export default function ChangeExplorer() {
           setDetailTab={setDetailTab}
           setSelectedChange={setSelectedChange}
           header={changeExplorerHeader}
+          title='Change History'
+          description='Explore the history of changes made to your DHIS2 objects, including who made the change and when.'
           tabledata={rowsFormatter(data?.audits!)} />
       </div>
 

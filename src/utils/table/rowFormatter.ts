@@ -6,8 +6,8 @@ function rowsFormatter(data: DataProps[]) {
         action: item.auditType,
         user: item.createdBy,
         time: new Date(item.updated_at).toLocaleString(),
-        object: item.auditScope,
-        type: item.klass.split(".").pop(),
+        type: item.auditScope,
+        object: item.klass.split(".").pop(),
     }))
     return formattedData
 }
