@@ -1,8 +1,8 @@
 import CardContainer from '../components/card/CardContainer';
-import { TrendingUp, AlertTriangle, Eye, ShieldCheck, Activity } from 'lucide-react';
+import { TrendingUp, AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, BarChart, Bar, Rectangle,
+  PieChart, Pie, Cell, Legend, BarChart, Bar,
 } from 'recharts';
 
 const userActivityData = [
@@ -41,23 +41,6 @@ const pieData = [
   { name: 'DELETE', value: 10, color: '#ef4444' },
 ];
 
-const recentActivity = [
-  { time: '2026-04-09 08:38', user: 'admin', type: 'dataSet', action: 'CREATE' },
-  { time: '2026-04-09 08:22', user: 'kchan', type: 'categoryCombo', action: 'UPDATE' },
-  { time: '2026-04-09 08:12', user: 'rbrown', type: 'indicator', action: 'UPDATE' },
-  { time: '2026-04-09 07:50', user: 'asmith', type: 'dataSet', action: 'CREATE' },
-  { time: '2026-04-09 07:35', user: 'mwilson', type: 'dataElement', action: 'DELETE' },
-  { time: '2026-04-09 07:27', user: 'admin', type: 'dataElement', action: 'CREATE' },
-  { time: '2026-04-09 07:07', user: 'mwilson', type: 'categoryCombo', action: 'DELETE' },
-  { time: '2026-04-09 06:54', user: 'admin', type: 'program', action: 'DELETE' },
-];
-
-const actionColors: Record<string, string> = {
-  CREATE: 'bg-[#3b82f6] text-white',
-  UPDATE: 'bg-[#fef3c7] text-[#d97706] border border-[#fcd34d]',
-  DELETE: 'bg-[#fee2e2] text-[#ef4444] border border-[#fca5a5]',
-};
-
 const stats = [
   { label: 'TOTAL CHANGES TODAY', value: '15', change: '+5% vs yesterday', changeColor: 'text-[#22c55e]', icon: <TrendingUp size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
   { label: 'TOTAL CHANGES', value: '50', change: '+12% vs last week', changeColor: 'text-[#22c55e]', icon: <Activity size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
@@ -82,20 +65,6 @@ export default function Dashboard() {
               iconBgColor={s.iconBg}
               indicatorColor={s.changeColor}
             />
-            {/* <div
-              key={i}
-              className={`rounded-xl border p-5 flex items-start justify-between ${s.cardBg || 'bg-white border-[#e2e8f0]'
-                }`}
-            >
-              <div>
-                <div className="text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">{s.label}</div>
-                <div className="text-3xl font-bold text-[#0f172a] mt-1">{s.value}</div>
-                {s.change && <div className={`text-xs mt-1 ${s.changeColor}`}>{s.change}</div>}
-              </div>
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${s.iconBg}`}>
-                {s.icon}
-              </div>
-            </div> */}
           </>
         ))}
       </div>
@@ -162,7 +131,7 @@ export default function Dashboard() {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" tickFormatter={(tick) => `${tick * 100}%`} />
             <YAxis dataKey="name" type="category" />
-            <Tooltip formatter={(value: number) => `${(value * 100).toFixed(1)}%`} />
+            <Tooltip formatter={(value, ) => typeof value === 'number' ? `${value.toFixed(1)}%` : ''} />
             <Legend />
             <Bar dataKey="CREATE" fill="#3b82f6" stackId="a" />
             <Bar dataKey="UPDATE" fill="#f59e0b" stackId="a" />
