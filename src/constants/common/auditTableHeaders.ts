@@ -1,8 +1,4 @@
-export const columns = [
-    {
-        id: "collapse",
-        displayName: "",
-    },
+export const changeExplorerHeader = [
     {
         id: "time",
         displayName: "Timestamp",

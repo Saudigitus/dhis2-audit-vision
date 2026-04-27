@@ -1,27 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import Table from '../../components/table/Table';
 import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
 import { Center, CircularLoader } from '@dhis2/ui';
-import { rowsFormater } from '../../utils/table/rowFormater';
-
-const diffData = [
-  { field: 'name', before: 'ANC 1st Visit', after: 'ANC 1st Visit (Updated)', changed: true },
-  { field: 'shortName', before: 'ANC1', after: 'ANC1_v2', changed: true },
-  { field: 'aggregationType', before: 'SUM', after: 'AVERAGE', changed: true },
-  { field: 'valueType', before: 'NUMBER', after: 'NUMBER', changed: false },
-  { field: 'domainType', before: 'AGGREGATE', after: 'AGGREGATE', changed: false },
-  { field: 'categoryCombo', before: '{"id":"bjDvmb4bfuf"}', after: '{"id":"bjDvmb4bfuf"}', changed: true },
-  { field: 'description', before: 'Number of first antenatal care visits', after: 'Average number of first antenatal care visits per facility', changed: true },
-];
-
-const changeHistory = [
-  { action: 'CREATE', user: 'admin', date: '2026-01-10 09:00', fields: 4, desc: 'Initial creation' },
-  { action: 'UPDATE', user: 'jdoe', date: '2026-02-14 11:23', fields: 2, desc: 'Updated aggregationType and description' },
-  { action: 'UPDATE', user: 'asmith', date: '2026-03-01 15:47', fields: 3, desc: 'Description and categoryCombo revised' },
-  { action: 'UPDATE', user: 'admin', date: '2026-04-08 10:05', fields: 2, desc: '' },
-];
+import { rowsFormatter } from '../../utils/table/rowFormatter';
+import TableFilter from '../../components/filter/TableFilter';
+import { changeExplorerHeader } from '../../constants/common/auditTableHeaders';
 
 export interface SelectedAuditProps {
   id: string;
@@ -79,75 +64,7 @@ export default function ChangeExplorer() {
       <div className="flex gap-5">
         {/* Filters Panel */}
         {showFilters && (
-          <div className="w-[260px] shrink-0 bg-white rounded-xl border border-[#e2e8f0] p-5 h-fit">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-sm text-[#0f172a] uppercase tracking-wide">Filters</h3>
-              <button className="flex items-center gap-1 text-sm text-[#64748b] hover:text-[#0f172a] cursor-pointer">
-                <RotateCcw size={14} />
-                Reset
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[#0f172a] mb-1.5">View Group</label>
-                <select className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]">
-                  <option>All Groups</option>
-                  <option>HIV/SIDA</option>
-                  <option>Malaria</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Metadata Type</label>
-                <select className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]">
-                  <option>All</option>
-                  <option>dataSet</option>
-                  <option>dataElement</option>
-                  <option>indicator</option>
-                  <option>categoryCombo</option>
-                  <option>program</option>
-                  <option>trackedEntityType</option>
-                  <option>organisationUnit</option>
-                  <option>optionSet</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#0f172a] mb-1.5">User</label>
-                <select className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]">
-                  <option>All</option>
-                  <option>admin</option>
-                  <option>jdoe</option>
-                  <option>kchan</option>
-                  <option>rbrown</option>
-                  <option>asmith</option>
-                  <option>mwilson</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Audit Type</label>
-                <select className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]">
-                  <option>All</option>
-                  <option>CREATE</option>
-                  <option>UPDATE</option>
-                  <option>DELETE</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Date From</label>
-                <input
-                  type="date"
-                  className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Date To</label>
-                <input
-                  type="date"
-                  className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
-                />
-              </div>
-            </div>
-          </div>
+          <TableFilter />
         )}
 
         {/* Results Table */}
@@ -155,7 +72,10 @@ export default function ChangeExplorer() {
           pagination={{ ...data?.pager!, setPage, setPageSize }}
           setDetailTab={setDetailTab}
           setSelectedChange={setSelectedChange}
-          tabledata={rowsFormater(data?.audits!)} />
+          header={changeExplorerHeader}
+          title='Change History'
+          description='Explore the history of changes made to your DHIS2 objects, including who made the change and when.'
+          tabledata={rowsFormatter(data?.audits!)} />
       </div>
 
       {/* Change Detail Slide-out Panel */}
