@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import Table from '../../components/table/Table';
 import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
@@ -26,10 +26,6 @@ const changeHistory = [
 ];
 
 const columns = [
-  {
-    id: "collapse",
-    displayName: "",
-  },
   {
     id: "time",
     displayName: "Timestamp",
