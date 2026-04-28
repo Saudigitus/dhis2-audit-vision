@@ -2,7 +2,7 @@ import { DataProps } from "../../hooks/audit/useGetudit";
 
 function rowsFormatter(data: DataProps[]) {
     if (!data) return []
-    
+
     const formattedData = data?.map((item) => ({
         id: item.uid,
         action: item.auditType,
@@ -13,4 +13,26 @@ function rowsFormatter(data: DataProps[]) {
     }))
     return formattedData
 }
-export { rowsFormatter }
+
+function filterValuesFormatter() {
+    return {
+        auditType: {
+            values: ['UPDATE', 'CREATE', 'DELETE'],
+            label: 'Action',
+            inputType: 'select'
+        },
+        createdBy: {
+            label: 'User',
+            inputType: 'text'
+        },
+        klass: {
+            label: 'Object',
+            inputType: 'text'
+        },
+        auditScope: {
+            label: 'Type',
+            inputType: 'text'
+        },
+    }
+}
+export { rowsFormatter, filterValuesFormatter }
