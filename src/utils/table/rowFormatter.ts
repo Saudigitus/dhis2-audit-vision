@@ -25,14 +25,14 @@ function filterValuesFormatter() {
             label: 'User',
             inputType: 'text'
         },
-        klass: {
-            label: 'Object',
-            inputType: 'text'
-        },
-        auditScope: {
-            label: 'Type',
-            inputType: 'text'
-        },
+        // klass: {
+        //     label: 'Object',
+        //     inputType: 'text'
+        // },
+        // auditScope: {
+        //     label: 'Type',
+        //     inputType: 'text'
+        // },
     }
 }
 export { rowsFormatter, filterValuesFormatter }
