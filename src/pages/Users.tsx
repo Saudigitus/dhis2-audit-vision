@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users as UsersIcon, X, ChevronRight, TrendingUp, Activity, ShieldCheck, AlertTriangle, UserPlus, UserCog, UserX, Shield } from 'lucide-react';
+import { Users as UsersIcon, X, ChevronRight, Activity, ShieldCheck, AlertTriangle } from 'lucide-react';
 import CardContainer from '../components/card/CardContainer';
 import {
   LineChart,
@@ -20,9 +20,6 @@ const users = [
   { name: 'kchan', initial: 'K', color: 'bg-[#3b82f6]', role: 'Analyst', roleColor: 'text-[#8b5cf6] border-[#c4b5fd] bg-[#f5f3ff]', status: 'Online', lastActive: '30 minutes ago', changes: 66, email: 'kchan@dhis2.org' },
   { name: 'rbrown', initial: 'R', color: 'bg-[#3b82f6]', role: 'Data Manager', roleColor: 'text-[#3b82f6] border-[#93c5fd] bg-[#eff6ff]', status: 'Offline', lastActive: '2 hours ago', changes: 98, email: 'rbrown@dhis2.org' },
 ];
-
-const totalUsers = users.length;
-const onlineNow = users.filter(u => u.status === 'Online').length;
 
 const actionColors: Record<string, string> = {
   CREATE: 'bg-[#3b82f6] text-white',
@@ -47,17 +44,6 @@ const chartData = [
   { name: 'Sem 4', NameX: 60, NameY: 35, NameZ: 57, NameD: 51, NameE: 9 },
 ];
 
-const userGridData = [
-  { id: 1, name: 'User1', value: 2520 },
-  { id: 2, name: 'User2', value: 2520 },
-  { id: 3, name: 'User3', value: 2520 },
-  { id: 4, name: 'User4', value: 2520 },
-  { id: 5, name: 'User5', value: 2520 },
-  { id: 6, name: 'User6', value: 2520 },
-  { id: 7, name: 'User7', value: 2520 },
-  { id: 8, name: 'User8', value: 2520 },
-];
-
 export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<typeof users[0] | null>(null);
 
@@ -67,7 +53,7 @@ export default function UsersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <CardContainer
           variant="dashboard-card"
-          label="Total users online"
+          label="USERS ACCESSED TODAY"
           value="2520"
           indicator="+5% vs yesterday"
           indicatorColor="text-[#22c55e]"
@@ -76,7 +62,7 @@ export default function UsersPage() {
         />
         <CardContainer
           variant="dashboard-card"
-          label="Total users"
+          label="TOTAL USERS"
           value="252"
           indicator="+12% vs last week"
           indicatorColor="text-[#22c55e]"
@@ -85,7 +71,7 @@ export default function UsersPage() {
         />
         <CardContainer
           variant="dashboard-card"
-          label="Total de super admins"
+          label="TOTAL SUPER ADMINS"
           value="252"
           indicator="+8% vs last week"
           indicatorColor="text-[#f59e0b]"
@@ -94,7 +80,7 @@ export default function UsersPage() {
         />
         <CardContainer
           variant="dashboard-card"
-          label="Total de mudanças"
+          label="TOTAL CHANGES"
           value="252"
           indicator="Requires review"
           indicatorColor="text-[#ef4444]"
