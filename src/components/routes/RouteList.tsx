@@ -11,7 +11,7 @@ import NotificationsPage from "../../pages/Notifications";
 import ProfilePage from "../../pages/Profile";
 import SettingsPage from "../../pages/Settings";
 import SystemHealth from "../../pages/sysHealth/SystemHealth";
-import MonitoringGroups from "../../pages/metadataGrouping/MonitoringGroups";
+import MonitoringGroups from "../../pages/metadataGroups/MonitoringGroups";
 import SeverityRules from "../../pages/SeverityRules";
 
 export default function RouteList() {

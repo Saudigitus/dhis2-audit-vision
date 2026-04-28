@@ -1,45 +1,10 @@
 import { useState } from 'react';
 import { Plus, Search, FolderGit2, Layers, X, Check } from 'lucide-react';
+import { MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
 
-interface GroupItem {
-    id: string;
-    name: string;
-    type: 'program' | 'dataSet';
-}
 
-interface ViewGroup {
-    id: string;
-    name: string;
-    description: string;
-    items: GroupItem[];
-    createdAt: string;
-}
 
-const initialGroups: ViewGroup[] = [
-    {
-        id: 'g1',
-        name: 'HIV/SIDA',
-        description: 'Monitoramento de todos os programas e datasets relacionados ao HIV',
-        createdAt: '2026-04-10',
-        items: [
-            { id: 'p1', name: 'HIV Care and Treatment', type: 'program' },
-            { id: 'p2', name: 'PMTCT', type: 'program' },
-            { id: 'ds1', name: 'HIV Monthly Summary', type: 'dataSet' },
-        ],
-    },
-    {
-        id: 'g2',
-        name: 'Malaria',
-        description: 'Programas de controle da Malaria',
-        createdAt: '2026-04-11',
-        items: [
-            { id: 'p3', name: 'Malaria Case Investigation', type: 'program' },
-            { id: 'ds2', name: 'Malaria Weekly Report', type: 'dataSet' },
-        ],
-    },
-];
-
-const availableItems: GroupItem[] = [
+const availableItems: MonitoringGroupItem[] = [
     { id: 'p1', name: 'HIV Care and Treatment', type: 'program' },
     { id: 'p2', name: 'PMTCT', type: 'program' },
     { id: 'p3', name: 'Malaria Case Investigation', type: 'program' },
@@ -52,14 +17,13 @@ const availableItems: GroupItem[] = [
 ];
 
 export default function MonitoringGroupsModal() {
-    const [groups, setGroups] = useState<ViewGroup[]>(initialGroups);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Form state
     const [editingId, setEditingId] = useState<string | null>(null);
     const [groupName, setGroupName] = useState('');
     const [groupDescription, setGroupDescription] = useState('');
-    const [selectedItems, setSelectedItems] = useState<GroupItem[]>([]);
+    const [selectedItems, setSelectedItems] = useState<MonitoringGroupItem[]>([]);
     const [itemSearch, setItemSearch] = useState('');
 
 
@@ -69,30 +33,32 @@ export default function MonitoringGroupsModal() {
     );
 
 
-    const handleSaveGroup = () => {
-        if (!groupName.trim()) return;
 
-        if (editingId) {
-            setGroups(groups.map(g => g.id === editingId ? {
-                ...g,
-                name: groupName,
-                description: groupDescription,
-                items: selectedItems
-            } : g));
-        } else {
-            setGroups([...groups, {
-                id: `g${Date.now()}`,
-                name: groupName,
-                description: groupDescription,
-                createdAt: new Date().toISOString().split('T')[0],
-                items: selectedItems
-            }]);
-        }
+    const handleSaveGroup = () => {
+        // if (!groupName.trim()) return;
+
+        // if (editingId) {
+        //     setGroups(groups.map(g => g.id === editingId ? {
+        //         ...g,
+        //         name: groupName,
+        //         description: groupDescription,
+        //         items: selectedItems
+        //     } : g));
+        // } else {
+        //     setGroups([...groups, {
+        //         id: `g${Date.now()}`,
+        //         name: groupName,
+        //         description: groupDescription,
+        //         createdAt: new Date().toISOString().split('T')[0],
+        //         updatedAt: new Date().toISOString().split('T')[0],
+        //         items: selectedItems
+        //     }]);
+        // }
         setIsModalOpen(false);
     };
 
 
-    const toggleItemSelection = (item: GroupItem) => {
+    const toggleItemSelection = (item: MonitoringGroupItem) => {
         if (selectedItems.find(si => si.id === item.id)) {
             setSelectedItems(selectedItems.filter(si => si.id !== item.id));
         } else {
@@ -100,11 +66,12 @@ export default function MonitoringGroupsModal() {
         }
     };
 
+
     return (
         <div className="">
             <button
                 onClick={() => { setIsModalOpen(true) }}
-                className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-xs font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer focus:outline-none focus:ring-2 focus:border-transparent"
+                className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-xs font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer focus:outline-none focus:ring-1 focus:border-transparent"
             >
                 <Plus size={15} />
                 Novo Grupo
