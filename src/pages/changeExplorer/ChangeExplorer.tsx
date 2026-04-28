@@ -75,7 +75,7 @@ console.log(data,'asasas')
           header={changeExplorerHeader}
           title='Change History'
           description='Explore the history of changes made to your DHIS2 objects, including who made the change and when.'
-          tabledata={rowsFormatter(data?.data!)} />
+          tabledata={rowsFormatter(data?.audits!)} />
       </div>
 
       {/* Change Detail Slide-out Panel */}
