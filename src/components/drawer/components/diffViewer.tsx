@@ -1,8 +1,11 @@
 import { ChevronRight, History } from "lucide-react";
 import { actionDot, actionOutline } from "../../../constants/common/common";
 import { buildDiff } from "../utils/buildDiffData";
+import { format } from 'date-fns'
+import { useEffect, useState } from "react";
 
 export default function DiffViewer({ auditDetails, action }: { action: string, auditDetails: any[] }) {
+    const [selected, setSelected] = useState({})
 
     return (
         <>
@@ -12,7 +15,7 @@ export default function DiffViewer({ auditDetails, action }: { action: string, a
                     <div className="text-xs font-bold text-[#22c55e] uppercase tracking-wider px-2">AFTER</div>
                 </div>
                 <div className="border border-[#e2e8f0] rounded-lg overflow-hidden divide-y divide-[#e2e8f0]">
-                    {buildDiff((auditDetails ?? []), action).map((row: any, i: number) => (
+                    {buildDiff((auditDetails ?? []), action,selected).map((row: any, i: number) => (
                         <div key={i} className="grid grid-cols-2 divide-x divide-[#e2e8f0]">
                             {/* Before */}
                             <div className="px-3 py-2.5">
@@ -47,23 +50,20 @@ export default function DiffViewer({ auditDetails, action }: { action: string, a
                                 <div className="absolute left-[7px] top-5 bottom-0 w-px bg-[#e2e8f0]" />
                             )}
                             {/* Dot */}
-                            <div className={`w-[15px] h-[15px] rounded-full ${actionDot[h.action]} shrink-0 mt-0.5 border-2 border-white shadow-sm`} />
+                            <div className={`w-[15px] h-[15px] rounded-full ${actionDot[h.auditType]} shrink-0 mt-0.5 border-2 border-white shadow-sm`} />
                             {/* Content */}
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${actionOutline[h.action]}`}>
-                                        {h.action}
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${actionOutline[h.auditType]}`}>
+                                        {h.auditType}
                                     </span>
-                                    <span className="text-sm font-semibold text-[#0f172a]">{h.user}</span>
+                                    <span className="text-sm font-semibold text-[#0f172a]">{h?.objectData?.lastUpdatedBy?.displayName}</span>
                                     <span className="text-xs text-[#94a3b8]">·</span>
-                                    <span className="text-xs text-[#94a3b8]">{h.date}</span>
+                                    <span className="text-xs text-[#94a3b8]">{format(h.created_at, 'yyyy-MM-dd HH:mm')}</span>
                                     <div className="flex-1" />
-                                    <span className="text-xs text-[#94a3b8]">{h.fields} fields</span>
-                                    <ChevronRight size={14} className="text-[#94a3b8]" />
+                                    <span className="text-xs text-[#94a3b8] cursor-pointer" onClick={() => setSelected(h)}>View details</span>
+                                    <ChevronRight size={14} className="text-[#94a3b8]" onClick={() => setSelected(h)} />
                                 </div>
-                                {h.desc && (
-                                    <p className="text-xs text-[#64748b] mt-0.5">{h.desc}</p>
-                                )}
                             </div>
                         </div>
                     ))}

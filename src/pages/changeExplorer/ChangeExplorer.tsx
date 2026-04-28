@@ -25,9 +25,8 @@ export default function ChangeExplorer() {
   const [parentChange, setParentChange] = useState<any | null>(null);
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
-  const [detailTab, setDetailTab] = useState<'diff' | 'dependencies' | 'raw'>('diff');
   const { getAudit, data, loading } = useGetudit();
-console.log(data,'asasas')
+
   useEffect(() => {
     getAudit(page, pageSize)
   }, [page, pageSize])
@@ -67,10 +66,8 @@ console.log(data,'asasas')
           <TableFilter />
         )}
 
-        {/* Results Table */}
         <Table
           pagination={{ ...data?.pager!, setPage, setPageSize }}
-          setDetailTab={setDetailTab}
           setSelectedChange={setSelectedChange}
           header={changeExplorerHeader}
           title='Change History'
@@ -78,13 +75,13 @@ console.log(data,'asasas')
           tabledata={rowsFormatter(data?.audits!)} />
       </div>
 
-      {/* Change Detail Slide-out Panel */}
-      {selectedChange && <ChangeExplorerDrawer
-        parentChange={parentChange}
-        selectedChange={selectedChange}
-        setParentChange={setParentChange}
-        setSelectedChange={setSelectedChange}
-      />}
+      {selectedChange &&
+        <ChangeExplorerDrawer
+          parentChange={parentChange}
+          selectedChange={selectedChange}
+          setParentChange={setParentChange}
+          setSelectedChange={setSelectedChange}
+        />}
     </div>
   );
 }

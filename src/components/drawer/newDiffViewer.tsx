@@ -1,0 +1,779 @@
+import { useState, useMemo, useEffect } from "react";
+import { displayValue, formatDate, isArrayOfObjects, isPlainObject, pairArrayItems, sortKeysWithIdentityFirst, valuesEqual } from "./utils/diffViewUtils";
+import { ArrayPair, DiffArrayItem, DiffNode, DiffNodeType } from "../../types/diffTypes/diffTypes";
+
+function buildDiff(
+    before: Record<string, unknown>,
+    after: Record<string, unknown>,
+    isCreate = false,
+    parentPath = ""
+): DiffNode[] {
+    const allKeys = sortKeysWithIdentityFirst(
+        Array.from(new Set([...Object.keys(before), ...Object.keys(after)]))
+    );
+
+    return allKeys.map((key) => {
+        const path = parentPath ? `${parentPath}.${key}` : key;
+        const bVal = before[key];
+        const aVal = after[key];
+        // For CREATE operations, everything is considered "changed" (new)
+        const changed = isCreate || !valuesEqual(bVal, aVal);
+
+        if (isArrayOfObjects(bVal) || isArrayOfObjects(aVal)) {
+            const bArr = (isArrayOfObjects(bVal) ? bVal : []) as Record<string, unknown>[];
+            const aArr = (isArrayOfObjects(aVal) ? aVal : []) as Record<string, unknown>[];
+            const pairedItems: ArrayPair[] = pairArrayItems(bArr, aArr) ?? Array.from(
+                { length: Math.max(bArr.length, aArr.length) },
+                (_, index): ArrayPair => ({
+                    index,
+                    before: bArr[index],
+                    after: aArr[index],
+                })
+            );
+            const items: DiffArrayItem[] = [];
+
+            for (const pair of pairedItems) {
+                const itemPath = `${path}[${pair.identity ?? pair.index}]`;
+                const bItem = pair.before as Record<string, unknown> | undefined;
+                const aItem = pair.after as Record<string, unknown> | undefined;
+                const itemChanged = !valuesEqual(bItem, aItem);
+                const allItemKeys = sortKeysWithIdentityFirst(
+                    Array.from(new Set([...Object.keys(bItem ?? {}), ...Object.keys(aItem ?? {})]))
+                );
+
+                const fields: DiffNode[] = allItemKeys.map((ik) => {
+                    const childPath = `${itemPath}.${ik}`;
+                    const ibVal = bItem?.[ik];
+                    const iaVal = aItem?.[ik];
+                    const fieldChanged = !valuesEqual(ibVal, iaVal);
+
+                    if (isPlainObject(ibVal) || isPlainObject(iaVal)) {
+                        const children = buildDiff(
+                            (isPlainObject(ibVal) ? ibVal : {}) as Record<string, unknown>,
+                            (isPlainObject(iaVal) ? iaVal : {}) as Record<string, unknown>,
+                            isCreate,
+                            childPath
+                        );
+                        return {
+                            key: ik,
+                            path: childPath,
+                            type: "object" as DiffNodeType,
+                            before: ibVal,
+                            after: iaVal,
+                            changed: isCreate || fieldChanged,
+                            children,
+                            arrayItemCount: { before: 0, after: 0 },
+                        };
+                    }
+
+                    return {
+                        key: ik,
+                        path: childPath,
+                        type: "primitive" as DiffNodeType,
+                        before: ibVal,
+                        after: iaVal,
+                        changed: isCreate || fieldChanged,
+                        arrayItemCount: { before: 0, after: 0 },
+                    };
+                });
+
+                items.push({
+                    index: pair.index,
+                    path: itemPath,
+                    identity: pair.identity,
+                    fields,
+                    changed: isCreate || itemChanged,
+                    beforeExists: isCreate ? false : !!bItem,
+                    afterExists: !!aItem,
+                });
+            }
+
+            return {
+                key,
+                path,
+                type: "array",
+                before: bVal,
+                after: aVal,
+                changed,
+                items,
+                arrayItemCount: { before: bArr.length, after: aArr.length },
+            };
+        }
+
+        if (isPlainObject(bVal) || isPlainObject(aVal)) {
+            const children = buildDiff(
+                (isPlainObject(bVal) ? bVal : {}) as Record<string, unknown>,
+                (isPlainObject(aVal) ? aVal : {}) as Record<string, unknown>,
+                isCreate,
+                path
+            );
+            return {
+                key,
+                path,
+                type: "object",
+                before: bVal,
+                after: aVal,
+                changed,
+                children,
+                arrayItemCount: { before: 0, after: 0 },
+            };
+        }
+
+        return {
+            key,
+            path,
+            type: "primitive",
+            before: bVal,
+            after: aVal,
+            changed,
+            arrayItemCount: { before: 0, after: 0 },
+        };
+    });
+}
+
+// ─── Component ──────────────────────────────────────────────────────────────
+
+type Tab = "diff" | "raw";
+type ExpandMode = "changed" | "all" | "none" | "manual";
+
+export default function AuditDiffViewer({ before, after, selectedChange }: { selectedChange: any, before: any, after: any }) {
+    const [tab, setTab] = useState<Tab>("diff");
+    const [showAll, setShowAll] = useState(false);
+    const [expandMode, setExpandMode] = useState<ExpandMode>("none");
+    const switchToManual = () => setExpandMode("manual");
+
+    console.log(selectedChange)
+    const createMode = !before
+
+    const diffTree = useMemo(
+        () =>
+            buildDiff(
+                before,
+                after,
+                createMode
+            ),
+        [createMode]
+    );
+
+    const totalFields = countNodes(diffTree);
+    const changedFields = countChanged(diffTree);
+
+    return (
+        <div className="w-full bg-white overflow-auto">
+            {/* ── Header ── */}
+            <div className="flex items-center justify-between px-8 pt-7 pb-2">
+                <h2 className="text-2xl font-bold text-slate-900">Change Detail</h2>
+                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            {/* ── Meta grid ── */}
+            <div className="px-8 py-5 grid grid-cols-2 gap-x-10 gap-y-3 border-b border-slate-100">
+                <div className="space-y-3">
+                    <MetaRow icon={<UserIcon />} label="User:" value={<span className="font-bold text-slate-800">{selectedChange?.user ?? "system"}</span>} />
+                    <MetaRow icon={<CalendarIcon />} label="Date:" value={<span className="font-bold text-slate-800">{formatDate(selectedChange?.date)}</span>} />
+                    <MetaRow icon={<DocIcon />} label="Type:" value={<span className="inline-flex px-3 py-0.5 bg-slate-100 text-slate-600 text-sm rounded font-medium">{selectedChange?.type}</span>} />
+                </div>
+                <div className="space-y-3">
+                    <MetaRow icon={<ActionIcon />} label="Action:" value={<span className={`inline-flex px-3 py-0.5 text-sm rounded font-bold border ${createMode ? "bg-green-100 text-green-700 border-green-200" : "bg-amber-100 text-amber-700 border-amber-200"}`}>{selectedChange?.action}</span>} />
+                    <MetaRow icon={<BoxIcon />} label="Object name:" value={<span className="font-bold text-slate-800">{selectedChange?.object}</span>} />
+                    <MetaRow icon={<HashIcon />} label="ID:" value={<span className="font-mono text-slate-700 font-semibold">{selectedChange?.id}</span>} />
+                </div>
+            </div>
+
+            {/* ── Tab switcher ── */}
+            <div className="px-8 pt-5 pb-0">
+                <div className="flex rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-1 gap-1">
+                    <TabBtn active={tab === "diff"} onClick={() => setTab("diff")}>Diff View</TabBtn>
+                    <TabBtn active={tab === "raw"} onClick={() => setTab("raw")}>Raw JSON</TabBtn>
+                </div>
+            </div>
+
+            {/* ── Content ── */}
+            {tab === "diff" ? (
+                <div className="px-8 py-5">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <button
+                                onClick={() => setShowAll((p) => !p)}
+                                className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${showAll
+                                    ? "border-slate-200 text-slate-600 hover:bg-slate-50"
+                                    : "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                                    }`}
+                            >
+                                {showAll ? <EyeOffIcon /> : <EyeIcon />}
+                                {showAll ? "Show only differences" : "Showing only differences"}
+                            </button>
+                            <button
+                                onClick={() => setExpandMode("all")}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+                            >
+                                <ExpandIcon />
+                                Expand all
+                            </button>
+                            <button
+                                onClick={() => setExpandMode("none")}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+                            >
+                                <CollapseIcon />
+                                Collapse all
+                            </button>
+                            <button
+                                onClick={() => setExpandMode("changed")}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+                            >
+                                <ResetExpandIcon />
+                                Auto-expand changed
+                            </button>
+                        </div>
+                        <span className="text-sm text-slate-500">
+                            <span className="font-semibold text-amber-600">{changedFields} changed</span>
+                            {" "}of <span className="font-semibold text-slate-700">{totalFields}</span> total fields
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-0 mb-2">
+                        <span className={`text-xs font-bold tracking-widest uppercase px-4 ${createMode ? "text-slate-300" : "text-red-500"}`}>{createMode ? "—" : "Before"}</span>
+                        <span className="text-xs font-bold tracking-widest uppercase px-4 text-green-600">{createMode ? "New Object" : "After"}</span>
+                    </div>
+
+                    <div className="border border-slate-200 rounded-xl overflow-hidden">
+                        <DiffTreeRenderer nodes={diffTree} showAll={showAll} depth={0} expandMode={expandMode} isCreate={createMode} onUserToggle={switchToManual} />
+                    </div>
+                </div>
+            ) : (
+                <RawJSON beforeData={before} afterData={after} isCreate={createMode} />
+            )}
+        </div>
+    );
+}
+
+// ─── Recursive Diff Tree Renderer ───────────────────────────────────────────
+
+function DiffTreeRenderer({ nodes, showAll, depth, expandMode, insideCollapsible = false, isCreate = false, onUserToggle }: { nodes: DiffNode[]; showAll: boolean; depth: number; expandMode: ExpandMode; insideCollapsible?: boolean; isCreate?: boolean; onUserToggle?: () => void }) {
+    // Inside collapsible sections: always show all fields (highlight changed ones)
+    // At top level: respect the showAll toggle
+    const filtered = insideCollapsible ? nodes : (showAll ? nodes : nodes.filter((n) => n.changed));
+
+    if (filtered.length === 0) {
+        return (
+            <div className="text-center py-10 text-slate-400 text-sm">
+                {depth === 0 ? (isCreate ? "New object created." : "No differences found between the two versions.") : "No differences in this section."}
+            </div>
+        );
+    }
+
+    return (
+        <>
+            {filtered.map((node) => (
+                <DiffNodeRow key={node.path} node={node} showAll={showAll} depth={depth} expandMode={expandMode} insideCollapsible={insideCollapsible} isCreate={isCreate} onUserToggle={onUserToggle} />
+            ))}
+        </>
+    );
+}
+
+function DiffNodeRow({ node, showAll, depth, expandMode, insideCollapsible = false, isCreate = false, onUserToggle }: { node: DiffNode; showAll: boolean; depth: number; expandMode: ExpandMode; insideCollapsible?: boolean; isCreate?: boolean; onUserToggle?: () => void }) {
+    if (node.type === "object" && node.children) {
+        return <CollapsibleObjectRow node={node} showAll={showAll} depth={depth} expandMode={expandMode} isCreate={isCreate} onUserToggle={onUserToggle} />;
+    }
+
+    if (node.type === "array" && node.items) {
+        return <CollapsibleArrayRow node={node} showAll={showAll} depth={depth} expandMode={expandMode} isCreate={isCreate} onUserToggle={onUserToggle} />;
+    }
+
+    return <PrimitiveRow node={node} depth={depth} insideCollapsible={insideCollapsible} isCreate={isCreate} />;
+}
+
+// ─── Primitive Row ──────────────────────────────────────────────────────────
+
+function PrimitiveRow({ node, depth, insideCollapsible = false, isCreate = false }: { node: DiffNode; depth: number; insideCollapsible?: boolean; isCreate?: boolean }) {
+    const beforeStr = isCreate ? "—" : displayValue(node.before);
+    const afterStr = displayValue(node.after);
+    const beforeEmpty = beforeStr === "—";
+    const afterEmpty = afterStr === "—";
+    const isRemoved = !isCreate && node.changed && node.before !== undefined && node.after === undefined;
+    const isAdded = !isCreate && node.changed && node.before === undefined && node.after !== undefined;
+    const badgeLabel = isCreate ? "New" : isRemoved ? "Removed" : isAdded ? "Added" : "Changed";
+    const badgeClass = isCreate || isAdded
+        ? "bg-green-100 text-green-800"
+        : isRemoved
+            ? "bg-red-100 text-red-800"
+            : "bg-amber-100 text-amber-800";
+    const showBadge = node.changed && (insideCollapsible || isRemoved || isAdded || isCreate);
+
+    // When inside a collapsible section, highlight the entire row if changed
+    const rowHighlight = insideCollapsible && node.changed
+        ? isCreate || isAdded
+            ? "bg-green-50/60 border-l-4 border-l-green-400"
+            : isRemoved
+                ? "bg-red-50/60 border-l-4 border-l-red-400"
+                : "bg-amber-50/60 border-l-4 border-l-amber-400"
+        : "";
+
+    // Labels always black, values keep their styling
+    const keyClass = insideCollapsible
+        ? "text-xs font-medium mb-1 font-mono text-slate-900"
+        : "text-xs text-slate-400 font-medium mb-1 font-mono";
+
+    return (
+        <div className={`grid grid-cols-2 divide-x divide-slate-100 border-b border-slate-100 last:border-b-0 ${rowHighlight}`}>
+            {/* Before */}
+            <div className="p-4" style={{ paddingLeft: `${16 + depth * 20}px` }}>
+                <p className={keyClass}>{node.key}{showBadge && <span className={`ml-2 inline-flex items-center px-1.5 py-0 rounded text-[10px] font-bold leading-tight uppercase tracking-wide ${badgeClass}`}>{badgeLabel}</span>}</p>
+                <div className={`text-sm font-mono break-all ${beforeEmpty ? "text-slate-300" : "text-slate-600"} ${node.changed && !beforeEmpty ? "bg-red-50 border border-red-200 rounded px-2 py-1 inline-block" : ""}`}>
+                    {beforeStr.includes("\n") ? <pre className="whitespace-pre-wrap text-xs">{beforeStr}</pre> : beforeStr}
+                </div>
+            </div>
+            {/* After */}
+            <div className="p-4" style={{ paddingLeft: `${16 + depth * 20}px` }}>
+                <p className={keyClass}>{node.key}{showBadge && <span className={`ml-2 inline-flex items-center px-1.5 py-0 rounded text-[10px] font-bold leading-tight uppercase tracking-wide ${badgeClass}`}>{badgeLabel}</span>}</p>
+                <div className={`text-sm font-mono break-all ${afterEmpty ? "text-slate-300" : "text-slate-600"} ${node.changed && !afterEmpty ? "bg-green-50 border border-green-200 rounded px-2 py-1 inline-block" : ""}`}>
+                    {afterStr.includes("\n") ? <pre className="whitespace-pre-wrap text-xs">{afterStr}</pre> : afterStr}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function CollapsibleObjectRow({
+    node,
+    showAll,
+    depth,
+    expandMode,
+    isCreate = false,
+    onUserToggle,
+}: {
+    node: DiffNode;
+    showAll: boolean;
+    depth: number;
+    expandMode: ExpandMode;
+    isCreate?: boolean;
+    onUserToggle?: () => void;
+}) {
+    const [manualOpen, setManualOpen] = useState(node.changed);
+
+    const open = expandMode === "all" ? true : expandMode === "none" ? false : expandMode === "changed" ? node.changed : manualOpen;
+
+    useEffect(() => {
+        if (expandMode === "all") setManualOpen(true);
+        else if (expandMode === "none") setManualOpen(false);
+        else if (expandMode === "changed") setManualOpen(node.changed);
+    }, [expandMode, node.changed]);
+
+    const handleToggle = () => {
+        setManualOpen(!open);
+        onUserToggle?.();
+    };
+
+    const childChanged = node.children ? countChanged(node.children) : 0;
+    const childTotal = node.children ? countNodes(node.children) : 0;
+
+    const isAdded = !isCreate && node.before === undefined && node.after !== undefined;
+    const isRemoved = !isCreate && node.before !== undefined && node.after === undefined;
+
+    const headerHighlight = node.changed
+        ? isCreate || isAdded
+            ? "bg-green-50/40"
+            : isRemoved
+                ? "bg-red-50/40"
+                : childChanged > 0
+                    ? "bg-amber-50/30"
+                    : ""
+        : "";
+
+    const statusBadge = isCreate || isAdded ? (
+        <span className="inline-flex items-center px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs font-bold uppercase">
+            {isCreate ? "New" : "Added"}
+        </span>
+    ) : isRemoved ? (
+        <span className="inline-flex items-center px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold uppercase">
+            Removed
+        </span>
+    ) : null;
+
+    return (
+        <div className="border-b border-slate-100 last:border-b-0">
+            <button
+                onClick={handleToggle}
+                className={`w-full grid grid-cols-2 divide-x divide-slate-100 hover:bg-slate-50/60 transition-colors ${headerHighlight}`}
+                style={{ paddingLeft: `${depth * 20}px` }}
+            >
+                <div className="p-4 flex items-center gap-2 text-left" style={{ paddingLeft: `${16}px` }}>
+                    <ChevronIcon open={open} />
+                    <span className="text-xs font-mono font-semibold text-slate-600">{node.key}</span>
+                    <span className="text-xs text-slate-400 font-medium">object</span>
+                    <span className="text-xs text-slate-300">·</span>
+                    <span className="text-xs text-slate-400">
+                        {isRemoved ? `${childTotal} fields` : isAdded ? "—" : `${childTotal} fields`}
+                    </span>
+                    {statusBadge}
+                    {!statusBadge && childChanged > 0 && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-bold">
+                            {childChanged} changed
+                        </span>
+                    )}
+                </div>
+
+                <div className="p-4 flex items-center gap-2 text-left" style={{ paddingLeft: `${16}px` }}>
+                    <span className="text-xs font-mono font-semibold text-slate-600">{node.key}</span>
+                    <span className="text-xs text-slate-400 font-medium">object</span>
+                    <span className="text-xs text-slate-300">·</span>
+                    <span className="text-xs text-slate-400">
+                        {isRemoved ? "—" : `${childTotal} fields`}
+                    </span>
+                    {statusBadge}
+                </div>
+            </button>
+
+            {node.children && (
+                <div
+                    hidden={!open}
+                    className="bg-slate-50/40 border-t border-slate-100"
+                >
+                    <DiffTreeRenderer
+                        nodes={node.children}
+                        showAll={showAll}
+                        depth={depth + 1}
+                        expandMode={expandMode}
+                        insideCollapsible={true}
+                        isCreate={isCreate}
+                        onUserToggle={onUserToggle}
+                    />
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Collapsible Array ──────────────────────────────────────────────────────
+
+function CollapsibleArrayRow({ node, showAll, depth, expandMode, isCreate = false, onUserToggle }: { node: DiffNode; showAll: boolean; depth: number; expandMode: ExpandMode; isCreate?: boolean; onUserToggle?: () => void }) {
+    const [manualOpen, setManualOpen] = useState(node.changed);
+    const open = expandMode === "all" ? true : expandMode === "none" ? false : expandMode === "changed" ? node.changed : manualOpen;
+
+    useEffect(() => {
+        if (expandMode === "all") setManualOpen(true);
+        else if (expandMode === "none") setManualOpen(false);
+        else if (expandMode === "changed") setManualOpen(node.changed);
+    }, [expandMode, node.changed]);
+
+    const handleToggle = () => {
+        setManualOpen(!open);
+        onUserToggle?.();
+    };
+
+    const items = node.items ?? [];
+    const changedItems = items.filter((it) => it.changed).length;
+    const addedItems = items.filter((it) => !it.beforeExists && it.afterExists).length;
+    const removedItems = items.filter((it) => it.beforeExists && !it.afterExists).length;
+
+    // Header background tint based on the dominant change type
+    const headerHighlight = node.changed
+        ? isCreate
+            ? "bg-green-50/40"
+            : addedItems > 0 && removedItems === 0
+                ? "bg-green-50/30"
+                : removedItems > 0 && addedItems === 0
+                    ? "bg-red-50/30"
+                    : "bg-amber-50/30"
+        : "";
+
+    return (
+        <div className="border-b border-slate-100 last:border-b-0">
+            {/* Array header */}
+            <button
+                onClick={handleToggle}
+                className={`w-full grid grid-cols-2 divide-x divide-slate-100 hover:bg-slate-50/60 transition-colors ${headerHighlight}`}
+                style={{ paddingLeft: `${depth * 20}px` }}
+            >
+                <div className="p-4 flex items-center gap-2 text-left" style={{ paddingLeft: `${16}px` }}>
+                    <ChevronIcon open={open} />
+                    <span className="text-xs font-mono font-semibold text-slate-600">{node.key}</span>
+                    <span className="text-xs text-slate-400 font-medium">array</span>
+                    <span className="text-xs text-slate-300">·</span>
+                    <span className="text-xs text-slate-400">{node.arrayItemCount.before} items</span>
+                    {changedItems > 0 && addedItems === 0 && removedItems === 0 && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-bold">
+                            {changedItems} changed
+                        </span>
+                    )}
+                    {removedItems > 0 && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold uppercase">
+                            {removedItems} removed
+                        </span>
+                    )}
+                </div>
+                <div className="p-4 flex items-center gap-2 text-left" style={{ paddingLeft: `${16}px` }}>
+                    <span className="text-xs font-mono font-semibold text-slate-600">{node.key}</span>
+                    <span className="text-xs text-slate-400 font-medium">array</span>
+                    <span className="text-xs text-slate-300">·</span>
+                    <span className="text-xs text-slate-400">{node.arrayItemCount.after} items</span>
+                    {addedItems > 0 && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs font-bold uppercase">
+                            +{addedItems} {isCreate ? "new" : "added"}
+                        </span>
+                    )}
+                </div>
+            </button>
+
+            {/* Array items */}
+            {open && (
+                <div className="bg-slate-50/40 border-t border-slate-100">
+                    {items.map((item) => {
+                        return (
+                            <ArrayItemRow
+                                key={item.path}
+                                item={item}
+                                parentKey={node.key}
+                                showAll={showAll}
+                                depth={depth + 1}
+                                expandMode={expandMode}
+                                isCreate={isCreate}
+                                onUserToggle={onUserToggle}
+                            />
+                        );
+                    })}
+                    {items.length === 0 && (
+                        <div className="text-center py-6 text-slate-400 text-sm">
+                            No items in this array.
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function ArrayItemRow({ item, parentKey, showAll, depth, expandMode, isCreate = false, onUserToggle }: { item: DiffArrayItem; parentKey: string; showAll: boolean; depth: number; expandMode: ExpandMode; isCreate?: boolean; onUserToggle?: () => void }) {
+    const [manualOpen, setManualOpen] = useState(item.changed);
+    const open = expandMode === "all" ? true : expandMode === "none" ? false : expandMode === "changed" ? item.changed : manualOpen;
+
+    useEffect(() => {
+        if (expandMode === "all") setManualOpen(true);
+        else if (expandMode === "none") setManualOpen(false);
+        else if (expandMode === "changed") setManualOpen(item.changed);
+    }, [expandMode, item.changed]);
+
+    const handleToggle = () => {
+        setManualOpen(!open);
+        onUserToggle?.();
+    };
+
+    const changedFieldCount = item.fields.filter((f) => f.changed).length;
+
+    const headerHighlight = item.changed
+        ? isCreate || !item.beforeExists
+            ? "bg-green-50/40"
+            : !item.afterExists
+                ? "bg-red-50/40"
+                : "bg-amber-50/40"
+        : "";
+    const itemLabel = item.identity ? `${parentKey}[${item.identity}]` : `${parentKey}[${item.index}]`;
+
+    return (
+        <div className="border-b border-slate-100 last:border-b-0">
+            <button
+                onClick={handleToggle}
+                className={`w-full grid grid-cols-2 divide-x divide-slate-100 hover:bg-slate-50/60 transition-colors ${headerHighlight}`}
+                style={{ paddingLeft: `${depth * 20}px` }}
+            >
+                <div className="p-3 flex items-center gap-2 text-left" style={{ paddingLeft: `${16}px` }}>
+                    <ChevronIcon open={open} />
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-slate-200 text-slate-600 text-xs font-bold">{item.index}</span>
+                    <span className="text-xs font-mono text-slate-500">{itemLabel}</span>
+                    {!item.beforeExists && (
+                        <span className="inline-flex px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs font-bold">{isCreate ? "New" : "Added"}</span>
+                    )}
+                    {!item.afterExists && (
+                        <span className="inline-flex px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold">Removed</span>
+                    )}
+                    {item.changed && item.beforeExists && item.afterExists && changedFieldCount > 0 && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-bold">
+                            {changedFieldCount} changed
+                        </span>
+                    )}
+                </div>
+                <div className="p-3 flex items-center gap-2 text-left" style={{ paddingLeft: `${16}px` }}>
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-slate-200 text-slate-600 text-xs font-bold">{item.index}</span>
+                    <span className="text-xs font-mono text-slate-500">{itemLabel}</span>
+                    <span className="text-xs text-slate-400">{item.fields.length} fields</span>
+                </div>
+            </button>
+
+            {open && (
+                <div className="bg-white/60 border-t border-slate-100">
+                    <DiffTreeRenderer nodes={item.fields} showAll={showAll} depth={depth + 1} expandMode={expandMode} insideCollapsible={true} isCreate={isCreate} onUserToggle={onUserToggle} />
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Count helpers ──────────────────────────────────────────────────────────
+
+function countNodes(nodes: DiffNode[]): number {
+    let c = 0;
+    for (const n of nodes) {
+        if (n.type === "primitive") c++;
+        else if (n.type === "object" && n.children) c += countNodes(n.children);
+        else if (n.type === "array" && n.items) {
+            for (const it of n.items) c += countNodes(it.fields);
+        }
+    }
+    return c;
+}
+
+function countChanged(nodes: DiffNode[]): number {
+    let c = 0;
+    for (const n of nodes) {
+        if (n.type === "primitive" && n.changed) c++;
+        else if (n.type === "object" && n.children) c += countChanged(n.children);
+        else if (n.type === "array" && n.items) {
+            for (const it of n.items) c += countChanged(it.fields);
+        }
+    }
+    return c;
+}
+
+// ─── Raw JSON ───────────────────────────────────────────────────────────────
+
+function RawJSON({ beforeData, afterData, isCreate }: { beforeData: Record<string, unknown>; afterData: Record<string, unknown>; isCreate: boolean }) {
+    const [which, setWhich] = useState<"before" | "after">("before");
+    const data = which === "before" ? beforeData : afterData;
+
+    return (
+        <div className="px-8 py-5">
+            <div className="flex gap-2 mb-4">
+                <button onClick={() => setWhich("before")} className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-all ${which === "before" ? "bg-red-50 border-red-300 text-red-700" : "border-slate-200 text-slate-500 hover:bg-slate-50"}`}>
+                    {isCreate ? "Before (empty)" : "Before (Version A)"}
+                </button>
+                <button onClick={() => setWhich("after")} className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-all ${which === "after" ? "bg-green-50 border-green-300 text-green-700" : "border-slate-200 text-slate-500 hover:bg-slate-50"}`}>
+                    {isCreate ? "New Object" : "After (Version B)"}
+                </button>
+            </div>
+            <pre className="bg-slate-900 text-green-300 text-xs rounded-xl p-5 overflow-auto max-h-[500px] leading-relaxed">
+                {JSON.stringify(data, null, 2)}
+            </pre>
+        </div>
+    );
+}
+
+// ─── Small UI helpers ───────────────────────────────────────────────────────
+
+function MetaRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
+    return (
+        <div className="flex items-center gap-2.5">
+            <span className="text-slate-400 flex-shrink-0">{icon}</span>
+            <span className="text-slate-500 text-sm">{label}</span>
+            <span className="text-sm">{value}</span>
+        </div>
+    );
+}
+
+function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+    return (
+        <button
+            onClick={onClick}
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-150 ${active ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-500 hover:text-slate-700"
+                }`}
+        >
+            {children}
+        </button>
+    );
+}
+
+function ChevronIcon({ open }: { open: boolean }) {
+    return (
+        <svg
+            className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0 ${open ? "rotate-90" : ""}`}
+            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+        </svg>
+    );
+}
+
+// ─── Icons ──────────────────────────────────────────────────────────────────
+
+function UserIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+    );
+}
+function CalendarIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth={2} />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+    );
+}
+function DocIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+    );
+}
+function ActionIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+    );
+}
+function BoxIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+    );
+}
+function HashIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+        </svg>
+    );
+}
+function EyeIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+    );
+}
+function EyeOffIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+        </svg>
+    );
+}
+function ExpandIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4" />
+        </svg>
+    );
+}
+function CollapseIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4" />
+        </svg>
+    );
+}
+function ResetExpandIcon() {
+    return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582M20 20v-5h-.581M5.168 9A7 7 0 0117 6.17M18.832 15A7 7 0 017 17.83" />
+        </svg>
+    );
+}
