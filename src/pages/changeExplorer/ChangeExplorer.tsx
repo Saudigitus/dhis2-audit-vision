@@ -72,8 +72,7 @@ export default function ChangeExplorer() {
           header={changeExplorerHeader}
           title='Change History'
           description='Explore the history of changes made to your DHIS2 objects, including who made the change and when.'
-          tabledata={rowsFormatter(data?.audits!)}
-        />
+          tabledata={rowsFormatter(data?.audits!)} />
       </div>
 
       {selectedChange &&
