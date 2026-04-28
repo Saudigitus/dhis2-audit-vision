@@ -1,16 +1,12 @@
 import { Layers } from "lucide-react"
 import { Column } from "./TableHeader"
-
-export const actionColors: Record<string, string> = {
-    CREATE: 'bg-[#3b82f6] text-white',
-    UPDATE: 'bg-[#fef3c7] text-[#d97706] border border-[#fcd34d]',
-    DELETE: 'bg-[#fee2e2] text-[#ef4444] border border-[#fca5a5]',
-}
+import { actionColors } from "../../../constants/common/common"
 
 const TableCell = ({ column, row }: { column: Column, row: Record<string, any> }) => {
     if (column.id === 'collapse' || column.id === 'view') {
         return null
     }
+    
     switch (column?.id) {
         case "action":
             return (

@@ -63,23 +63,23 @@ function reconstructNested(
     return result;
 }
 
-export function buildDiff(arr: AuditRecord[], action?: string | null): DiffEntry[] {
+export function buildDiff(arr: AuditRecord[], action?: string | null, selected?: any | null): DiffEntry[] {
     if (arr?.length === 0) return [];
 
     const a = actions.DELETE === action ? {} : flattenObject(arr?.[0]?.objectData ?? {});
     const b = actions.DELETE === action
         ? flattenObject(arr?.[0]?.objectData ?? {})
-        : arr?.[1] ? flattenObject(arr?.[1]?.objectData ?? {}) : {};
+        : selected ? flattenObject(selected) : arr?.[1] ? flattenObject(arr?.[1]?.objectData ?? {}) : {};
 
     const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
     const topLevelKeys = new Set(Array.from(allKeys).map(k => k.split('.')[0]));
 
     return Array.from(topLevelKeys).sort().map((topKey): DiffEntry => {
         const beforeValue = topKey in b ? reconstructNested(b, topKey) : undefined;
-        const afterValue  = topKey in a ? reconstructNested(a, topKey) : undefined;
+        const afterValue = topKey in a ? reconstructNested(a, topKey) : undefined;
 
         const before = beforeValue !== undefined ? serialize(beforeValue) : '—';
-        const after  = afterValue  !== undefined ? serialize(afterValue)  : '—';
+        const after = afterValue !== undefined ? serialize(afterValue) : '—';
 
         return { field: topKey, before, after, changed: before !== after };
     });
