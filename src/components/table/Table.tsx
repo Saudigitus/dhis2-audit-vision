@@ -7,6 +7,7 @@ import { SelectedAuditProps } from "../../pages/changeExplorer/ChangeExplorer"
 interface TableProps {
     title?: string
     description?: string
+    loading: boolean
     header: Array<{
         id: string,
         displayName: string
@@ -26,7 +27,7 @@ interface TableProps {
 }
 
 const Table: FC<TableProps> = (props) => {
-    const { header, tabledata, setDetailTab, setSelectedChange, pagination, title, description } = props
+    const { header, tabledata, setDetailTab, setSelectedChange, pagination, title, description, loading } = props
 
     return (
         <div className="flex-1 bg-white rounded-xl border border-[#e2e8f0]">
@@ -40,10 +41,10 @@ const Table: FC<TableProps> = (props) => {
 
             <table className="w-full">
                 <TableHeader header={header} />
-                <TableData data={tabledata} header={header} setSelectedChange={setSelectedChange} setDetailTab={setDetailTab} />
+                <TableData loading={loading} data={tabledata} header={header} setSelectedChange={setSelectedChange} setDetailTab={setDetailTab} />
             </table>
             <div className="py-5 px-10">
-                {pagination && <Pagination pagination={pagination} />}
+                {(pagination && !loading) && <Pagination pagination={pagination} />}
             </div>
         </div>
     )

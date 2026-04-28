@@ -4,7 +4,7 @@ import Table from '../../components/table/Table';
 import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
 import { Center, CircularLoader } from '@dhis2/ui';
-import { rowsFormatter } from '../../utils/table/rowFormatter';
+import { filterValuesFormatter, rowsFormatter } from '../../utils/table/rowFormatter';
 import TableFilter from '../../components/filter/TableFilter';
 import { changeExplorerHeader } from '../../constants/common/auditTableHeaders';
 
@@ -20,23 +20,22 @@ export interface SelectedAuditProps {
 
 export default function ChangeExplorer() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [query, setQuery] = useState<Record<string, string> | null>(null)
+  const [filterQuery, setFilteQuery] = useState<string | null>(null)
+
+
   const [selectedChange, setSelectedChange] = useState<SelectedAuditProps | null>(null);
   const [parentChange, setParentChange] = useState<any | null>(null);
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
   const [detailTab, setDetailTab] = useState<'diff' | 'dependencies' | 'raw'>('diff');
   const { getAudit, data, loading } = useGetudit();
-console.log(data,'asasas')
-  useEffect(() => {
-    getAudit(page, pageSize)
-  }, [page, pageSize])
 
-  if (loading) {
-    return <Center>
-      <CircularLoader />
-    </Center>
-  }
+
+  useEffect(() => {
+    getAudit(page, pageSize, filterQuery!)
+  }, [page, pageSize, filterQuery])
 
   return (
     <div className="space-y-5 relative">
@@ -53,6 +52,7 @@ console.log(data,'asasas')
           />
         </div>
         <button
+          disabled={loading}
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-sm font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer"
         >
@@ -62,13 +62,13 @@ console.log(data,'asasas')
       </div>
 
       <div className="flex gap-5">
-        {/* Filters Panel */}
         {showFilters && (
-          <TableFilter />
+          <TableFilter query={query} setQuery={setQuery} setFilteQuery={setFilteQuery} filters={filterValuesFormatter()} />
         )}
 
         {/* Results Table */}
         <Table
+          loading={loading}
           pagination={{ ...data?.pager!, setPage, setPageSize }}
           setDetailTab={setDetailTab}
           setSelectedChange={setSelectedChange}
