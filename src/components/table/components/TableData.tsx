@@ -1,20 +1,20 @@
 import { ChevronDown, ChevronUp, Eye } from "lucide-react";
 import { useState } from "react";
 import { Column } from "./TableHeader";
-import TableCell, { actionColors } from "./TableCell";
+import TableCell from "./TableCell";
 import { SelectedAuditProps } from "../../../pages/changeExplorer/ChangeExplorer";
 import { Center, CircularLoader } from "@dhis2/ui";
+import { actionColors } from "../../../constants/common/common";
 
 interface TableDataProps {
     data: Record<string, any>[],
     loading: boolean,
     header: Column[]
     setSelectedChange: (selectedChange: SelectedAuditProps) => void
-    setDetailTab: (detailTab: 'diff' | 'dependencies' | 'raw') => void
 }
 
 const TableData = (props: TableDataProps) => {
-    const { data, header, setSelectedChange, setDetailTab, loading } = props
+    const { data, header, setSelectedChange, loading } = props
     const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
     const toggleRow = (id: number) => {
@@ -64,7 +64,7 @@ const TableData = (props: TableDataProps) => {
                                     )
                                 })}
                                 <td className="px-4 py-3.5">
-                                    <button onClick={() => { setSelectedChange({ date: row?.time, type: row?.type, user: row?.user, id: row?.id, action: row?.action, object: row?.object }); setDetailTab('diff'); }} className="cursor-pointer">
+                                    <button onClick={() => { setSelectedChange({ date: row?.time, type: row?.type, user: row?.user, id: row?.id, action: row?.action, object: row?.object });}} className="cursor-pointer">
                                         <Eye size={16} className="text-[#94a3b8] hover:text-[#64748b]" />
                                     </button>
                                 </td>
@@ -97,7 +97,7 @@ const TableData = (props: TableDataProps) => {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3.5">
-                                        <button onClick={() => { setSelectedChange(dep); setDetailTab('diff'); }} className="cursor-pointer">
+                                        <button onClick={() => { setSelectedChange(dep);}} className="cursor-pointer">
                                             <Eye size={16} className="text-[#94a3b8] hover:text-[#64748b]" />
                                         </button>
                                     </td>

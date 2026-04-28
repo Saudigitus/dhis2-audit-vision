@@ -14,7 +14,6 @@ interface TableProps {
     }>
     tabledata: Record<string, any>[]
     setSelectedChange: (selectedChange: SelectedAuditProps) => void
-    setDetailTab: (detailTab: 'diff' | 'dependencies' | 'raw') => void
     pagination?: {
         total: number
         page: number
@@ -27,7 +26,7 @@ interface TableProps {
 }
 
 const Table: FC<TableProps> = (props) => {
-    const { header, tabledata, setDetailTab, setSelectedChange, pagination, title, description, loading } = props
+    const { header, tabledata, setSelectedChange, pagination, title, description, loading } = props
 
     return (
         <div className="flex-1 bg-white rounded-xl border border-[#e2e8f0]">
@@ -36,12 +35,11 @@ const Table: FC<TableProps> = (props) => {
                     <h3 className="font-bold text-[15px] text-[#0f172a]">{title}</h3>
                     <span className="text-sm text-[#64748b]">{description}</span>
                 </div>
-                {/* <span className="text-xs font-medium text-[#0f172a] border border-[#e2e8f0] rounded px-2.5 py-1">Metadata</span> */}
             </div>
 
             <table className="w-full">
                 <TableHeader header={header} />
-                <TableData loading={loading} data={tabledata} header={header} setSelectedChange={setSelectedChange} setDetailTab={setDetailTab} />
+                <TableData loading={loading} data={tabledata} header={header} setSelectedChange={setSelectedChange} />
             </table>
             <div className="py-5 px-10">
                 {(pagination && !loading) && <Pagination pagination={pagination} />}

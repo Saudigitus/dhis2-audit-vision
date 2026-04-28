@@ -29,7 +29,6 @@ export default function ChangeExplorer() {
   const [parentChange, setParentChange] = useState<any | null>(null);
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
-  const [detailTab, setDetailTab] = useState<'diff' | 'dependencies' | 'raw'>('diff');
   const { getAudit, data, loading } = useGetudit();
 
 
@@ -66,11 +65,9 @@ export default function ChangeExplorer() {
           <TableFilter query={query} setQuery={setQuery} setFilteQuery={setFilteQuery} filters={filterValuesFormatter()} />
         )}
 
-        {/* Results Table */}
         <Table
           loading={loading}
           pagination={{ ...data?.pager!, setPage, setPageSize }}
-          setDetailTab={setDetailTab}
           setSelectedChange={setSelectedChange}
           header={changeExplorerHeader}
           title='Change History'
@@ -78,13 +75,13 @@ export default function ChangeExplorer() {
           tabledata={rowsFormatter(data?.audits!)} />
       </div>
 
-      {/* Change Detail Slide-out Panel */}
-      {selectedChange && <ChangeExplorerDrawer
-        parentChange={parentChange}
-        selectedChange={selectedChange}
-        setParentChange={setParentChange}
-        setSelectedChange={setSelectedChange}
-      />}
+      {selectedChange &&
+        <ChangeExplorerDrawer
+          parentChange={parentChange}
+          selectedChange={selectedChange}
+          setParentChange={setParentChange}
+          setSelectedChange={setSelectedChange}
+        />}
     </div>
   );
 }
