@@ -27,8 +27,8 @@ export default function MonitoringGroups() {
   }, [values])
 
   const filteredGroups = groups?.filter(g =>
-    g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    g.description.toLowerCase().includes(searchQuery.toLowerCase())
+    g.name?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+    g.description?.toLowerCase()?.includes(searchQuery?.toLowerCase())
   );
 
   const handleOpenModal = (group?: MonitoringGroup) => {
