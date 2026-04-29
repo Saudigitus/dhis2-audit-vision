@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { useDataEngine } from "@dhis2/app-runtime"
 import { dataStoreKey, DataStoreType } from "../../packages/wrapper/config"
 import usePostDataStore from "../../packages/wrapper/hooks/dataStore/usePostDataStore"
@@ -10,16 +10,7 @@ const query = {
     }
 }
 
-// const mutation = {
-//     type: "create",
-//     resource: dataStoreKey,
-//     data: (data: any) => data,
-//     params: {
-//         importStrategy: 'CREATE_AND_UPDATE'
-//     }
-// }
-
-const formatGroupToPost = ({ dataStore, newGroup }: { dataStore: DataStoreType, newGroup: MonitoringGroup }) => {
+const formatGroupToPost = ({ dataStore, newGroup }: { dataStore: DataStoreType, newGroup: MonitoringGroup }): DataStoreType => {
     const exists = dataStore?.monitoringGroups?.some((g) => g?.id === newGroup?.id);
     const updated = exists
         ? dataStore?.monitoringGroups?.map((g) => (g?.id === newGroup?.id ? newGroup : g))
@@ -34,26 +25,28 @@ const formatGroupToPost = ({ dataStore, newGroup }: { dataStore: DataStoreType, 
 const useSaveMonitoringGroup = () => {
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<Error | null>(null)
     const { createDataStore } = usePostDataStore()
 
-    const saveMonitoringGroup = async ({ newGroup }: { newGroup: MonitoringGroup }) => {
+    const saveMonitoringGroup = useCallback(async ({ newGroup }: { newGroup: MonitoringGroup }) => {
         setLoading(true)
+        setError(null)
 
-        await engine.query(query, {
-            onComplete: async (result) => {
+        try {
+            const result: any = await engine.query(query)
+            const dataToPost = formatGroupToPost({ dataStore: result?.dataStoreValues, newGroup })
+            await createDataStore({ key: dataStoreKey, data: dataToPost })
+            return { success: true }
+        } catch (err) {
+            const caught = err instanceof Error ? err : new Error(String(err))
+            setError(caught)
+            return { success: false, error: caught }
+        } finally {
+            setLoading(false)
+        }
+    }, [engine, createDataStore])
 
-                const dataToPost = formatGroupToPost({ dataStore: result?.dataStoreValues, newGroup })
-
-                await createDataStore({ key: dataStoreKey, data: dataToPost })
-                    .finally(() => {
-                        setLoading(false)
-                    })
-            },
-
-        })
-    }
-
-    return { saveMonitoringGroup, loading }
+    return { saveMonitoringGroup, loading, error }
 }
 
 export { useSaveMonitoringGroup }

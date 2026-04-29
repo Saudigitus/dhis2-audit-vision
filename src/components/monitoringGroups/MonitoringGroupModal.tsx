@@ -1,8 +1,8 @@
+import { CircularLoader } from '@dhis2/ui';
 import { useEffect, useState } from 'react';
 import { Plus, Search, FolderGit2, Layers, X, Check } from 'lucide-react';
-import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
 import { useSaveMonitoringGroup } from '../../hooks/monitoringGroup/useSaveMonitoringGroup';
-import { CircularLoader, LinearLoader } from '@dhis2/ui';
+import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
 
 const availableItems: MonitoringGroupItem[] = [
     { id: 'p1', name: 'HIV Care and Treatment', type: 'program' },
@@ -25,11 +25,12 @@ interface MonitoringGroupsModal {
 }
 
 export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
-    const { isModalOpen, setIsModalOpen, editingGroup, onCompleteSave } = props
+    const { isModalOpen, setIsModalOpen, editingGroup, onCompleteSave, setEditingGroup } = props
     const [itemSearch, setItemSearch] = useState('');
     const [groupName, setGroupName] = useState('');
     const [groupDescription, setGroupDescription] = useState('');
     const [selectedItems, setSelectedItems] = useState<MonitoringGroupItem[]>([]);
+    console.log(selectedItems, editingGroup)
 
     useEffect(() => {
         setGroupName(editingGroup?.name!)
@@ -41,6 +42,11 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
         item.name.toLowerCase().includes(itemSearch.toLowerCase()) &&
         !selectedItems?.find(si => si?.id === item.id)
     );
+
+    const handleClose = () => {
+        setIsModalOpen(false)
+        setEditingGroup(null)
+    }
 
     // save group
     const { loading, saveMonitoringGroup } = useSaveMonitoringGroup()
@@ -57,7 +63,11 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
                 updatedAt: new Date().toISOString().split('T')[0],
             }
         }).then(() => {
+            setGroupName('')
+            setSelectedItems([])
+            setEditingGroup(null);
             setIsModalOpen(false);
+            setGroupDescription('')
         }).finally(() => {
             onCompleteSave()
         })
@@ -87,7 +97,7 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-6 border-b border-[#e2e8f0]">
                             <h2 className="text-xl font-bold text-[#0f172a]">{editingGroup ? 'Editar Grupo' : 'Novo Grupo de Visualização'}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-[#64748b] hover:bg-[#f1f5f9] p-2 rounded-lg cursor-pointer">
+                            <button onClick={() => handleClose()} className="text-[#64748b] hover:bg-[#f1f5f9] p-2 rounded-lg cursor-pointer">
                                 <X size={20} />
                             </button>
                         </div>
@@ -180,7 +190,7 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
                         <div className="p-6 border-t border-[#e2e8f0] flex justify-end gap-3 bg-[#f8fafc] rounded-b-2xl">
                             <button
                                 disabled={loading}
-                                onClick={() => setIsModalOpen(false)}
+                                onClick={() => handleClose()}
                                 className="px-5 py-2.5 text-sm font-medium text-[#64748b] bg-white border border-[#e2e8f0] rounded-xl hover:bg-[#f1f5f9] transition-colors cursor-pointer"
                             >
 
