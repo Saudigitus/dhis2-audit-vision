@@ -6,7 +6,7 @@ import SecurityAudit from "../../pages/SecurityAudit";
 import Documentation from "../../pages/Documentation";
 import Alerts from "../../pages/Alerts";
 import Trends from "../../pages/Trends";
-import UsersPage from "../../pages/Users";
+import UsersPage from "../../pages/users/Users";
 import NotificationsPage from "../../pages/Notifications";
 import ProfilePage from "../../pages/Profile";
 import SettingsPage from "../../pages/Settings";
