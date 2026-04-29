@@ -68,13 +68,13 @@ export default function MonitoringGroups() {
     return formattedData
   }
 
-  if (loading) {
-    return (
-      <div className='flex items-center justify-center'>
-        <CircularLoader />
-      </div>
-    )
-  }
+  // if (loading) {
+  //   return (
+  //     <div className='flex items-center justify-center'>
+  //       <CircularLoader />
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="space-y-6">
@@ -116,11 +116,20 @@ export default function MonitoringGroups() {
 
       {
         viewMode == "grid" ?
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredGroups?.map(group => (
-              <MonitoringGroupCard group={group} handleDeleteGroup={handleDeleteGroup} handleOpenModal={handleOpenModal} />
-            ))}
-          </div>
+          <>
+            {
+              loading ?
+                <div className='flex items-center justify-center'>
+                  <CircularLoader />
+                </div>
+                :
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredGroups?.map(group => (
+                    <MonitoringGroupCard group={group} handleDeleteGroup={handleDeleteGroup} handleOpenModal={handleOpenModal} />
+                  ))}
+                </div>
+            }
+          </>
           :
           <Table
             description=''
