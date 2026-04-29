@@ -171,7 +171,7 @@ export default function AuditDiffViewer({ auditDetails, selectedChange, onClose,
     const changedFields = countChanged(diffTree);
 
     const onConfirmRestore = async () => {
-        setOpen(false)
+        setOpen(false); setSelected(null)
         const { lastUpdated, lastUpdatedBy, ...data } = selected ? selected?.objectData : before
         const resource = selectedChange?.object.charAt(0).toLowerCase() + selectedChange?.object.slice(1) + 's';
         await rollback({ [resource]: [data] })
