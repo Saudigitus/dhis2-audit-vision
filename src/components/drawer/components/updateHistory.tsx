@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { actionDot, actionOutline } from "../../../constants/common/common";
 import { useState } from "react";
 
-export default function UpdateHistory({ auditDetails, setSelected, selected }: { selected: any, setSelected: (args: any) => void, auditDetails: any }) {
+export default function UpdateHistory({ loading, auditDetails, setSelected, selected }: { loading: boolean, selected: any, setSelected: (args: any) => void, auditDetails: any }) {
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 6;
 
@@ -20,7 +20,7 @@ export default function UpdateHistory({ auditDetails, setSelected, selected }: {
     };
 
     return (
-        <div className="px-8 py-5" >
+        <div className={`px-8 py-5 ${loading ? "opacity-50 pointer-events-none cursor-not-allowed" : ""}`}>
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                     <History size={16} className="text-[#64748b]" />

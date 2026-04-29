@@ -6,6 +6,7 @@ import UpdateHistory from "./components/updateHistory";
 import { format } from "date-fns";
 import { RotateCcw } from "lucide-react";
 import useRollback from "../../hooks/rollback/rollback";
+import { CircularLoader } from "@dhis2/ui";
 
 function buildDiff(
     before: Record<string, unknown>,
@@ -141,17 +142,18 @@ function buildDiff(
 type Tab = "diff" | "raw";
 type ExpandMode = "changed" | "all" | "none" | "manual";
 
-export default function AuditDiffViewer({ auditDetails, selectedChange }: { selectedChange: any, auditDetails: any, }) {
+export default function AuditDiffViewer({ auditDetails, selectedChange, onClose, setRefecth }: { setRefecth: (args: any) => void, onClose: () => void, selectedChange: any, auditDetails: any, }) {
     const [tab, setTab] = useState<Tab>("diff");
     const [showAll, setShowAll] = useState(false);
     const [expandMode, setExpandMode] = useState<ExpandMode>("none");
     const switchToManual = () => setExpandMode("manual");
     const [selected, setSelected] = useState<any>(null)
-    const { rollback } = useRollback()
+    const { rollback, loading } = useRollback()
 
     const after = auditDetails?.[0]?.objectData ?? {}
     const before = auditDetails?.[1]?.objectData ?? {}
     const createMode = !before
+    const disabled = (Object?.keys(before)?.length === 0 && !selected) || loading
 
     const diffTree = useMemo(
         () =>
@@ -171,7 +173,7 @@ export default function AuditDiffViewer({ auditDetails, selectedChange }: { sele
             {/* ── Header ── */}
             <div className="flex items-center justify-between px-8 pt-7 pb-2">
                 <h2 className="text-2xl font-bold text-slate-900">Change Detail</h2>
-                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+                <button onClick={() => onClose()} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -201,77 +203,78 @@ export default function AuditDiffViewer({ auditDetails, selectedChange }: { sele
             </div>
 
             {/* ── Content ── */}
-            {tab === "diff" ? (
-                <div className="px-8 py-5">
-                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <button
-                                onClick={() => setShowAll((p) => !p)}
-                                className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${showAll
-                                    ? "border-slate-200 text-slate-600 hover:bg-slate-50"
-                                    : "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
-                                    }`}
-                            >
-                                {showAll ? <EyeOffIcon /> : <EyeIcon />}
-                                {showAll ? "Show only differences" : "Showing only differences"}
-                            </button>
-                            <button
-                                onClick={() => setExpandMode("all")}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
-                            >
-                                <ExpandIcon />
-                                Expand all
-                            </button>
-                            <button
-                                onClick={() => setExpandMode("none")}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
-                            >
-                                <CollapseIcon />
-                                Collapse all
-                            </button>
-                        </div>
-                        <span className="text-sm text-slate-500">
-                            <span className="font-semibold text-amber-600">{changedFields} changed</span>
-                            {" "}of <span className="font-semibold text-slate-700">{totalFields}</span> total fields
-                        </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-0 mb-3 items-center">
-                        <div className="flex items-center justify-between pr-4 border-r border-slate-200 min-h-[32px]">
-                            <span className={`text-[14px] font-bold tracking-widest uppercase ${selected?.auditType ? "text-amber-700 bg-amber-50 px-2 py-0.5" : createMode ? "text-slate-300" : "text-red-500 bg-red-50 px-2 py-0.5"}`}>
-                                {selected?.auditType ? `${selected?.auditType} - ${format(selected?.created_at, 'yyyy-MM-dd HH:mm:ss')}` : createMode ? "—" : "Before"}
-                            </span>
-                            {/* {selected && ( */}
-                            <button
-                                disabled={Object?.keys(before)?.length == 0 || !selected}
-                                onClick={async () => {
-                                    const { lastUpdated, lastUpdatedBy, ...data } = selected ? selected?.objectData : before
-                                    const resource = selectedChange?.object.charAt(0).toLowerCase() + selectedChange?.object.slice(1) + 's';
-                                    await rollback({ [resource]: [data] })
-                                }}
-                                className="inline-flex items-center gap-1.5 rounded-[5px] border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm active:scale-95"
-                            >
-                                <RotateCcw size={12} />
-                                Restore
-                            </button>
-                            {/* )} */}
-                        </div>
-                        <div className="pl-4">
-                            <span className="text-[14px] font-bold tracking-widest uppercase text-green-600 bg-green-50 px-2 py-0.5">
-                                {createMode ? "New Object" : "Current"}
+            {
+                tab === "diff" ? (
+                    <div className="px-8 py-5">
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <button
+                                    onClick={() => setShowAll((p) => !p)}
+                                    className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${showAll
+                                        ? "border-slate-200 text-slate-600 hover:bg-slate-50"
+                                        : "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                                        }`}
+                                >
+                                    {showAll ? <EyeOffIcon /> : <EyeIcon />}
+                                    {showAll ? "Show only differences" : "Showing only differences"}
+                                </button>
+                                <button
+                                    onClick={() => setExpandMode("all")}
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+                                >
+                                    <ExpandIcon />
+                                    Expand all
+                                </button>
+                                <button
+                                    onClick={() => setExpandMode("none")}
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+                                >
+                                    <CollapseIcon />
+                                    Collapse all
+                                </button>
+                            </div>
+                            <span className="text-sm text-slate-500">
+                                <span className="font-semibold text-amber-600">{changedFields} changed</span>
+                                {" "}of <span className="font-semibold text-slate-700">{totalFields}</span> total fields
                             </span>
                         </div>
-                    </div>
 
-                    <div className="border border-slate-200 rounded-xl overflow-hidden">
-                        <DiffTreeRenderer nodes={diffTree} showAll={showAll} depth={0} expandMode={expandMode} isCreate={createMode} onUserToggle={switchToManual} />
+                        <div className="grid grid-cols-2 gap-0 mb-3 items-center">
+                            <div className="flex items-center justify-between pr-4 border-r border-slate-200 min-h-[32px]">
+                                <span className={`text-[14px] font-bold tracking-widest uppercase ${selected?.auditType ? "text-amber-700 bg-amber-50 px-2 py-0.5" : createMode ? "text-slate-300" : "text-red-500 bg-red-50 px-2 py-0.5"}`}>
+                                    {selected?.auditType ? `${selected?.auditType} - ${format(selected?.created_at, 'yyyy-MM-dd HH:mm:ss')}` : createMode ? "—" : "Before"}
+                                </span>
+                                <button
+                                    disabled={disabled}
+                                    onClick={async () => {
+                                        const { lastUpdated, lastUpdatedBy, ...data } = selected ? selected?.objectData : before
+                                        const resource = selectedChange?.object.charAt(0).toLowerCase() + selectedChange?.object.slice(1) + 's';
+                                        await rollback({ [resource]: [data] })
+                                        setRefecth((prev: boolean) => !prev)
+                                    }}
+                                    className={`inline-flex items-center gap-1.5 rounded-[5px] border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm active:scale-95 ${disabled ? "opacity-50 pointer-events-none cursor-not-allowed" : ""}`}
+                                >
+                                    {loading ? <CircularLoader small /> : <RotateCcw size={12} />}
+                                    Restore
+                                </button>
+                            </div>
+                            <div className="pl-4">
+                                <span className="text-[14px] font-bold tracking-widest uppercase text-green-600 bg-green-50 px-2 py-0.5">
+                                    {createMode ? "New Object" : "Current"}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="border border-slate-200 rounded-xl overflow-hidden">
+                            <DiffTreeRenderer nodes={diffTree} showAll={showAll} depth={0} expandMode={expandMode} isCreate={createMode} onUserToggle={switchToManual} />
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <RawJSON beforeData={before} afterData={after} isCreate={createMode} />
-            )}
-            <UpdateHistory selected={selected} auditDetails={auditDetails} setSelected={setSelected} />
-        </div>
+                ) : (
+                    <RawJSON beforeData={before} afterData={after} isCreate={createMode} />
+                )
+            }
+            <UpdateHistory loading={loading} selected={selected} auditDetails={auditDetails} setSelected={setSelected} />
+        </div >
     );
 }
 
