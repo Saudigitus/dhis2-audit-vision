@@ -19,9 +19,5 @@ export interface UserActivity {
 
 export interface ChartData {
   name: string;
-  NameX: number;
-  NameY: number;
-  NameZ: number;
-  NameD: number;
-  NameE: number;
+  [key: string]: string | number;
 }

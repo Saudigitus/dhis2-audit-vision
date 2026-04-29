@@ -9,6 +9,7 @@ import { useGetSuperUsers } from '../../hooks/users/useGetSuperUsers';
 import { useGetActiveUsersToday } from '../../hooks/users/useGetActiveUsersToday';
 import { useGetTotalUsersCount } from '../../hooks/users/useGetTotalUsersCount';
 import { useGetTotalChangesYear } from '../../hooks/users/useGetTotalChangesYear';
+import { useGetTop5UsersChanges } from '../../hooks/users/useGetTop5UsersChanges';
 
 const users: User[] = [
   { name: 'admin', initial: 'A', color: 'bg-[#3b82f6]', role: 'Super Admin', roleColor: 'text-[#ef4444] border-[#fca5a5] bg-[#fef2f2]', status: 'Online', lastActive: '2 minutes ago', changes: 127, email: 'admin@dhis2.org' },
@@ -35,18 +36,12 @@ const userActivity = [
   { date: '2026-04-08 23:06', type: 'dataSet', object: 'dataSet_649', action: 'DELETE' },
 ];
 
-const chartData = [
-  { name: 'Sem 1', NameX: 30, NameY: 45, NameZ: 25, NameD: 35, NameE: 10 },
-  { name: 'Sem 2', NameX: 40, NameY: 25, NameZ: 22, NameD: 40, NameE: 12 },
-  { name: 'Sem 3', NameX: 15, NameY: 28, NameZ: 43, NameD: 42, NameE: 11 },
-  { name: 'Sem 4', NameX: 60, NameY: 35, NameZ: 57, NameD: 51, NameE: 9 },
-];
-
 export default function UsersPage() {
   const { superUsers, loading: superUsersLoading } = useGetSuperUsers();
   const { activeUsersCount, loading: activeUsersLoading } = useGetActiveUsersToday();
   const { totalUsers: totalUsersCount, loading: totalUsersLoading } = useGetTotalUsersCount();
   const { totalChanges: changesYear, loading: changesYearLoading } = useGetTotalChangesYear();
+  const { chartData: topUsersChartData, usernames, loading: chartLoading } = useGetTop5UsersChanges();
   const [selectedUser, setSelectedUser] = useState<typeof users[0] | null>(null);
 
   return (
@@ -92,7 +87,10 @@ export default function UsersPage() {
       </div>
 
       {/* Line Chart Section */}
-      <UserChangesChart data={chartData} />
+      <UserChangesChart 
+        data={chartLoading ? [] : topUsersChartData} 
+        usernames={chartLoading ? [] : usernames}
+      />
 
       {/* Existing User Cards (Original) */}
       <div className="pt-6 border-t border-gray-100">

@@ -13,9 +13,12 @@ import { ChartData } from '../../types/users/users';
 
 interface UserChangesChartProps {
   data: ChartData[];
+  usernames: string[];
 }
 
-const UserChangesChart: React.FC<UserChangesChartProps> = ({ data }) => {
+const colors = ['#6366f1', '#f43f5e', '#fb923c', '#8b5cf6', '#b91c1c'];
+
+const UserChangesChart: React.FC<UserChangesChartProps> = ({ data, usernames }) => {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
       <h3 className="text-sm font-medium text-indigo-600 mb-6">Realização de mudanças ao longo do tempo por User (top 5)</h3>
@@ -48,11 +51,17 @@ const UserChangesChart: React.FC<UserChangesChartProps> = ({ data }) => {
               iconType="diamond"
               wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }}
             />
-            <Line type="monotone" dataKey="NameX" stroke="#6366f1" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="NameY" stroke="#f43f5e" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="NameZ" stroke="#fb923c" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="NameD" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="NameE" stroke="#b91c1c" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+            {usernames.map((username, index) => (
+              <Line
+                key={username}
+                type="monotone"
+                dataKey={username}
+                stroke={colors[index % colors.length]}
+                strokeWidth={2}
+                dot={{ r: 4, strokeWidth: 2 }}
+                activeDot={{ r: 6 }}
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </div>
