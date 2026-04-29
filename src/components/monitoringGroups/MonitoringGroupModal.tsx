@@ -33,7 +33,7 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
 
     useEffect(() => {
         setGroupName(editingGroup?.name!)
-        setSelectedItems(editingGroup?.items!)
+        setSelectedItems(editingGroup?.items! || [])
         setGroupDescription(editingGroup?.description!)
     }, [editingGroup])
 

@@ -124,8 +124,8 @@ export default function MonitoringGroups() {
           :
           <Table
             description=''
+            loading={loading}
             title='Metadata Grouping'
-            setDetailTab={{} as any}
             setSelectedChange={{} as any}
             header={monitoringGroupsHeaders}
             tabledata={rowsFormatter(groups)}
