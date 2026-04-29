@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "start": "d2-app-scripts start --proxy https://emis.dhis2.org/startracker",
+    "start": "d2-app-scripts start --proxy https://training.saudigitus.org/audit",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -14,6 +14,7 @@
     "axios": "^1.15.2",
     "classnames": "^2.5.1",
     "clsx": "2.1.1",
+    "date-fns": "^4.1.0",
     "lucide-react": "^1.8.0",
     "react-router-dom": "^7.14.1",
     "recharts": "^3.8.1",

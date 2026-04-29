@@ -24,10 +24,11 @@ export const useGetudit = () => {
     const [data, setData] = useState<GetAuditProps | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
 
-    const getAudit = async (page: number, pageSize: number) => {
+    const getAudit = async (page: number, pageSize: number, filterQuery?: string) => {
         setLoading(true)
         try {
-            const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits?page=${page}&pageSize=${pageSize}`)
+            const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits?page=${page}&pageSize=${pageSize}${filterQuery ? `&${filterQuery}` : ''}`)
+            console.log(response, "response")
             setData(response?.data)
             return response
         } catch (error) {
