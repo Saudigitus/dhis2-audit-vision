@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { RotateCcw } from "lucide-react";
 import useRollback from "../../hooks/rollback/rollback";
 import { CircularLoader } from "@dhis2/ui";
+import ConfirmDialog from "../confirm/confirmDialog";
 
 function buildDiff(
     before: Record<string, unknown>,
@@ -149,6 +150,7 @@ export default function AuditDiffViewer({ auditDetails, selectedChange, onClose,
     const switchToManual = () => setExpandMode("manual");
     const [selected, setSelected] = useState<any>(null)
     const { rollback, loading } = useRollback()
+    const [open, setOpen] = useState<boolean>(false)
 
     const after = auditDetails?.[0]?.objectData ?? {}
     const before = auditDetails?.[1]?.objectData ?? {}
@@ -168,8 +170,36 @@ export default function AuditDiffViewer({ auditDetails, selectedChange, onClose,
     const totalFields = countNodes(diffTree);
     const changedFields = countChanged(diffTree);
 
+    const onConfirmRestore = async () => {
+        setOpen(false)
+        const { lastUpdated, lastUpdatedBy, ...data } = selected ? selected?.objectData : before
+        const resource = selectedChange?.object.charAt(0).toLowerCase() + selectedChange?.object.slice(1) + 's';
+        await rollback({ [resource]: [data] })
+        setRefecth((prev: boolean) => !prev)
+    }
+
+    const getMessage = () => {
+        const { lastUpdated, lastUpdatedBy } = selected?.objectData ?? before ?? {};
+        return (
+            <span>
+                Are you sure you want to restore the version from{" "}
+                <strong>{lastUpdated ? format(lastUpdated, 'yyyy-MM-dd HH:mm:ss') : 'unknown date'}</strong>
+                {" "}by{" "}
+                <strong>{lastUpdatedBy?.displayName ?? 'Unknown User'}</strong>?
+            </span>
+        );
+    };
+
     return (
         <div className="w-full bg-white overflow-auto">
+            {open && <ConfirmDialog
+                message={getMessage()}
+                onConfirm={onConfirmRestore}
+                title="Confirm restore"
+                open={open}
+                onCancel={() => setOpen(false)}
+            />}
+
             {/* ── Header ── */}
             <div className="flex items-center justify-between px-8 pt-7 pb-2">
                 <h2 className="text-2xl font-bold text-slate-900">Change Detail</h2>
@@ -246,12 +276,7 @@ export default function AuditDiffViewer({ auditDetails, selectedChange, onClose,
                                 </span>
                                 <button
                                     disabled={disabled}
-                                    onClick={async () => {
-                                        const { lastUpdated, lastUpdatedBy, ...data } = selected ? selected?.objectData : before
-                                        const resource = selectedChange?.object.charAt(0).toLowerCase() + selectedChange?.object.slice(1) + 's';
-                                        await rollback({ [resource]: [data] })
-                                        setRefecth((prev: boolean) => !prev)
-                                    }}
+                                    onClick={() => setOpen(true)}
                                     className={`inline-flex items-center gap-1.5 rounded-[5px] border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm active:scale-95 ${disabled ? "opacity-50 pointer-events-none cursor-not-allowed" : ""}`}
                                 >
                                     {loading ? <CircularLoader small /> : <RotateCcw size={12} />}
