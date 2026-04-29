@@ -4,6 +4,8 @@ import { ArrayPair, DiffArrayItem, DiffNode, DiffNodeType } from "../../types/di
 import { ActionIcon, BoxIcon, CalendarIcon, CollapseIcon, DocIcon, ExpandIcon, EyeIcon, EyeOffIcon, HashIcon, ResetExpandIcon, UserIcon } from "./components/icons";
 import UpdateHistory from "./components/updateHistory";
 import { format } from "date-fns";
+import { RotateCcw } from "lucide-react";
+import useRollback from "../../hooks/rollback/rollback";
 
 function buildDiff(
     before: Record<string, unknown>,
@@ -145,12 +147,12 @@ export default function AuditDiffViewer({ auditDetails, selectedChange }: { sele
     const [expandMode, setExpandMode] = useState<ExpandMode>("none");
     const switchToManual = () => setExpandMode("manual");
     const [selected, setSelected] = useState<any>(null)
+    const { rollback } = useRollback()
 
     const after = auditDetails?.[0]?.objectData ?? {}
     const before = auditDetails?.[1]?.objectData ?? {}
     const createMode = !before
 
-    console.log(selected)
     const diffTree = useMemo(
         () =>
             buildDiff(
@@ -234,9 +236,31 @@ export default function AuditDiffViewer({ auditDetails, selectedChange }: { sele
                         </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-0 mb-2">
-                        <span className={`text-xs font-bold tracking-widest uppercase px-4 ${selected?.auditType ? "text-amber-700" : createMode ? "text-slate-300" : "text-red-500"}`}>{selected?.auditType ? `${selected?.auditType} - ${format(selected?.created_at, 'yyyy-MM-dd HH:mm:ss')}` : createMode ? "—" : "Before"}</span>
-                        <span className="text-xs font-bold tracking-widest uppercase px-4 text-green-600">{createMode ? "New Object" : "Current"}</span>
+                    <div className="grid grid-cols-2 gap-0 mb-3 items-center">
+                        <div className="flex items-center justify-between pr-4 border-r border-slate-200 min-h-[32px]">
+                            <span className={`text-[14px] font-bold tracking-widest uppercase ${selected?.auditType ? "text-amber-700 bg-amber-50 px-2 py-0.5" : createMode ? "text-slate-300" : "text-red-500 bg-red-50 px-2 py-0.5"}`}>
+                                {selected?.auditType ? `${selected?.auditType} - ${format(selected?.created_at, 'yyyy-MM-dd HH:mm:ss')}` : createMode ? "—" : "Before"}
+                            </span>
+                            {/* {selected && ( */}
+                            <button
+                                disabled={Object?.keys(before)?.length == 0 || !selected}
+                                onClick={async () => {
+                                    const { lastUpdated, lastUpdatedBy, ...data } = selected ? selected?.objectData : before
+                                    const resource = selectedChange?.object.charAt(0).toLowerCase() + selectedChange?.object.slice(1) + 's';
+                                    await rollback({ [resource]: [data] })
+                                }}
+                                className="inline-flex items-center gap-1.5 rounded-[5px] border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm active:scale-95"
+                            >
+                                <RotateCcw size={12} />
+                                Restore
+                            </button>
+                            {/* )} */}
+                        </div>
+                        <div className="pl-4">
+                            <span className="text-[14px] font-bold tracking-widest uppercase text-green-600 bg-green-50 px-2 py-0.5">
+                                {createMode ? "New Object" : "Current"}
+                            </span>
+                        </div>
                     </div>
 
                     <div className="border border-slate-200 rounded-xl overflow-hidden">
