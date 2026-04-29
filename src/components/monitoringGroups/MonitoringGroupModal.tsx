@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, FolderGit2, Layers, X, Check } from 'lucide-react';
-import { MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
-
-
+import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
+import { useSaveMonitoringGroup } from '../../hooks/monitoringGroup/useSaveMonitoringGroup';
+import { CircularLoader, LinearLoader } from '@dhis2/ui';
 
 const availableItems: MonitoringGroupItem[] = [
     { id: 'p1', name: 'HIV Care and Treatment', type: 'program' },
@@ -16,65 +16,69 @@ const availableItems: MonitoringGroupItem[] = [
     { id: 'ds4', name: 'Facility Assessment', type: 'dataSet' },
 ];
 
-export default function MonitoringGroupsModal() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+interface MonitoringGroupsModal {
+    isModalOpen: boolean
+    onCompleteSave: () => void
+    editingGroup: MonitoringGroup | null
+    setIsModalOpen: (arg: boolean) => void
+    setEditingGroup: (arg: MonitoringGroup | null) => void
+}
 
-    // Form state
-    const [editingId, setEditingId] = useState<string | null>(null);
+export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
+    const { isModalOpen, setIsModalOpen, editingGroup, onCompleteSave } = props
+    const [itemSearch, setItemSearch] = useState('');
     const [groupName, setGroupName] = useState('');
     const [groupDescription, setGroupDescription] = useState('');
     const [selectedItems, setSelectedItems] = useState<MonitoringGroupItem[]>([]);
-    const [itemSearch, setItemSearch] = useState('');
 
+    useEffect(() => {
+        setGroupName(editingGroup?.name!)
+        setSelectedItems(editingGroup?.items!)
+        setGroupDescription(editingGroup?.description!)
+    }, [editingGroup])
 
     const filteredAvailableItems = availableItems.filter(item =>
         item.name.toLowerCase().includes(itemSearch.toLowerCase()) &&
-        !selectedItems.find(si => si.id === item.id)
+        !selectedItems?.find(si => si?.id === item.id)
     );
 
+    // save group
+    const { loading, saveMonitoringGroup } = useSaveMonitoringGroup()
 
-
-    const handleSaveGroup = () => {
-        // if (!groupName.trim()) return;
-
-        // if (editingId) {
-        //     setGroups(groups.map(g => g.id === editingId ? {
-        //         ...g,
-        //         name: groupName,
-        //         description: groupDescription,
-        //         items: selectedItems
-        //     } : g));
-        // } else {
-        //     setGroups([...groups, {
-        //         id: `g${Date.now()}`,
-        //         name: groupName,
-        //         description: groupDescription,
-        //         createdAt: new Date().toISOString().split('T')[0],
-        //         updatedAt: new Date().toISOString().split('T')[0],
-        //         items: selectedItems
-        //     }]);
-        // }
-        setIsModalOpen(false);
+    const handleSaveGroup = async () => {
+        if (!groupName?.trim()) return;
+        await saveMonitoringGroup({
+            newGroup: {
+                name: groupName!,
+                items: selectedItems!,
+                description: groupDescription!,
+                id: editingGroup?.id || `g${Date.now()}`,
+                createdAt: new Date().toISOString().split('T')[0],
+                updatedAt: new Date().toISOString().split('T')[0],
+            }
+        }).then(() => {
+            setIsModalOpen(false);
+        }).finally(() => {
+            onCompleteSave()
+        })
     };
 
 
     const toggleItemSelection = (item: MonitoringGroupItem) => {
-        if (selectedItems.find(si => si.id === item.id)) {
-            setSelectedItems(selectedItems.filter(si => si.id !== item.id));
+        if (selectedItems?.find(si => si.id === item.id)) {
+            setSelectedItems(selectedItems?.filter(si => si.id !== item.id));
         } else {
-            setSelectedItems([...selectedItems, item]);
+            setSelectedItems([...selectedItems!, item]);
         }
     };
 
-
     return (
-        <div className="">
+        <div>
             <button
-                onClick={() => { setIsModalOpen(true) }}
+                disabled={loading} onClick={() => { setIsModalOpen(true) }}
                 className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-xs font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer focus:outline-none focus:ring-1 focus:border-transparent"
             >
-                <Plus size={15} />
-                Novo Grupo
+                <Plus size={15} /> Novo Grupo
             </button>
 
             {/* Create/Edit Modal */}
@@ -82,7 +86,7 @@ export default function MonitoringGroupsModal() {
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-6 border-b border-[#e2e8f0]">
-                            <h2 className="text-xl font-bold text-[#0f172a]">{editingId ? 'Editar Grupo' : 'Novo Grupo de Visualização'}</h2>
+                            <h2 className="text-xl font-bold text-[#0f172a]">{editingGroup ? 'Editar Grupo' : 'Novo Grupo de Visualização'}</h2>
                             <button onClick={() => setIsModalOpen(false)} className="text-[#64748b] hover:bg-[#f1f5f9] p-2 rounded-lg cursor-pointer">
                                 <X size={20} />
                             </button>
@@ -96,6 +100,7 @@ export default function MonitoringGroupsModal() {
                                     <input
                                         type="text"
                                         value={groupName}
+                                        disabled={loading}
                                         onChange={(e) => setGroupName(e.target.value)}
                                         placeholder="Ex: HIV/SIDA Monitor"
                                         className="w-full px-4 py-2 rounded-xl border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
@@ -104,6 +109,7 @@ export default function MonitoringGroupsModal() {
                                 <div>
                                     <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Descrição</label>
                                     <textarea
+                                        disabled={loading}
                                         value={groupDescription}
                                         onChange={(e) => setGroupDescription(e.target.value)}
                                         placeholder="Descreva o propósito deste grupo..."
@@ -113,18 +119,18 @@ export default function MonitoringGroupsModal() {
                                 </div>
 
                                 <div className="pt-4">
-                                    <h4 className="text-sm font-bold text-[#0f172a] mb-3">Itens Selecionados ({selectedItems.length})</h4>
+                                    <h4 className="text-sm font-bold text-[#0f172a] mb-3">Itens Selecionados ({selectedItems?.length})</h4>
                                     <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {selectedItems.length === 0 ? (
+                                        {selectedItems?.length === 0 ? (
                                             <p className="text-sm text-[#94a3b8] italic">Nenhum item selecionado.</p>
                                         ) : (
-                                            selectedItems.map(item => (
+                                            selectedItems?.map(item => (
                                                 <div key={item.id} className="flex justify-between items-center p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg">
                                                     <div className="flex items-center gap-2">
                                                         {item.type === 'program' ? <FolderGit2 size={16} className="text-[#3b82f6]" /> : <Layers size={16} className="text-[#8b5cf6]" />}
                                                         <span className="text-sm font-medium text-[#0f172a]">{item.name}</span>
                                                     </div>
-                                                    <button onClick={() => toggleItemSelection(item)} className="text-[#ef4444] hover:bg-[#fee2e2] p-1 rounded cursor-pointer">
+                                                    <button disabled={loading} onClick={() => toggleItemSelection(item)} className="text-[#ef4444] hover:bg-[#fee2e2] p-1 rounded cursor-pointer">
                                                         <X size={14} />
                                                     </button>
                                                 </div>
@@ -151,7 +157,7 @@ export default function MonitoringGroupsModal() {
                                     {filteredAvailableItems.map(item => (
                                         <div
                                             key={item.id}
-                                            onClick={() => toggleItemSelection(item)}
+                                            onClick={() => { !loading && toggleItemSelection(item) }}
                                             className="flex justify-between items-center p-3 border border-[#e2e8f0] rounded-lg cursor-pointer hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-colors"
                                         >
                                             <div className="flex items-center gap-3">
@@ -173,17 +179,19 @@ export default function MonitoringGroupsModal() {
 
                         <div className="p-6 border-t border-[#e2e8f0] flex justify-end gap-3 bg-[#f8fafc] rounded-b-2xl">
                             <button
+                                disabled={loading}
                                 onClick={() => setIsModalOpen(false)}
                                 className="px-5 py-2.5 text-sm font-medium text-[#64748b] bg-white border border-[#e2e8f0] rounded-xl hover:bg-[#f1f5f9] transition-colors cursor-pointer"
                             >
+
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleSaveGroup}
-                                disabled={!groupName.trim()}
+                                disabled={!groupName?.trim() || loading}
                                 className="px-5 py-2.5 text-sm font-bold text-white bg-[#3b82f6] rounded-xl hover:bg-[#2563eb] disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-2"
                             >
-                                <Check size={16} />
+                                {loading ? <CircularLoader small /> : <Check size={16} />}
                                 Salvar Grupo
                             </button>
                         </div>

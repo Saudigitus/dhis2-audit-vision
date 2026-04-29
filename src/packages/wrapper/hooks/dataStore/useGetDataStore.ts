@@ -1,8 +1,9 @@
-import { useSetRecoilState } from "recoil"
+import { useRecoilState, useSetRecoilState } from "recoil"
 import { dataStoreKey } from "../../config"
 import useShowAlerts from "../alert/useShowAlert"
 import { DataStoreConfigState } from "../../types/DataStoreSchema"
-import { type FetchError, useDataQuery } from "@dhis2/app-runtime"
+import { type FetchError, useDataEngine, useDataQuery } from "@dhis2/app-runtime"
+import { useEffect, useState } from "react"
 
 const query = {
     dataStoreValues: {
@@ -11,22 +12,50 @@ const query = {
 }
 
 export function useGetDataStore(lazy: boolean = false) {
+    const engine = useDataEngine()
     const { show, hide } = useShowAlerts()
-    const setDataStoreDataState = useSetRecoilState(DataStoreConfigState)
+    const [error, setError] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
+    const [dataStoreDataState, setDataStoreDataState] = useRecoilState(DataStoreConfigState)
 
-    const { error, loading, refetch } = useDataQuery<any>(query, {
-        onComplete: (response: any) => {
+    const getDataStore = async () => {
+        setLoading(true)
+        try {
+            const response: any = await engine.query(query)
             setDataStoreDataState(response?.dataStoreValues)
-        },
-        onError: (error: FetchError) => {
+            return response;
+        } catch (error: any) {
+            setError(error)
             show({
                 message: `Can't load resources data store`,
                 type: { critical: true }
             })
             setTimeout(hide, 5000)
-        },
-        lazy,
-    })
+            throw error;
+        } finally {
+            setLoading(false)
+        }
+    }
 
-    return { refetch, loading, error }
+    useEffect(() => {
+        if (!dataStoreDataState) {
+            getDataStore()
+        }
+    }, [])
+
+    // const { error, loading, refetch } = useDataQuery<any>(query, {
+    //     onComplete: (response: any) => {
+    //         setDataStoreDataState(response?.dataStoreValues)
+    //     },
+    //     onError: (error: FetchError) => {
+    //         show({
+    //             message: `Can't load resources data store`,
+    //             type: { critical: true }
+    //         })
+    //         setTimeout(hide, 5000)
+    //     },
+    //     lazy,
+    // })
+
+    return { refetch: getDataStore, loading, error }
 }

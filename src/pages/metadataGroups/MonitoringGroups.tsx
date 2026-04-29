@@ -1,54 +1,44 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import Table from '../../components/table/Table';
+import { Search, Edit2, Trash2, Group, Grid, TableIcon } from 'lucide-react';
 import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSchema';
 import MonitoringGroupCard from '../../components/monitoringGroups/MonitoringGroupCard';
 import { monitoringGroupsHeaders } from '../../constants/common/monitoringGroupsHeaders';
 import MonitoringGroupsModal from '../../components/monitoringGroups/MonitoringGroupModal';
 import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
-import { Plus, Search, Edit2, Trash2, FolderGit2, Layers, X, Check, Activity, Group, Table2, Grid2X2 } from 'lucide-react';
+import { useGetDataStore } from '../../packages/wrapper/hooks/dataStore/useGetDataStore';
+import { CircularLoader } from '@dhis2/ui';
 
 
 export default function MonitoringGroups() {
   // Groups from dataStore
+  const { loading, refetch } = useGetDataStore()
   const values = useRecoilValue(DataStoreConfigState)
   const [groups, setGroups] = useState<MonitoringGroup[]>(values?.monitoringGroups);
-
   // View mode
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid")
-
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [editingGroup, setEditingGroup] = useState<MonitoringGroup | null>(null);
 
-  // Form state
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [groupName, setGroupName] = useState('');
-  const [groupDescription, setGroupDescription] = useState('');
-  const [selectedItems, setSelectedItems] = useState<MonitoringGroupItem[]>([]);
-  const [itemSearch, setItemSearch] = useState('');
+  useEffect(() => {
+    setGroups(values?.monitoringGroups)
+  }, [values])
 
-  const filteredGroups = groups.filter(g =>
+  const filteredGroups = groups?.filter(g =>
     g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     g.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-
-
   const handleOpenModal = (group?: MonitoringGroup) => {
     if (group) {
-      setEditingId(group.id);
-      setGroupName(group.name);
-      setGroupDescription(group.description);
-      setSelectedItems([...group.items]);
+      setEditingGroup(group);
     } else {
-      setEditingId(null);
-      setGroupName('');
-      setGroupDescription('');
-      setSelectedItems([]);
+      setEditingGroup(null);
     }
     setIsModalOpen(true);
   };
-
 
   const handleDeleteGroup = (id: string) => {
     setGroups(groups.filter(g => g.id !== id));
@@ -78,6 +68,14 @@ export default function MonitoringGroups() {
     return formattedData
   }
 
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center'>
+        <CircularLoader />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header Actions */}
@@ -104,39 +102,35 @@ export default function MonitoringGroups() {
           />
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => setViewMode(viewMode == "grid" ? "table" : "grid")}
-            className="text-[#64748b] hover:text-[#3b82f6] cursor-pointer">
-            {viewMode == "grid" ? <Table2 /> : <Grid2X2 />}
+          <button
+            onClick={() => setViewMode(viewMode == "grid" ? "table" : "grid")}
+            className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-xs font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer focus:outline-none focus:ring-1 focus:border-transparent"
+          >
+            {viewMode == "grid" ? <TableIcon size={15} /> : <Grid size={15} />}
+            {viewMode == "grid" ? <>Tabela</> : <>Grelha</>}
           </button>
-          <MonitoringGroupsModal />
+
+          <MonitoringGroupsModal onCompleteSave={refetch} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} editingGroup={editingGroup} setEditingGroup={setEditingGroup} />
         </div>
       </div>
 
-      <>
-        {
-          viewMode == "grid" ?
-            <>
-              {/* Groups Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredGroups.map(group => (
-                  <MonitoringGroupCard group={group} handleDeleteGroup={handleDeleteGroup} handleOpenModal={handleOpenModal} />
-                ))}
-              </div>
-            </>
-            :
-            <>
-              {/* Table */}
-              <Table
-                description=''
-                title='Metadata Grouping'
-                setDetailTab={{} as any}
-                setSelectedChange={{} as any}
-                header={monitoringGroupsHeaders}
-                tabledata={rowsFormatter(groups)}
-              />
-            </>
-        }
-      </>
+      {
+        viewMode == "grid" ?
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredGroups?.map(group => (
+              <MonitoringGroupCard group={group} handleDeleteGroup={handleDeleteGroup} handleOpenModal={handleOpenModal} />
+            ))}
+          </div>
+          :
+          <Table
+            description=''
+            title='Metadata Grouping'
+            setDetailTab={{} as any}
+            setSelectedChange={{} as any}
+            header={monitoringGroupsHeaders}
+            tabledata={rowsFormatter(groups)}
+          />
+      }
     </div>
   );
 }
