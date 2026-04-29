@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { actionDot, actionOutline } from "../../../constants/common/common";
 import { useState } from "react";
 
-export default function UpdateHistory({ auditDetails, setSelected }: { setSelected: (args: any) => void, auditDetails: any }) {
+export default function UpdateHistory({ auditDetails, setSelected, selected }: { selected: any, setSelected: (args: any) => void, auditDetails: any }) {
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 6;
 
@@ -66,11 +66,11 @@ export default function UpdateHistory({ auditDetails, setSelected }: { setSelect
                         </div>
 
                         <button
-                            disabled={i == 0}
+                            disabled={(h.id == auditDetails?.[0]?.id || selected?.id == h?.id)}
                             onClick={() => setSelected(h)}
-                            className={`flex items-center justify-center gap-2 p-1 rounded-lg text-[7px] font-bold transition-all ${i == 0
-                                    ? "cursor-not-allowed bg-[#e2e8f0] text-[#cbd5e1] pointer-events-none"
-                                    : "cursor-pointer bg-[#f8fafc] text-[#64748b] group-hover:bg-[#3b82f6] group-hover:text-white"
+                            className={`flex items-center justify-center gap-2 p-1 rounded-lg text-[7px] font-bold transition-all ${(h.id == auditDetails?.[0]?.id || selected?.id == h?.id)
+                                ? "cursor-not-allowed bg-[#e2e8f0] text-[#cbd5e1] pointer-events-none"
+                                : "cursor-pointer bg-[#f8fafc] text-[#64748b] group-hover:bg-[#3b82f6] group-hover:text-white"
                                 }`}
                         >
                             View details

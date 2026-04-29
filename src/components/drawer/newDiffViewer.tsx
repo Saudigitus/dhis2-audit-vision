@@ -3,6 +3,7 @@ import { displayValue, formatDate, isArrayOfObjects, isPlainObject, pairArrayIte
 import { ArrayPair, DiffArrayItem, DiffNode, DiffNodeType } from "../../types/diffTypes/diffTypes";
 import { ActionIcon, BoxIcon, CalendarIcon, CollapseIcon, DocIcon, ExpandIcon, EyeIcon, EyeOffIcon, HashIcon, ResetExpandIcon, UserIcon } from "./components/icons";
 import UpdateHistory from "./components/updateHistory";
+import { format } from "date-fns";
 
 function buildDiff(
     before: Record<string, unknown>,
@@ -234,7 +235,7 @@ export default function AuditDiffViewer({ auditDetails, selectedChange }: { sele
                     </div>
 
                     <div className="grid grid-cols-2 gap-0 mb-2">
-                        <span className={`text-xs font-bold tracking-widest uppercase px-4 ${createMode ? "text-slate-300" : "text-red-500"}`}>{createMode ? "—" : "Before"}</span>
+                        <span className={`text-xs font-bold tracking-widest uppercase px-4 ${selected?.auditType ? "text-amber-700" : createMode ? "text-slate-300" : "text-red-500"}`}>{selected?.auditType ? `${selected?.auditType} - ${format(selected?.created_at, 'yyyy-MM-dd HH:mm:ss')}` : createMode ? "—" : "Before"}</span>
                         <span className="text-xs font-bold tracking-widest uppercase px-4 text-green-600">{createMode ? "New Object" : "Current"}</span>
                     </div>
 
@@ -245,7 +246,7 @@ export default function AuditDiffViewer({ auditDetails, selectedChange }: { sele
             ) : (
                 <RawJSON beforeData={before} afterData={after} isCreate={createMode} />
             )}
-            <UpdateHistory auditDetails={auditDetails} setSelected={setSelected} />
+            <UpdateHistory selected={selected} auditDetails={auditDetails} setSelected={setSelected} />
         </div>
     );
 }
@@ -488,7 +489,7 @@ function CollapsibleArrayRow({ node, showAll, depth, expandMode, isCreate = fals
                 className={`w-full grid grid-cols-2 divide-x divide-slate-100 hover:bg-slate-50/60 transition-colors ${headerHighlight}`}
                 style={{ paddingLeft: `${depth * 20}px` }}
             >
-                <div className="p-4 flex items-center gap-2 text-left" style={{ paddingLeft: `${16}px` }}>
+                <div className="w-[100%] p-4 flex items-center gap-2 text-left" style={{ paddingLeft: `${16}px` }}>
                     <ChevronIcon open={open} />
                     <span className="text-xs font-mono font-semibold text-slate-600">{node.key}</span>
                     <span className="text-xs text-slate-400 font-medium">array</span>
