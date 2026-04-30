@@ -1,10 +1,16 @@
 import './index.css';
+import { RecoilRoot } from 'recoil';
+import { AppWrapper } from './packages';
 import { Router } from './components/routes';
 
 function App() {
 
   return (
-    <Router />
+    <RecoilRoot>
+      <AppWrapper>
+        <Router />
+      </AppWrapper>
+    </RecoilRoot>
   );
 }
 

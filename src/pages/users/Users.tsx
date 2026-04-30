@@ -91,7 +91,7 @@ export default function UsersPage() {
         <CardContainer
           variant="dashboard-card"
           label="USERS ACCESSED TODAY"
-          value={activeUsersLoading ? '...' : activeUsersCount.toString()}
+          value={activeUsersLoading ? '...' : activeUsersCount?.toString()}
           indicator="+5% vs yesterday"
           indicatorColor="text-[#22c55e]"
           icon={<UsersIcon size={20} className="text-[#3b82f6]" />}
@@ -100,7 +100,7 @@ export default function UsersPage() {
         <CardContainer
           variant="dashboard-card"
           label="TOTAL USERS"
-          value={totalUsersLoading ? '...' : totalUsersCount.toString()}
+          value={totalUsersLoading ? '...' : totalUsersCount?.toString()}
           indicator="+12% vs last week"
           indicatorColor="text-[#22c55e]"
           icon={<Activity size={20} className="text-[#3b82f6]" />}
@@ -109,7 +109,7 @@ export default function UsersPage() {
         <CardContainer
           variant="dashboard-card"
           label="TOTAL SUPER ADMINS"
-          value={superUsersLoading ? '...' : superUsers.length.toString()}
+          value={superUsersLoading ? '...' : superUsers.length?.toString()}
           indicator="+8% vs last week"
           indicatorColor="text-[#f59e0b]"
           icon={<ShieldCheck size={20} className="text-[#f59e0b]" />}
@@ -118,7 +118,7 @@ export default function UsersPage() {
         <CardContainer
           variant="dashboard-card"
           label="TOTAL CHANGES"
-          value={changesYearLoading ? '...' : changesYear.toString()}
+          value={changesYearLoading ? '...' : changesYear?.toString()}
           indicator="Requires review"
           indicatorColor="text-[#ef4444]"
           icon={<AlertTriangle size={20} className="text-[#ef4444]" />}
