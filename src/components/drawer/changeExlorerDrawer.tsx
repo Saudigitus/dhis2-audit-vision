@@ -23,17 +23,6 @@ export default function ChangeExplorerDrawer({ setSelectedChange, selectedChange
 
     return (
         <>
-<<<<<<< HEAD
-            <div className="fixed inset-0 bg-black/20 z-50 h-screen" onClick={() => setSelectedChange(null)} />
-            <div className="fixed top-12 right-0 bottom-0 w-[70vw] bg-white shadow-2xl z-50 flex flex-col overflow-scroll">
-                {
-                    loadingDetails ?
-                        <div className='flex items-center justify-center h-full'>
-                            <CircularLoader />
-                        </div>
-                        :
-                        <AuditDiffViewer selectedChange={selectedChange} onClose={()=> setSelectedChange(null)} after={auditDetails?.[0]?.objectData ?? []} before={auditDetails?.[1]?.objectData ?? []} />
-=======
             <div className="fixed inset-0 bg-black/20 z-50 h-[100vh]" onClick={() => onClose()} />
             <div className="fixed top-12 right-0 bottom-0 w-[60vw] bg-white shadow-2xl z-50 flex flex-col overflow-scroll">
                 {
@@ -44,7 +33,6 @@ export default function ChangeExplorerDrawer({ setSelectedChange, selectedChange
                             </Center>
                         </div> :
                         <AuditDiffViewer setRefecth={setRefecth} onClose={onClose} auditDetails={auditDetails} selectedChange={selectedChange} />
->>>>>>> 0d4544f86c138ca72a5f7a6ba274bc6996ab259f
                 }
             </div>
         </>
