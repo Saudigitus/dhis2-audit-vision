@@ -1,5 +1,6 @@
+import { cn } from '../../utils/cn';
 import { CircularLoader } from '@dhis2/ui';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus, Search, FolderGit2, Layers, X, Check } from 'lucide-react';
 import { useGetMonitoringItems } from '../../hooks/monitoringGroup/useGetMonitoringItems';
 import { useSaveMonitoringGroup } from '../../hooks/monitoringGroup/useSaveMonitoringGroup';
@@ -13,6 +14,13 @@ interface MonitoringGroupsModal {
     setEditingGroup: (arg: MonitoringGroup | null) => void
 }
 
+const FILTER_TABS = [
+    { key: 'all', label: 'All' },
+    { key: 'program', label: 'Programs' },
+    { key: 'dataSet', label: 'DataSets' },
+];
+
+
 export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
     const { isModalOpen, setIsModalOpen, editingGroup, onCompleteSave, setEditingGroup } = props
     const [groupName, setGroupName] = useState('');
@@ -21,6 +29,7 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
     const { loading, saveMonitoringGroup } = useSaveMonitoringGroup()
     const [selectedItems, setSelectedItems] = useState<MonitoringGroupItem[]>([]);
     const { data: monitoringItems, getMonitoringItems, loading: gettingMonitoringItems } = useGetMonitoringItems()
+    const [activeFilter, setActiveFilter] = useState('all');
 
     useEffect(() => {
         getMonitoringItems()
@@ -37,9 +46,21 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
     }
 
     const filteredAvailableItems = monitoringItems?.filter(item =>
-        getItemName(item.id).toLowerCase().includes(itemSearch.toLowerCase()) &&
-        !selectedItems?.find(si => si?.id === item.id)
+        getItemName(item?.id).toLowerCase().includes(itemSearch.toLowerCase()) &&
+        !selectedItems?.find(si => si?.id === item?.id)
     );
+
+    const typeCounts = useMemo(() => {
+        const counts: any = {};
+        filteredAvailableItems.forEach((item) => { counts[item?.type] = (counts[item?.type] || 0) + 1; });
+        return counts;
+    }, [filteredAvailableItems]);
+
+    const filtered = useMemo(() => filteredAvailableItems.filter((item) => {
+        const matchesSearch = getItemName(item?.id).toLowerCase().includes(itemSearch?.toLowerCase());
+        const matchesFilter = activeFilter === 'all' || item?.type === activeFilter;
+        return matchesSearch && matchesFilter;
+    }), [filteredAvailableItems, itemSearch, activeFilter]);
 
     const handleClose = () => {
         setIsModalOpen(false)
@@ -72,8 +93,8 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
     };
 
     const toggleItemSelection = (item: MonitoringGroupItem) => {
-        if (selectedItems?.find(si => si.id === item.id)) {
-            setSelectedItems(selectedItems?.filter(si => si.id !== item.id));
+        if (selectedItems?.find(si => si.id === item?.id)) {
+            setSelectedItems(selectedItems?.filter(si => si.id !== item?.id));
         } else {
             setSelectedItems([...selectedItems!, item]);
         }
@@ -134,10 +155,10 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
                                             <p className="text-sm text-[#94a3b8] italic">No selected items yet.</p>
                                         ) : (
                                             selectedItems?.map(item => (
-                                                <div key={item.id} className="flex justify-between items-center p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg">
+                                                <div key={item?.id} className="flex justify-between items-center p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg">
                                                     <div className="flex items-center gap-2">
-                                                        {item.type === 'program' ? <FolderGit2 size={16} className="text-[#3b82f6]" /> : <Layers size={16} className="text-[#8b5cf6]" />}
-                                                        <span className="text-sm font-medium text-[#0f172a]">{getItemName(item.id)}</span>
+                                                        {item?.type === 'program' ? <FolderGit2 size={16} className="text-[#3b82f6]" /> : <Layers size={16} className="text-[#8b5cf6]" />}
+                                                        <span className="text-sm font-medium text-[#0f172a]">{getItemName(item?.id)}</span>
                                                     </div>
                                                     <button disabled={loading} onClick={() => toggleItemSelection(item)} className="text-[#ef4444] hover:bg-[#fee2e2] p-1 rounded cursor-pointer">
                                                         <X size={14} />
@@ -162,24 +183,46 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
                                         className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
                                     />
                                 </div>
+                                <div className="flex flex-wrap gap-1.5 mb-3">
+                                    {FILTER_TABS.map((tab) => {
+                                        const count = tab.key === 'all' ? filteredAvailableItems.length : (typeCounts[tab.key] || 0);
+                                        if (tab.key !== 'all' && count === 0) return null;
+                                        return (
+                                            <button
+                                                key={tab.key}
+                                                onClick={() => setActiveFilter(tab.key)}
+                                                className={cn(
+                                                    'px-3 py-1.5 rounded-lg font-semibold tracking-wide transition-all duration-200 ease-in-out',
+                                                    activeFilter === tab.key
+                                                        ? 'bg-[#3b82f6] text-white'
+                                                        : 'bg-[#f5f5f5] text-slate-600 hover:bg-slate-20',
+                                                )}
+                                            >
+                                                <span className='text-xs'>{tab.label}</span>
+                                                <span className="text-xs ml-1">{count}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
                                 <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar min-h-[300px]">
-                                    {filteredAvailableItems.map(item => (
+                                    {filtered?.map(item => (
                                         <div
-                                            key={item.id}
+                                            key={item?.id}
                                             onClick={() => { !loading && toggleItemSelection(item) }}
                                             className="flex justify-between items-center p-3 border border-[#e2e8f0] rounded-lg cursor-pointer hover:border-[#3b82f6] hover:bg-[#eff6ff] transition-colors"
                                         >
                                             <div className="flex items-center gap-3">
-                                                {item.type === 'program' ? <FolderGit2 size={18} className="text-[#3b82f6]" /> : <Layers size={18} className="text-[#8b5cf6]" />}
+                                                {item?.type === 'program' ? <FolderGit2 size={18} className="text-[#3b82f6]" /> : <Layers size={18} className="text-[#8b5cf6]" />}
                                                 <div>
-                                                    <p className="text-sm font-medium text-[#0f172a]">{getItemName(item.id)}</p>
-                                                    <p className="text-[11px] text-[#64748b] uppercase tracking-wider">{item.type}</p>
+                                                    <p className="text-sm font-medium text-[#0f172a]">{getItemName(item?.id)}</p>
+                                                    <p className="text-[11px] text-[#64748b] uppercase tracking-wider">{item?.type}</p>
                                                 </div>
                                             </div>
                                             <Plus size={16} className="text-[#94a3b8]" />
                                         </div>
                                     ))}
-                                    {filteredAvailableItems.length === 0 && (
+                                    {filtered?.length === 0 && (
                                         <p className="text-sm text-[#94a3b8] text-center py-4">No item was found.</p>
                                     )}
                                 </div>
