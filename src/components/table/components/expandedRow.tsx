@@ -22,14 +22,14 @@ export default function ExpandedRow({ dependenceHeaders, dep, index, expandedDat
             ))}
 
             {/* Eye button for dep row */}
-            <td className="px-4 py-3.5">
+            <td className=" py-3.5">
                 <button
                     onClick={() =>
                         setSelectedChange({
                             date: dep?.time, type: dep?.type, user: dep?.user, id: dep?.id, action: dep?.action, object: dep?.object,
                         })
                     }
-                    className=" inline-flex items-center justify-center w-6 h-6 rounded text-[#cbd5e1] hover:text-[#475569] hover:bg-[#e2e8f0] transition-colors duration-150 cursor-pointer"
+                    className="inline-flex items-center justify-center w-6 h-6 rounded text-[#cbd5e1] hover:text-[#475569] hover:bg-[#e2e8f0] transition-colors duration-150 cursor-pointer"
                 >
                     <Eye size={14} />
                 </button>

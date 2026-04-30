@@ -49,7 +49,7 @@ export default function ChangeExplorer() {
           />
         </div>
         <button
-          disabled={loading}
+          disabled={loading || !!group}
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-sm font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer"
         >

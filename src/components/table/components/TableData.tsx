@@ -1,12 +1,11 @@
 import { ChevronDown, ChevronUp, Eye } from "lucide-react";
 import React, { useState } from "react";
-import TableHeader, { Column } from "./TableHeader";
+import { Column } from "./TableHeader";
 import TableCell from "./TableCell";
 import { SelectedAuditProps } from "../../../pages/changeExplorer/ChangeExplorer";
 import { Center, CircularLoader } from "@dhis2/ui";
 import { useGetchildAudit } from "../../../hooks/audit/useGetChildAudit";
 import { rowsFormatter } from "../../../utils/table/rowFormatter";
-import Pagination from "./Pagination";
 import ExpandedRow from "./expandedRow";
 import ExpandedRowPagination from "./expandedRowPagination";
 
@@ -60,15 +59,17 @@ const TableData = (props: TableDataProps) => {
         <tbody>
             {loading ? (
                 <tr>
-                    <td className="pt-4" colSpan={header.length}>
-                        <Center>
-                            <CircularLoader />
-                        </Center>
+                    <td className="pt-4" colSpan={header.length + (dependenceHeaders ? 1 : 0)}>
+                        <div className="flex justify-center m-5">
+                            <Center>
+                                <CircularLoader />
+                            </Center>
+                        </div>
                     </td>
                 </tr>
             ) : data.length === 0 ? (
                 <tr>
-                    <td className="pt-4 text-center" colSpan={header.length}>
+                    <td className="pt-4 text-center" colSpan={header.length + (dependenceHeaders ? 1 : 0)}>
                         <span className="text-[#94a3b8] text-sm">No data found</span>
                     </td>
                 </tr>
@@ -115,12 +116,12 @@ const TableData = (props: TableDataProps) => {
 
                         {expandedRows.has(row.id) && row.hasDependencies && (
                             <>
-                                <tr className="bg-[#f8fafc] border-y border-[#e2e8f0]">
+                                <tr className="bg-[#cfebdf66] border-y border-[#e2e8f0]">
                                     <td className="w-10" />
                                     {dependenceHeaders?.map((column: Column) => (
                                         <th
                                             key={column.id}
-                                            className=" text-left px-4 py-2 text-[10px] font-semibold tracking-widest uppercase text-[#94a3b8]"
+                                            className=" text-left px-4 py-3.5 text-[10px] font-semibold tracking-widest uppercase text-[#94a3b8]"
                                         >
                                             {column.displayName}
                                         </th>
@@ -128,7 +129,7 @@ const TableData = (props: TableDataProps) => {
                                     <th className="w-10" />
                                 </tr>
 
-                                {rowsFormatter(expandedData?.[row.id]?.audits)?.map(
+                                {!isLoading[row.id] && rowsFormatter(expandedData?.[row.id]?.audits)?.map(
                                     (dep: any, index: number) => <ExpandedRow
                                         dep={dep}
                                         dependenceHeaders={dependenceHeaders!}
@@ -143,6 +144,7 @@ const TableData = (props: TableDataProps) => {
                                     dependenceHeaders={dependenceHeaders}
                                     fetchExpandedData={fetchExpandedData}
                                     row={row}
+                                    loading={!!isLoading[row.id]}
                                     expandedPagination={expandedPagination}
                                 />}
 
