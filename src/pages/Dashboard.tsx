@@ -80,7 +80,7 @@ export default function Dashboard() {
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={{ stroke: '#e2e8f0' }} tickLine={false} />
               <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={{ stroke: '#e2e8f0' }} tickLine={false} domain={[0, 60]} />
               <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
+              <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={{ r: 1, fill: '#3b82f6' }} activeDot={{ r: 1 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -98,6 +98,7 @@ export default function Dashboard() {
                 outerRadius={95}
                 paddingAngle={2}
                 dataKey="value"
+                style={{ fontSize: 8 }}
                 label={({ name, value }) => `${name} ${value}%`}
               >
                 {pieData.map((entry, index) => (
@@ -131,7 +132,7 @@ export default function Dashboard() {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" tickFormatter={(tick) => `${tick * 100}%`} />
             <YAxis dataKey="name" type="category" />
-            <Tooltip formatter={(value, ) => typeof value === 'number' ? `${value.toFixed(1)}%` : ''} />
+            <Tooltip formatter={(value,) => typeof value === 'number' ? `${value.toFixed(1)}%` : ''} />
             <Legend />
             <Bar dataKey="CREATE" fill="#3b82f6" stackId="a" />
             <Bar dataKey="UPDATE" fill="#f59e0b" stackId="a" />
