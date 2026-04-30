@@ -143,11 +143,7 @@ function buildDiff(
 type Tab = "diff" | "raw";
 type ExpandMode = "changed" | "all" | "none" | "manual";
 
-<<<<<<< HEAD
-export default function AuditDiffViewer({ before, after, selectedChange, onClose }: { selectedChange: any, before: any, after: any, onClose: () => void }) {
-=======
 export default function AuditDiffViewer({ auditDetails, selectedChange, onClose, setRefecth }: { setRefecth: (args: any) => void, onClose: () => void, selectedChange: any, auditDetails: any, }) {
->>>>>>> 0d4544f86c138ca72a5f7a6ba274bc6996ab259f
     const [tab, setTab] = useState<Tab>("diff");
     const [showAll, setShowAll] = useState(false);
     const [expandMode, setExpandMode] = useState<ExpandMode>("none");
