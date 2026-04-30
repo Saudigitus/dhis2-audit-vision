@@ -1,5 +1,6 @@
 export interface User {
   name: string;
+  username?: string;
   initial: string;
   color: string;
   role: string;
