@@ -3,22 +3,22 @@ import {
   Group, AlertTriangle,
 } from 'lucide-react';
 
-const navItems: { id: string; label: string; icon: React.ReactNode; path: string }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-  { id: 'change-explorer', label: 'Change Explorer', icon: <Search size={20} />, path: '/change-explorer' },
-  { id: 'metadata-grouping', label: 'Metadata Grouping', icon: <Group size={20} />, path: '/metadata-grouping' },
-  { id: 'users', label: 'User Audit', icon: <Shield size={20} />, path: '/users' },
-  // { id: 'monitoring-groups', label: 'Monitoring Groups', icon: <Layers size={20} />, path: '/monitoring-groups' },
-  // { id: 'system-health', label: 'System Health', icon: <Activity size={20} />, path: '/system-health' },
-  // { id: 'security-audit', label: 'Security Audit', icon: <Lock size={20} />, path: '/security-audit' },
-  { id: 'documentation', label: 'Documentation', icon: <BookOpen size={20} />, path: '/documentation' },
-  // { id: 'alerts', label: 'Alerts', icon: <Bell size={20} />, path: '/alerts' },
-  // { id: 'trends', label: 'Trends', icon: <TrendingUp size={20} />, path: '/trends' },
-  // { id: 'users', label: 'Users', icon: <Users size={20} />, path: '/users' },
-  { id: 'severity-rules', label: 'Severity Rules', icon: <AlertTriangle size={20} />, path: '/severity-rules' },
-  { id: 'notifications', label: 'Notifications', icon: <MessageSquare size={20} />, path: '/notifications' },
-  // { id: 'profile', label: 'Profile', icon: <UserCircle size={20} />, path: '/profile' },
-  { id: 'settings', label: 'Settings', icon: <Settings size={20} />, path: '/settings' },
+const navItems: { id: string; label: string; icon: any; path: string }[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { id: 'change-explorer', label: 'Change Explorer', icon: Search, path: '/change-explorer' },
+  { id: 'metadata-grouping', label: 'Metadata Grouping', icon: Group, path: '/metadata-grouping' },
+  { id: 'users', label: 'User Audit', icon: Shield, path: '/users' },
+  // { id: 'monitoring-groups', label: 'Monitoring Groups', icon: Layers,path: '/monitoring-groups' },
+  // { id: 'system-health', label: 'System Health', icon: Activity,path: '/system-health' },
+  // { id: 'security-audit', label: 'Security Audit', icon: Lock,path: '/security-audit' },
+  { id: 'documentation', label: 'Documentation', icon: BookOpen, path: '/documentation' },
+  // { id: 'alerts', label: 'Alerts', icon: Bell,path: '/alerts' },
+  // { id: 'trends', label: 'Trends', icon: TrendingUp,path: '/trends' },
+  // { id: 'users', label: 'Users', icon: Users,path: '/users' },
+  { id: 'severity-rules', label: 'Severity Rules', icon: AlertTriangle, path: '/severity-rules' },
+  { id: 'notifications', label: 'Notifications', icon: MessageSquare, path: '/notifications' },
+  // { id: 'profile', label: 'Profile', icon: UserCircle,path: '/profile' },
+  { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
 ]
 
 const sidebarData = () => {
