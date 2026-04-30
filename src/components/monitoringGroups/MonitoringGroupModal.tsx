@@ -1,7 +1,7 @@
 import { cn } from '../../utils/cn';
 import { CircularLoader } from '@dhis2/ui';
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Search, FolderGit2, Layers, X, Check } from 'lucide-react';
+import { Plus, Search, FolderGit2, Layers, X, Check, LoaderCircle } from 'lucide-react';
 import { useGetMonitoringItems } from '../../hooks/monitoringGroup/useGetMonitoringItems';
 import { useManageMonitoringGroup } from '../../hooks/monitoringGroup/useManageMonitoringGroup';
 import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
@@ -107,7 +107,7 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
                 disabled={loading || gettingMonitoringItems}
                 className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-xs font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer focus:outline-none focus:ring-1 focus:border-transparent"
             >
-                {gettingMonitoringItems ? <CircularLoader small /> : <Plus size={15} />}
+                {gettingMonitoringItems ? <LoaderCircle size={15} className="animate-spin" /> : <Plus size={15} />}
                 New Group
             </button>
 

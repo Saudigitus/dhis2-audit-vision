@@ -7,7 +7,8 @@ import {
   Save,
   ShieldAlert,
   Edit2,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 
 interface SeverityRule {
@@ -192,7 +193,18 @@ const SeverityRules = () => {
   };
 
   return (
-    <div className="max-w-12xl mx-auto space-y-2 pb-12">
+    <div className="max-w-12xl mx-auto space-y-5 pb-12">
+      {/* Header Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={20} className="text-[#3b82f6]" />
+            <span className="text-lg font-bold text-[#0f172a]">Severity Rules</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">  </div>
+      </div>
+
       {!isFormOpen ? (
         <div className="space-y-6">
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
