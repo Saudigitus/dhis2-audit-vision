@@ -1,7 +1,7 @@
 import { FunctionComponent } from "react";
 import { Activity, Edit2, FolderGit2, Layers, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { MonitoringGroup } from "../../types/monitoringGroups/MonitoringGroupsTypes";
-
 
 interface MonitoringGroupCardProps {
     group: MonitoringGroup
@@ -11,6 +11,7 @@ interface MonitoringGroupCardProps {
 
 const MonitoringGroupCard: FunctionComponent<MonitoringGroupCardProps> = (props) => {
     const { group, handleOpenModal, handleDeleteGroup } = props
+    const navigate = useNavigate()
 
     return (
         <div key={group.id} className="bg-white rounded-xl border border-[#e2e8f0] p-5 shadow-sm hover:shadow-md transition-shadow">

@@ -3,10 +3,10 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import Table from '../../components/table/Table';
 import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
-import { Center, CircularLoader } from '@dhis2/ui';
 import { filterValuesFormatter, rowsFormatter } from '../../utils/table/rowFormatter';
 import TableFilter from '../../components/filter/TableFilter';
-import { changeExplorerHeader } from '../../constants/common/auditTableHeaders';
+import { changeExplorerHeader, metadataGroupAudit } from '../../constants/common/auditTableHeaders';
+import { useParams } from '../../hooks/common/useQueryParams';
 
 export interface SelectedAuditProps {
   id: string;
@@ -23,18 +23,16 @@ export default function ChangeExplorer() {
   const [showFilters, setShowFilters] = useState(false);
   const [query, setQuery] = useState<Record<string, string> | null>(null)
   const [filterQuery, setFilteQuery] = useState<string | null>(null)
-
-
   const [selectedChange, setSelectedChange] = useState<SelectedAuditProps | null>(null);
   const [parentChange, setParentChange] = useState<any | null>(null);
   const [page, setPage] = useState<number>(2)
   const [pageSize, setPageSize] = useState<number>(10)
   const { getAudit, data, loading } = useGetudit();
-
+  const { group } = useParams()
 
   useEffect(() => {
     getAudit(page, pageSize, filterQuery!)
-  }, [page, pageSize, filterQuery])
+  }, [page, pageSize, filterQuery, group])
 
   return (
     <div className="space-y-5 relative">
@@ -62,7 +60,7 @@ export default function ChangeExplorer() {
           />
         </div>
         <button
-          disabled={loading}
+          disabled={loading || !!group}
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-sm font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer"
         >
@@ -80,10 +78,12 @@ export default function ChangeExplorer() {
           loading={loading}
           pagination={{ ...data?.pager!, setPage, setPageSize }}
           setSelectedChange={setSelectedChange}
-          header={changeExplorerHeader}
+          header={group ? metadataGroupAudit : changeExplorerHeader}
+          dependenceHeaders={group ? changeExplorerHeader : []}
           title='Change History'
           description='Explore the history of changes made to your DHIS2 objects, including who made the change and when.'
-          tabledata={rowsFormatter(data?.audits!)} />
+          tabledata={group ? data?.audits! : rowsFormatter(data?.audits!)}
+        />
       </div>
 
       {selectedChange &&

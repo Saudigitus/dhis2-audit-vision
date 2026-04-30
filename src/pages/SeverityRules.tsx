@@ -125,7 +125,7 @@ const SeverityRules = () => {
       } : r));
     } else {
       const rule: SeverityRule = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random()?.toString(36).substr(2, 9),
         level: newSeverity,
         action: newAction,
         objectType: newObjectType,
@@ -156,7 +156,7 @@ const SeverityRules = () => {
       setEditingId(null);
     } else {
       const newContact: NotificationContact = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random()?.toString(36).substr(2, 9),
         type,
         value,
         label: label || value

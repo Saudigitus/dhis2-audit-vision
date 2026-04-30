@@ -20,13 +20,19 @@ const TableFilter = (props: TableFilterProps) => {
                 })
             );
 
-            const queryStr = new URLSearchParams(cleanQuery).toString();
+            const queryStr = new URLSearchParams(cleanQuery)?.toString();
             setFilteQuery(queryStr)
         }
     }
 
     const handleChange = (e: any) => {
         setQuery({ ...query, [e.target.name]: e.target.value })
+    }
+
+    const onHandleKeyDown = (key: any) => {
+        if (key == 'Enter') {
+            handleFilter()
+        }
     }
 
     return (
@@ -46,7 +52,7 @@ const TableFilter = (props: TableFilterProps) => {
                             <label className="block text-sm font-medium text-[#0f172a] mb-1.5">{item.label}</label>
                             {
                                 item.inputType === 'select' ?
-                                    <select value={query?.[key] || ''} name={key} onChange={handleChange} className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]">
+                                    <select onKeyDown={(key) => onHandleKeyDown(key.key)} value={query?.[key] || ''} name={key} onChange={handleChange} className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]">
                                         <option value=''>All</option>
                                         {
                                             item?.values?.map((item) => (
@@ -54,7 +60,7 @@ const TableFilter = (props: TableFilterProps) => {
                                             ))
                                         }
                                     </select> :
-                                    <input value={query?.[key] || ''} onChange={handleChange} className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" name={key} type={item.inputType} />
+                                    <input onKeyDown={(key) => onHandleKeyDown(key.key)} value={query?.[key] || ''} onChange={handleChange} className="w-full px-3 py-2 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" name={key} type={item.inputType} />
 
                             }
 

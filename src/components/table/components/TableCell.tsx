@@ -6,8 +6,46 @@ const TableCell = ({ column, row }: { column: Column, row: Record<string, any> }
     if (column.id === 'collapse' || column.id === 'view') {
         return null
     }
-    
+
     switch (column?.id) {
+        case "last5":
+            return (
+                <td className="px-6 py-3.5">
+                    <div className="status-stack">
+                        {row?.last5
+                            ?.reduce((acc: { status: string; count: number }[], status: string) => {
+                                if (!status) return acc
+                                const last = acc[acc.length - 1]
+                                if (last && last.status === status) {
+                                    last.count++
+                                } else {
+                                    acc.push({ status, count: 1 })
+                                }
+                                return acc
+                            }, [])
+                            .map(({ status, count }: any, index: number) => {
+                                const statusKey = status.toLowerCase()
+                                const statusClass =
+                                    statusKey === 'create' ? 'created' :
+                                        statusKey === 'update' ? 'updated' :
+                                            statusKey === 'delete' ? 'deleted' :
+                                                statusKey
+
+                                return (
+                                    <span
+                                        key={index}
+                                        className={`status-badge status-${statusClass}`}
+                                        title={count > 1 ? `${status} x${count}` : status}
+                                    >
+                                        {statusClass}&nbsp;
+                                        {count > 1 && <sup>+{count}</sup>}
+                                    </span>
+                                )
+                            })
+                        }
+                    </div>
+                </td>
+            )
         case "action":
             return (
                 <td className="px-6 py-3.5">

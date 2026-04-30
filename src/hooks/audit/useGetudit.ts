@@ -1,5 +1,8 @@
 import axios from "axios"
 import { useState } from "react"
+import { useParams } from "../common/useQueryParams"
+import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
+import { useRecoilValue } from "recoil"
 
 export interface DataProps {
     uid: number
@@ -11,7 +14,7 @@ export interface DataProps {
 }
 
 interface GetAuditProps {
-    audits: DataProps[]
+    audits: DataProps[] | any[]
     pager: {
         total: number
         page: number
@@ -23,14 +26,43 @@ interface GetAuditProps {
 export const useGetudit = () => {
     const [data, setData] = useState<GetAuditProps | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
+    const { group } = useParams()
+    const dataStoreDataState = useRecoilValue(DataStoreConfigState)
 
     const getAudit = async (page: number, pageSize: number, filterQuery?: string) => {
         setLoading(true)
         try {
-            const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits?page=${page}&pageSize=${pageSize}${filterQuery ? `&${filterQuery}` : ''}`)
-            console.log(response, "response")
-            setData(response?.data)
-            return response
+            if (group) {
+                const dsGroup = dataStoreDataState?.monitoringGroups?.find(x => x.id == group)?.items || []
+
+                const total = dsGroup.length
+                const pageCount = Math.ceil(total / pageSize)
+                const startIndex = (page - 1) * pageSize
+                const paginatedItems = dsGroup.slice(startIndex, startIndex + pageSize)
+                const enrichedItems = []
+
+                for (const item of paginatedItems) {
+                    const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits/metadata/${item.id}?type=${item.type.toUpperCase()}&page=1&pageSize=5`)
+                    const enrichedItem: any = { ...item }
+
+                    if (response?.data?.audits?.length > 0) {
+                        enrichedItem.hasDependencies = true
+                        enrichedItem.last5 = response?.data?.audits?.map((x: any) => x.auditType)
+                    }
+
+                    enrichedItems.push(enrichedItem)
+                }
+
+                setData({
+                    audits: enrichedItems,
+                    pager: { page, pageCount, pageSize, total }
+                })
+            } else {
+                const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits?page=${page}&pageSize=${pageSize}${filterQuery ? `&${filterQuery}` : ''}`)
+
+                setData(response?.data)
+                return response
+            }
         } catch (error) {
             throw error
         } finally {
