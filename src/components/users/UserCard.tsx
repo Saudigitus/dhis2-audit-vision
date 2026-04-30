@@ -4,9 +4,10 @@ import { User } from '../../types/users/users';
 interface UserCardProps {
   user: User;
   onClick: (user: User) => void;
+  loadingChanges?: boolean;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ user, onClick }) => {
+const UserCard: React.FC<UserCardProps> = ({ user, onClick, loadingChanges }) => {
   return (
     <div
       onClick={() => onClick(user)}
@@ -32,7 +33,9 @@ const UserCard: React.FC<UserCardProps> = ({ user, onClick }) => {
       </div>
       <div className="flex items-center justify-between pt-3 border-t border-[#f1f5f9]">
         <span className="text-xs text-[#64748b]">Changes</span>
-        <span className="text-lg font-bold text-[#0f172a]">{user.changes}</span>
+        <span className="text-lg font-bold text-[#0f172a]">
+          {loadingChanges ? '...' : user.changes}
+        </span>
       </div>
     </div>
   );

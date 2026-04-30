@@ -33,8 +33,12 @@ export default function ChangeExplorer() {
 
 
   useEffect(() => {
-    getAudit(page, pageSize, filterQuery!)
-  }, [page, pageSize, filterQuery])
+    let finalFilter = filterQuery || '';
+    if (searchQuery) {
+      finalFilter = finalFilter ? `${finalFilter}&createdBy=${searchQuery}` : `createdBy=${searchQuery}`;
+    }
+    getAudit(page, pageSize, finalFilter)
+  }, [page, pageSize, filterQuery, searchQuery])
 
   return (
     <div className="space-y-5 relative">
