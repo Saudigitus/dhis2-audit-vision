@@ -40,7 +40,7 @@ export default function Sidebar({ navItems }: SidebarProps) {
       </nav>
 
       {/* Collapse button */}
-      <div className="px-3 py-4 border-t border-[#e2e8f036] shrink-0">
+      <div className="px-2.5 py-1 border-t border-[#e2e8f036] shrink-0">
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-lg text-[14px] font-medium transition-colors cursor-pointer 

@@ -27,7 +27,7 @@ export default function ChangeExplorer() {
 
   const [selectedChange, setSelectedChange] = useState<SelectedAuditProps | null>(null);
   const [parentChange, setParentChange] = useState<any | null>(null);
-  const [page, setPage] = useState<number>(1)
+  const [page, setPage] = useState<number>(2)
   const [pageSize, setPageSize] = useState<number>(10)
   const { getAudit, data, loading } = useGetudit();
 
@@ -38,6 +38,17 @@ export default function ChangeExplorer() {
 
   return (
     <div className="space-y-5 relative">
+      {/* Header Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Search size={20} className="text-[#3b82f6]" />
+            <span className="text-lg font-bold text-[#0f172a]">Change Explorer</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">  </div>
+      </div>
+
       {/* Search Bar */}
       <div className="flex items-center gap-3">
         <div className="flex-1 relative">
