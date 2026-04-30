@@ -1,0 +1,15 @@
+{
+  "type": "app",
+  "name": "Booking",
+  "description": "Booking",
+  "version": "1.0.0",
+  "author": {
+    "name": "Hisp Mozambique (Saudigitus)",
+    "email": "info@saudigitus.org"
+  },
+  "title": "Booking",
+  "entryPoints": {
+    "app": "index.html"
+  }
+}
+

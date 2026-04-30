@@ -1,12 +1,13 @@
 {
   "name": "react-vite-tailwind",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
     "start": "d2-app-scripts start --proxy https://training.saudigitus.org/audit",
-    "build": "vite build",
-    "preview": "vite preview"
+    "test": "d2-app-scripts test",
+    "deploy": "d2-app-scripts deploy",
+    "build": "d2-app-scripts build --no-verify",
+    "dev": "vite"
   },
   "dependencies": {
     "@dhis2/data-engine": "^3.17.0",
