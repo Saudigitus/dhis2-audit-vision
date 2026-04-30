@@ -16,12 +16,12 @@ import SeverityRules from "../../pages/SeverityRules";
 export default function RouteList(hasURL: boolean) {
 
     return [
+        {
+            path: "/",
+            layout: SimpleLayout,
+            component: () => <Navigate to={hasURL ? "/dashboard" : "/settings"} replace />
+        },
         ...(hasURL ? [
-            {
-                path: "/",
-                layout: SimpleLayout,
-                component: () => <Navigate to="/dashboard" replace />
-            },
             {
                 path: "/dashboard",
                 layout: SideBarLayout,

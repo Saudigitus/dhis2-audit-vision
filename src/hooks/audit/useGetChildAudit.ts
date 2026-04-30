@@ -1,4 +1,6 @@
 import axios from "axios"
+import { useRecoilValue } from "recoil"
+import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 
 export interface DataProps {
     uid: number
@@ -10,10 +12,11 @@ export interface DataProps {
 }
 
 export const useGetchildAudit = () => {
+    const dataStoreDataState = useRecoilValue(DataStoreConfigState)
 
     const getAudit = async (page: number, pageSize: number, id: string, type: string) => {
         try {
-            const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits/metadata/${id}?page=${page}&pageSize=${pageSize}&type=${type.toUpperCase()}`)
+            const response = await axios.get(`${dataStoreDataState.auditApi}/api/audits/metadata/${id}?page=${page}&pageSize=${pageSize}&type=${type.toUpperCase()}`)
 
             return response
         } catch (error) {

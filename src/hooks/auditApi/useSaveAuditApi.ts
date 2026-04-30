@@ -30,6 +30,7 @@ const useAuditApi = () => {
                 type: { success: true }
             });
             setTimeout(hide, 5000);
+            window.location.reload()
         } catch (err) {
             const caught = err instanceof Error ? err : new Error(String(err))
             show({

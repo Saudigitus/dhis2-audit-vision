@@ -78,8 +78,8 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
                 }))!,
                 description: groupDescription!,
                 id: editingGroup?.id || `g${Date.now()}`,
-                updatedAt: new Date().toISOString().split('T')[0],
-                createdAt: editingGroup?.createdAt || new Date().toISOString().split('T')[0],
+                updatedAt: new Date().toISOString()?.split('T')[0],
+                createdAt: editingGroup?.createdAt || new Date().toISOString()?.split('T')[0],
             }
         }).then(() => {
             setGroupName('')

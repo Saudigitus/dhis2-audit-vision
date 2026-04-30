@@ -42,7 +42,7 @@ const MonitoringGroupCard: FunctionComponent<MonitoringGroupCardProps> = (props)
             <div className="pt-4 border-t border-[#e2e8f0] flex justify-between items-center text-xs text-[#94a3b8]">
                 <span>Created at {group.createdAt}</span>
                 <span>Updated at {group.updatedAt}</span>
-                <button className="text-[#3b82f6] font-medium hover:underline cursor-pointer flex items-center gap-1">
+                <button onClick={()=>navigate(`/change-explorer?group=${group.id}&groupName=${group.name}`)} className="text-[#3b82f6] font-medium hover:underline cursor-pointer flex items-center gap-1">
                     <Activity size={14} /> Monitor
                 </button>
             </div>

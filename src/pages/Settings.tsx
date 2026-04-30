@@ -42,13 +42,17 @@ export default function SettingsPage() {
 
         <div className="space-y-0 divide-y divide-[#e2e8f0]">
           <div className="pb-4">
-            <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Audit API URL</label>
+            <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Audit API Base URL</label>
             <input
               value={retention}
               type='text'
               onChange={(e) => setRetention(e.target.value)}
               className="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
             />
+            <p className="text-xs text-[#94a3b8] mt-2 ml-1">
+              Enter your base URL (e.g. <span className="font-mono text-[#64748b]">https://your-server.com</span>).
+              We'll automatically append <span className="font-mono text-[#64748b]">/api/endpoint?params</span> to make requests.
+            </p>
           </div>
         </div>
       </div>

@@ -92,9 +92,9 @@ textarea {
 
   .status-updated {
     z-index: 20;
-    border-color: #fbbf24;
+    border-color: #fbbe24c6;
     background-color: #fef3c7;
-    color: #f59e0b;
+    color: #f59f0bdb;
   }
 
   .status-deleted {

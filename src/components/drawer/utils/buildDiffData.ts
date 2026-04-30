@@ -52,7 +52,7 @@ function reconstructNested(
     // Reconstruct nested object from dot-notation children
     const result: Record<string, unknown> = {};
     for (const [flatKey, value] of children) {
-        const parts = flatKey.slice(prefix.length).split('.');
+        const parts = flatKey.slice(prefix.length)?.split('.');
         let cursor = result;
         for (let i = 0; i < parts.length - 1; i++) {
             if (!(parts[i] in cursor)) cursor[parts[i]] = {};
@@ -72,7 +72,7 @@ export function buildDiff(arr: AuditRecord[], action?: string | null, selected?:
         : selected ? flattenObject(selected) : arr?.[1] ? flattenObject(arr?.[1]?.objectData ?? {}) : {};
 
     const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
-    const topLevelKeys = new Set(Array.from(allKeys).map(k => k.split('.')[0]));
+    const topLevelKeys = new Set(Array.from(allKeys).map(k => k?.split('.')[0]));
 
     return Array.from(topLevelKeys).sort().map((topKey): DiffEntry => {
         const beforeValue = topKey in b ? reconstructNested(b, topKey) : undefined;
