@@ -29,6 +29,8 @@ const useParams = () => {
             serviceId: query.get('serviceId') ?? null,
             mappingId: query.get('mappingId') ?? null,
             tab: query.get('tab') ?? null,
+            group: query.get('group') ?? null,
+            groupName: query.get('groupName') ?? null,
         }
     }
 

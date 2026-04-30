@@ -11,7 +11,6 @@ import { MonitoringGroup } from '../../types/monitoringGroups/MonitoringGroupsTy
 import { useGetDataStore } from '../../packages/wrapper/hooks/dataStore/useGetDataStore';
 import DeleteMonitoringGroupsModal from '../../components/monitoringGroups/DeleteMonitoringGroupModal';
 
-
 export default function MonitoringGroups() {
   // Groups from dataStore
   const { loading, refetch } = useGetDataStore()

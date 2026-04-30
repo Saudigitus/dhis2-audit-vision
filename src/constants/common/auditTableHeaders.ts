@@ -24,3 +24,22 @@ export const changeExplorerHeader = [
         displayName: "",
     }
 ];
+
+export const metadataGroupAudit = [
+    {
+        id: "id",
+        displayName: "ID",
+    },
+    {
+        id: "name",
+        displayName: "Name",
+    },
+    {
+        id: "type",
+        displayName: "Type",
+    },
+    {
+        id: "last5",
+        displayName: "Last  operations",
+    }
+];
