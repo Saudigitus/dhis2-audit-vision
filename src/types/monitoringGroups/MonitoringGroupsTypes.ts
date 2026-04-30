@@ -1,6 +1,6 @@
 interface MonitoringGroupItem {
     id: string;
-    name: string;
+    // name: string;
     type: 'program' | 'dataSet';
 }
 
