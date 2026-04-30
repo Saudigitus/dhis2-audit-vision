@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react"
 import { useDataEngine } from "@dhis2/app-runtime"
 import { dataStoreKey, DataStoreType } from "../../packages/wrapper/config"
+import { MonitoringGroup } from "../../types/monitoringGroups/MonitoringGroupsTypes"
 import usePostDataStore from "../../packages/wrapper/hooks/dataStore/usePostDataStore"
-import { MonitoringGroup } from "src/types/monitoringGroups/MonitoringGroupsTypes"
 
 const query = {
     dataStoreValues: {
@@ -22,20 +22,37 @@ const formatGroupToPost = ({ dataStore, newGroup }: { dataStore: DataStoreType, 
     };
 };
 
-const useSaveMonitoringGroup = () => {
+const formatGroupToDelete = ({ dataStore, groupToDelete }: { dataStore: DataStoreType, groupToDelete: MonitoringGroup }): DataStoreType => {
+    const exists = dataStore?.monitoringGroups?.some((g) => g?.id === groupToDelete?.id);
+
+    const updated = exists
+        ? [...dataStore?.monitoringGroups?.filter((g) => (g?.id !== groupToDelete?.id))]
+        : [...(dataStore?.monitoringGroups ?? []), groupToDelete];
+
+    return {
+        ...dataStore,
+        monitoringGroups: updated,
+    };
+};
+
+const useManageMonitoringGroup = () => {
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<Error | null>(null)
     const { createDataStore } = usePostDataStore()
+    const [error, setError] = useState<Error | null>(null)
 
-    const saveMonitoringGroup = useCallback(async ({ newGroup }: { newGroup: MonitoringGroup }) => {
+    const manageMonitoringGroup = useCallback(async ({ group, mode = "post" }: { group: MonitoringGroup, mode?: "post" | "delete" }) => {
         setLoading(true)
         setError(null)
 
         try {
             const result: any = await engine.query(query)
-            const dataToPost = formatGroupToPost({ dataStore: result?.dataStoreValues, newGroup })
+            const dataToPost = mode == "post"
+                ? formatGroupToPost({ dataStore: result?.dataStoreValues, newGroup: group })
+                : formatGroupToDelete({ dataStore: result?.dataStoreValues, groupToDelete: group })
+
             await createDataStore({ key: dataStoreKey, data: dataToPost })
+
             return { success: true }
         } catch (err) {
             const caught = err instanceof Error ? err : new Error(String(err))
@@ -46,7 +63,7 @@ const useSaveMonitoringGroup = () => {
         }
     }, [engine, createDataStore])
 
-    return { saveMonitoringGroup, loading, error }
+    return { manageMonitoringGroup, loading, error }
 }
 
-export { useSaveMonitoringGroup }
+export { useManageMonitoringGroup }

@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { useEffect, useState } from 'react';
+import { CircularLoader } from '@dhis2/ui';
 import Table from '../../components/table/Table';
 import { Search, Edit2, Trash2, Group, Grid, TableIcon } from 'lucide-react';
 import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSchema';
 import MonitoringGroupCard from '../../components/monitoringGroups/MonitoringGroupCard';
 import { monitoringGroupsHeaders } from '../../constants/common/monitoringGroupsHeaders';
 import MonitoringGroupsModal from '../../components/monitoringGroups/MonitoringGroupModal';
-import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
+import { MonitoringGroup } from '../../types/monitoringGroups/MonitoringGroupsTypes';
 import { useGetDataStore } from '../../packages/wrapper/hooks/dataStore/useGetDataStore';
-import { CircularLoader } from '@dhis2/ui';
+import DeleteMonitoringGroupsModal from '../../components/monitoringGroups/DeleteMonitoringGroupModal';
 
 
 export default function MonitoringGroups() {
@@ -19,6 +20,7 @@ export default function MonitoringGroups() {
   // View mode
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [editingGroup, setEditingGroup] = useState<MonitoringGroup | null>(null);
 
@@ -40,8 +42,13 @@ export default function MonitoringGroups() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteGroup = (id: string) => {
-    setGroups(groups.filter(g => g.id !== id));
+  const handleDeleteGroup = (group?: MonitoringGroup) => {
+    if (group) {
+      setEditingGroup(group);
+    } else {
+      setEditingGroup(null);
+    }
+    setIsDeleteModalOpen(true);
   };
 
   function rowsFormatter(data: MonitoringGroup[]) {
@@ -59,7 +66,7 @@ export default function MonitoringGroups() {
         <button onClick={() => handleOpenModal(item)} className="text-[#64748b] hover:text-[#3b82f6] cursor-pointer">
           <Edit2 size={16} />
         </button>
-        <button onClick={() => handleDeleteGroup(item.id)} className="text-[#64748b] hover:text-[#ef4444] cursor-pointer">
+        <button onClick={() => handleDeleteGroup(item)} className="text-[#64748b] hover:text-[#ef4444] cursor-pointer">
           <Trash2 size={16} />
         </button>
       </div>
@@ -67,14 +74,6 @@ export default function MonitoringGroups() {
     }))
     return formattedData
   }
-
-  // if (loading) {
-  //   return (
-  //     <div className='flex items-center justify-center'>
-  //       <CircularLoader />
-  //     </div>
-  //   )
-  // }
 
   return (
     <div className="space-y-6">
@@ -95,7 +94,7 @@ export default function MonitoringGroups() {
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
           <input
             type="text"
-            placeholder="Search by object name or user..."
+            placeholder="Search by object name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent"
@@ -107,7 +106,7 @@ export default function MonitoringGroups() {
             className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-xs font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer focus:outline-none focus:ring-1 focus:border-transparent"
           >
             {viewMode == "grid" ? <TableIcon size={15} /> : <Grid size={15} />}
-            {viewMode == "grid" ? <>Tabela</> : <>Grelha</>}
+            {viewMode == "grid" ? <>Table</> : <>Grid</>}
           </button>
 
           <MonitoringGroupsModal onCompleteSave={refetch} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} editingGroup={editingGroup} setEditingGroup={setEditingGroup} />
@@ -140,6 +139,7 @@ export default function MonitoringGroups() {
             tabledata={rowsFormatter(groups)}
           />
       }
+      <DeleteMonitoringGroupsModal deletingGroup={editingGroup} isModalOpen={isDeleteModalOpen} setDeletingGroup={setEditingGroup} setIsModalOpen={setIsDeleteModalOpen} onCompleteDelete={refetch} />
     </div>
   );
 }
