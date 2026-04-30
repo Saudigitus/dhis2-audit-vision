@@ -1,4 +1,3 @@
-import { ChevronLeft, Activity } from 'lucide-react';
 import { useLocation, useNavigate} from "react-router-dom";
 
 interface SidebarProps {
