@@ -14,7 +14,7 @@ export interface DataProps {
 }
 
 interface GetAuditProps {
-    audits: DataProps[]
+    audits: DataProps[] | any[]
     pager: {
         total: number
         page: number
@@ -33,23 +33,28 @@ export const useGetudit = () => {
         setLoading(true)
         try {
             if (group) {
-                const audits: DataProps[] = []
                 const dsGroup = dataStoreDataState?.monitoringGroups?.find(x => x.id == group)?.items || []
 
                 const total = dsGroup.length
                 const pageCount = Math.ceil(total / pageSize)
                 const startIndex = (page - 1) * pageSize
                 const paginatedItems = dsGroup.slice(startIndex, startIndex + pageSize)
+                const enrichedItems = []
 
                 for (const item of paginatedItems) {
-                    const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits/metadata/${item.id}?type=${item.type.toUpperCase()}&page=1&pageSize=1`)
-                    if (response?.data?.audits?.[0]) {
-                        audits.push(response.data.audits[0])
+                    const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits/metadata/${item.id}?type=${item.type.toUpperCase()}&page=1&pageSize=5`)
+                    const enrichedItem: any = { ...item }
+
+                    if (response?.data?.audits?.length > 0) {
+                        enrichedItem.hasDependencies = true
+                        enrichedItem.last5 = response?.data?.audits?.map((x: any) => x.auditType)
                     }
+
+                    enrichedItems.push(enrichedItem)
                 }
 
                 setData({
-                    audits,
+                    audits: enrichedItems,
                     pager: { page, pageCount, pageSize, total }
                 })
             } else {

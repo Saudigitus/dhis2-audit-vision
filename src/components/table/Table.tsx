@@ -15,6 +15,7 @@ interface TableProps {
     }>
     tabledata: Record<string, any>[]
     setSelectedChange: (selectedChange: SelectedAuditProps) => void
+    dependenceHeaders?: Array<{ id: string, displayName: string }>
     pagination?: {
         total: number
         page: number
@@ -27,7 +28,7 @@ interface TableProps {
 }
 
 const Table: FC<TableProps> = (props) => {
-    const { header, tabledata, setSelectedChange, pagination, title, description, loading } = props
+    const { header, tabledata, setSelectedChange, pagination, title, description, loading, dependenceHeaders } = props
     const { groupName } = useParams()
 
     return (
@@ -43,8 +44,8 @@ const Table: FC<TableProps> = (props) => {
             </div>
 
             <table className="w-full">
-                <TableHeader header={header} />
-                <TableData loading={loading} data={tabledata} header={header} setSelectedChange={setSelectedChange} />
+                <TableHeader hasDependence={dependenceHeaders?.length! > 0} header={header} />
+                <TableData dependenceHeaders={dependenceHeaders} loading={loading} data={tabledata} header={header} setSelectedChange={setSelectedChange} />
             </table>
             <div className="py-5 px-10">
                 {(pagination && !loading && pagination.page) && <Pagination pagination={pagination} />}

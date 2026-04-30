@@ -5,7 +5,7 @@ import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
 import { filterValuesFormatter, rowsFormatter } from '../../utils/table/rowFormatter';
 import TableFilter from '../../components/filter/TableFilter';
-import { changeExplorerHeader } from '../../constants/common/auditTableHeaders';
+import { changeExplorerHeader, metadataGroupAudit } from '../../constants/common/auditTableHeaders';
 import { useParams } from '../../hooks/common/useQueryParams';
 
 export interface SelectedAuditProps {
@@ -67,10 +67,11 @@ export default function ChangeExplorer() {
           loading={loading}
           pagination={{ ...data?.pager!, setPage, setPageSize }}
           setSelectedChange={setSelectedChange}
-          header={changeExplorerHeader}
+          header={group ? metadataGroupAudit : changeExplorerHeader}
+          dependenceHeaders={group ? changeExplorerHeader : []}
           title='Change History'
           description='Explore the history of changes made to your DHIS2 objects, including who made the change and when.'
-          tabledata={rowsFormatter(data?.audits!)}
+          tabledata={group ? data?.audits! : rowsFormatter(data?.audits!)}
         />
       </div>
 
