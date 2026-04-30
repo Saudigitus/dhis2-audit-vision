@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { useEffect, useState } from 'react';
+import { CircularLoader } from '@dhis2/ui';
 import Table from '../../components/table/Table';
 import { Search, Edit2, Trash2, Group, Grid, TableIcon } from 'lucide-react';
 import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSchema';
 import MonitoringGroupCard from '../../components/monitoringGroups/MonitoringGroupCard';
 import { monitoringGroupsHeaders } from '../../constants/common/monitoringGroupsHeaders';
 import MonitoringGroupsModal from '../../components/monitoringGroups/MonitoringGroupModal';
-import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
+import { MonitoringGroup } from '../../types/monitoringGroups/MonitoringGroupsTypes';
 import { useGetDataStore } from '../../packages/wrapper/hooks/dataStore/useGetDataStore';
-import { CircularLoader } from '@dhis2/ui';
+import DeleteMonitoringGroupsModal from '../../components/monitoringGroups/DeleteMonitoringGroupModal';
 
 
 export default function MonitoringGroups() {
@@ -19,6 +20,7 @@ export default function MonitoringGroups() {
   // View mode
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [editingGroup, setEditingGroup] = useState<MonitoringGroup | null>(null);
 
@@ -40,8 +42,13 @@ export default function MonitoringGroups() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteGroup = (id: string) => {
-    setGroups(groups.filter(g => g.id !== id));
+  const handleDeleteGroup = (group?: MonitoringGroup) => {
+    if (group) {
+      setEditingGroup(group);
+    } else {
+      setEditingGroup(null);
+    }
+    setIsDeleteModalOpen(true);
   };
 
   function rowsFormatter(data: MonitoringGroup[]) {
@@ -59,7 +66,7 @@ export default function MonitoringGroups() {
         <button onClick={() => handleOpenModal(item)} className="text-[#64748b] hover:text-[#3b82f6] cursor-pointer">
           <Edit2 size={16} />
         </button>
-        <button onClick={() => handleDeleteGroup(item.id)} className="text-[#64748b] hover:text-[#ef4444] cursor-pointer">
+        <button onClick={() => handleDeleteGroup(item)} className="text-[#64748b] hover:text-[#ef4444] cursor-pointer">
           <Trash2 size={16} />
         </button>
       </div>
@@ -67,14 +74,6 @@ export default function MonitoringGroups() {
     }))
     return formattedData
   }
-
-  // if (loading) {
-  //   return (
-  //     <div className='flex items-center justify-center'>
-  //       <CircularLoader />
-  //     </div>
-  //   )
-  // }
 
   return (
     <div className="space-y-6">
@@ -140,6 +139,7 @@ export default function MonitoringGroups() {
             tabledata={rowsFormatter(groups)}
           />
       }
+      <DeleteMonitoringGroupsModal deletingGroup={editingGroup} isModalOpen={isDeleteModalOpen} setDeletingGroup={setEditingGroup} setIsModalOpen={setIsDeleteModalOpen} onCompleteDelete={refetch} />
     </div>
   );
 }

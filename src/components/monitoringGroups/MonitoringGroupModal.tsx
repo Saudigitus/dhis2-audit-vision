@@ -3,7 +3,7 @@ import { CircularLoader } from '@dhis2/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Search, FolderGit2, Layers, X, Check } from 'lucide-react';
 import { useGetMonitoringItems } from '../../hooks/monitoringGroup/useGetMonitoringItems';
-import { useSaveMonitoringGroup } from '../../hooks/monitoringGroup/useSaveMonitoringGroup';
+import { useManageMonitoringGroup } from '../../hooks/monitoringGroup/useManageMonitoringGroup';
 import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
 
 interface MonitoringGroupsModal {
@@ -26,7 +26,7 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
     const [groupName, setGroupName] = useState('');
     const [itemSearch, setItemSearch] = useState('');
     const [groupDescription, setGroupDescription] = useState('');
-    const { loading, saveMonitoringGroup } = useSaveMonitoringGroup()
+    const { loading, manageMonitoringGroup } = useManageMonitoringGroup()
     const [selectedItems, setSelectedItems] = useState<MonitoringGroupItem[]>([]);
     const { data: monitoringItems, getMonitoringItems, loading: gettingMonitoringItems } = useGetMonitoringItems()
     const [activeFilter, setActiveFilter] = useState('all');
@@ -69,8 +69,8 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
 
     const handleSaveGroup = async () => {
         if (!groupName?.trim()) return;
-        await saveMonitoringGroup({
-            newGroup: {
+        await manageMonitoringGroup({
+            group: {
                 name: groupName!,
                 items: selectedItems?.map((item) => ({
                     id: item?.id,
@@ -78,8 +78,8 @@ export default function MonitoringGroupsModal(props: MonitoringGroupsModal) {
                 }))!,
                 description: groupDescription!,
                 id: editingGroup?.id || `g${Date.now()}`,
-                createdAt: new Date().toISOString().split('T')[0],
                 updatedAt: new Date().toISOString().split('T')[0],
+                createdAt: editingGroup?.createdAt || new Date().toISOString().split('T')[0],
             }
         }).then(() => {
             setGroupName('')

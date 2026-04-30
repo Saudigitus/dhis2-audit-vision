@@ -5,7 +5,7 @@ import { MonitoringGroup } from "../../types/monitoringGroups/MonitoringGroupsTy
 
 interface MonitoringGroupCardProps {
     group: MonitoringGroup
-    handleDeleteGroup: (id: string) => void
+    handleDeleteGroup: (arg: MonitoringGroup) => void
     handleOpenModal: (arg: MonitoringGroup) => void
 }
 
@@ -20,7 +20,7 @@ const MonitoringGroupCard: FunctionComponent<MonitoringGroupCardProps> = (props)
                     <button onClick={() => handleOpenModal(group)} className="text-[#64748b] hover:text-[#3b82f6] cursor-pointer">
                         <Edit2 size={16} />
                     </button>
-                    <button onClick={() => handleDeleteGroup(group.id)} className="text-[#64748b] hover:text-[#ef4444] cursor-pointer">
+                    <button onClick={() => handleDeleteGroup(group)} className="text-[#64748b] hover:text-[#ef4444] cursor-pointer">
                         <Trash2 size={16} />
                     </button>
                 </div>
