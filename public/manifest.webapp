@@ -1,0 +1,25 @@
+{
+  "appType": "APP",
+  "short_name": "Booking",
+  "name": "Booking",
+  "description": "Booking",
+  "version": "1.0.0",
+  "launch_path": "index.html",
+  "default_locale": "en",
+  "activities": {
+    "dhis": {
+      "href": "*"
+    }
+  },
+  "icons": {
+    "48": "dhis2-app-icon.png"
+  },
+  "developer": {
+    "name": "Hisp Mozambique (Saudigitus)",
+    "email": "info@saudigitus.org"
+  },
+  "manifest_generated_at": "Fri Aug 11 2023 09:02:26 GMT+0200 (Hora da África Central)",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff"
+}
