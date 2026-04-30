@@ -10,7 +10,7 @@ type DataStoreType = {
         updatedAt: string
         items: Array<{
             id: string,
-            name: string,
+            // name: string,
             type: "program" | "dataSet"
         }>,
         // programs: Array<{

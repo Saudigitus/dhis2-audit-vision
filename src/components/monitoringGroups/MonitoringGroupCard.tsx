@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react";
 import { Activity, Edit2, FolderGit2, Layers, Trash2 } from "lucide-react";
-import { MonitoringGroup } from "src/types/monitoringGroups/MonitoringGroupsTypes";
+import { MonitoringGroup } from "../../types/monitoringGroups/MonitoringGroupsTypes";
 
 
 interface MonitoringGroupCardProps {
@@ -30,7 +30,7 @@ const MonitoringGroupCard: FunctionComponent<MonitoringGroupCardProps> = (props)
             <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2 text-sm text-[#475569]">
                     <FolderGit2 size={16} className="text-[#3b82f6]" />
-                    <span className="font-medium">{group?.items?.filter(i => i.type === 'program').length} Programas</span>
+                    <span className="font-medium">{group?.items?.filter(i => i.type === 'program').length} Programs</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-[#475569]">
                     <Layers size={16} className="text-[#8b5cf6]" />
@@ -39,10 +39,10 @@ const MonitoringGroupCard: FunctionComponent<MonitoringGroupCardProps> = (props)
             </div>
 
             <div className="pt-4 border-t border-[#e2e8f0] flex justify-between items-center text-xs text-[#94a3b8]">
-                <span>Criado em {group.createdAt}</span>
-                <span>Actualizado em {group.updatedAt}</span>
+                <span>Created at {group.createdAt}</span>
+                <span>Updated at {group.updatedAt}</span>
                 <button className="text-[#3b82f6] font-medium hover:underline cursor-pointer flex items-center gap-1">
-                    <Activity size={14} /> Monitorar
+                    <Activity size={14} /> Monitor
                 </button>
             </div>
         </div>

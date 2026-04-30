@@ -95,7 +95,7 @@ export default function MonitoringGroups() {
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
           <input
             type="text"
-            placeholder="Search by object name or user..."
+            placeholder="Search by object name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent"
@@ -107,7 +107,7 @@ export default function MonitoringGroups() {
             className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-xs font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer focus:outline-none focus:ring-1 focus:border-transparent"
           >
             {viewMode == "grid" ? <TableIcon size={15} /> : <Grid size={15} />}
-            {viewMode == "grid" ? <>Tabela</> : <>Grelha</>}
+            {viewMode == "grid" ? <>Table</> : <>Grid</>}
           </button>
 
           <MonitoringGroupsModal onCompleteSave={refetch} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} editingGroup={editingGroup} setEditingGroup={setEditingGroup} />
