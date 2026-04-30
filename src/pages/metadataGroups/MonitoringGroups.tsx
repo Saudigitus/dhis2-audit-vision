@@ -6,10 +6,9 @@ import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSche
 import MonitoringGroupCard from '../../components/monitoringGroups/MonitoringGroupCard';
 import { monitoringGroupsHeaders } from '../../constants/common/monitoringGroupsHeaders';
 import MonitoringGroupsModal from '../../components/monitoringGroups/MonitoringGroupModal';
-import { MonitoringGroup, MonitoringGroupItem } from '../../types/monitoringGroups/MonitoringGroupsTypes';
+import { MonitoringGroup } from '../../types/monitoringGroups/MonitoringGroupsTypes';
 import { useGetDataStore } from '../../packages/wrapper/hooks/dataStore/useGetDataStore';
 import { CircularLoader } from '@dhis2/ui';
-
 
 export default function MonitoringGroups() {
   // Groups from dataStore
@@ -67,14 +66,6 @@ export default function MonitoringGroups() {
     }))
     return formattedData
   }
-
-  // if (loading) {
-  //   return (
-  //     <div className='flex items-center justify-center'>
-  //       <CircularLoader />
-  //     </div>
-  //   )
-  // }
 
   return (
     <div className="space-y-6">

@@ -20,7 +20,7 @@ const TableFilter = (props: TableFilterProps) => {
                 })
             );
 
-            const queryStr = new URLSearchParams(cleanQuery).toString();
+            const queryStr = new URLSearchParams(cleanQuery)?.toString();
             setFilteQuery(queryStr)
         }
     }

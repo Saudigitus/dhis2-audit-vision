@@ -3,10 +3,10 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import Table from '../../components/table/Table';
 import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
 import { useGetudit } from '../../hooks/audit/useGetudit';
-import { Center, CircularLoader } from '@dhis2/ui';
 import { filterValuesFormatter, rowsFormatter } from '../../utils/table/rowFormatter';
 import TableFilter from '../../components/filter/TableFilter';
 import { changeExplorerHeader } from '../../constants/common/auditTableHeaders';
+import { useParams } from '../../hooks/common/useQueryParams';
 
 export interface SelectedAuditProps {
   id: string;
@@ -23,18 +23,16 @@ export default function ChangeExplorer() {
   const [showFilters, setShowFilters] = useState(false);
   const [query, setQuery] = useState<Record<string, string> | null>(null)
   const [filterQuery, setFilteQuery] = useState<string | null>(null)
-
-
   const [selectedChange, setSelectedChange] = useState<SelectedAuditProps | null>(null);
   const [parentChange, setParentChange] = useState<any | null>(null);
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
   const { getAudit, data, loading } = useGetudit();
-
+  const { group } = useParams()
 
   useEffect(() => {
     getAudit(page, pageSize, filterQuery!)
-  }, [page, pageSize, filterQuery])
+  }, [page, pageSize, filterQuery, group])
 
   return (
     <div className="space-y-5 relative">
@@ -72,7 +70,8 @@ export default function ChangeExplorer() {
           header={changeExplorerHeader}
           title='Change History'
           description='Explore the history of changes made to your DHIS2 objects, including who made the change and when.'
-          tabledata={rowsFormatter(data?.audits!)} />
+          tabledata={rowsFormatter(data?.audits!)}
+        />
       </div>
 
       {selectedChange &&

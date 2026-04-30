@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import { Activity, Edit2, FolderGit2, Layers, Trash2 } from "lucide-react";
 import { MonitoringGroup } from "src/types/monitoringGroups/MonitoringGroupsTypes";
+import { useNavigate } from "react-router-dom";
 
 
 interface MonitoringGroupCardProps {
@@ -11,6 +12,7 @@ interface MonitoringGroupCardProps {
 
 const MonitoringGroupCard: FunctionComponent<MonitoringGroupCardProps> = (props) => {
     const { group, handleOpenModal, handleDeleteGroup } = props
+    const navigate = useNavigate()
 
     return (
         <div key={group.id} className="bg-white rounded-xl border border-[#e2e8f0] p-5 shadow-sm hover:shadow-md transition-shadow">
@@ -41,7 +43,7 @@ const MonitoringGroupCard: FunctionComponent<MonitoringGroupCardProps> = (props)
             <div className="pt-4 border-t border-[#e2e8f0] flex justify-between items-center text-xs text-[#94a3b8]">
                 <span>Criado em {group.createdAt}</span>
                 <span>Actualizado em {group.updatedAt}</span>
-                <button className="text-[#3b82f6] font-medium hover:underline cursor-pointer flex items-center gap-1">
+                <button onClick={() => navigate('/change-explorer?group=' + group.id + '&groupName=' + group.name)} className="text-[#3b82f6] font-medium hover:underline cursor-pointer flex items-center gap-1">
                     <Activity size={14} /> Monitorar
                 </button>
             </div>
