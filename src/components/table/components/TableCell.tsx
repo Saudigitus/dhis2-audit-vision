@@ -12,17 +12,16 @@ const TableCell = ({ column, row }: { column: Column, row: Record<string, any> }
             return (
                 <td className="px-6 py-3.5">
                     <div className="status-stack">
-                        {row?.last5
-                            ?.reduce((acc: { status: string; count: number }[], status: string) => {
-                                if (!status) return acc
-                                const last = acc[acc.length - 1]
-                                if (last && last.status === status) {
-                                    last.count++
-                                } else {
-                                    acc.push({ status, count: 1 })
-                                }
-                                return acc
-                            }, [])
+                        {row?.last5?.reduce((acc: { status: string; count: number }[], status: string) => {
+                            if (!status) return acc
+                            const last = acc[acc.length - 1]
+                            if (last && last.status === status) {
+                                last.count++
+                            } else {
+                                acc.push({ status, count: 1 })
+                            }
+                            return acc
+                        }, [])
                             .map(({ status, count }: any, index: number) => {
                                 const statusKey = status.toLowerCase()
                                 const statusClass =
@@ -34,7 +33,7 @@ const TableCell = ({ column, row }: { column: Column, row: Record<string, any> }
                                 return (
                                     <span
                                         key={index}
-                                        className={`status-badge status-${statusClass}`}
+                                        className={`text-[12px] capitalize status-badge status-${statusClass}`}
                                         title={count > 1 ? `${status} x${count}` : status}
                                     >
                                         {statusClass}&nbsp;

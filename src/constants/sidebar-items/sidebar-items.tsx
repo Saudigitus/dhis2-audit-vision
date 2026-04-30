@@ -21,8 +21,8 @@ const navItems: { id: string; label: string; icon: any; path: string }[] = [
   { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
 ]
 
-const sidebarData = () => {
-  return navItems
+const sidebarData = (hasURL: boolean) => {
+  return hasURL ? navItems : navItems?.filter(x => x.id == 'settings')
 }
 
 export { sidebarData }

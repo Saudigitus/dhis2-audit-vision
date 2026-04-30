@@ -1,5 +1,7 @@
 import axios from "axios"
 import { useState } from "react"
+import { useRecoilValue } from "recoil"
+import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 
 export interface DataProps {
     id: number
@@ -13,11 +15,12 @@ export interface DataProps {
 export const useGetuditDetails = () => {
     const [data, setData] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(false)
+    const dataStoreDataState = useRecoilValue(DataStoreConfigState)
 
     const getAuditDetails = async (objectId: string) => {
         setLoading(true)
         try {
-            const response = await axios.get(`https://agro.desinglab.org/audit-api/api/auditObjects?objectId=${objectId}`)
+            const response = await axios.get(`${dataStoreDataState.auditApi}/api/auditObjects?objectId=${objectId}`)
             setData(response?.data?.auditObjects)
             return response
         } catch (error) {

@@ -25,7 +25,7 @@ export default function ChangeExplorer() {
   const [filterQuery, setFilteQuery] = useState<string | null>(null)
   const [selectedChange, setSelectedChange] = useState<SelectedAuditProps | null>(null);
   const [parentChange, setParentChange] = useState<any | null>(null);
-  const [page, setPage] = useState<number>(2)
+  const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
   const { getAudit, data, loading } = useGetudit();
   const { group } = useParams()

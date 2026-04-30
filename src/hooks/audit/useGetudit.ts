@@ -42,7 +42,7 @@ export const useGetudit = () => {
                 const enrichedItems = []
 
                 for (const item of paginatedItems) {
-                    const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits/metadata/${item.id}?type=${item.type.toUpperCase()}&page=1&pageSize=5`)
+                    const response = await axios.get(`${dataStoreDataState.auditApi}/api/audits/metadata/${item.id}?type=${item.type.toUpperCase()}&page=1&pageSize=5`)
                     const enrichedItem: any = { ...item }
 
                     if (response?.data?.audits?.length > 0) {
@@ -53,12 +53,13 @@ export const useGetudit = () => {
                     enrichedItems.push(enrichedItem)
                 }
 
+                console.log(paginatedItems,dataStoreDataState)
                 setData({
                     audits: enrichedItems,
                     pager: { page, pageCount, pageSize, total }
                 })
             } else {
-                const response = await axios.get(`https://agro.desinglab.org/audit-api/api/audits?page=${page}&pageSize=${pageSize}${filterQuery ? `&${filterQuery}` : ''}`)
+                const response = await axios.get(`${dataStoreDataState.auditApi}/api/audits?page=${page}&pageSize=${pageSize}${filterQuery ? `&${filterQuery}` : ''}`)
 
                 setData(response?.data)
                 return response

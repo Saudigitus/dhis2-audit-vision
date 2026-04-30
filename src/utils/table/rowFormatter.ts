@@ -9,7 +9,7 @@ function rowsFormatter(data: DataProps[]) {
         user: item.createdBy,
         time: new Date(item.updated_at).toLocaleString(),
         type: item.auditScope,
-        object: item.klass.split(".").pop(),
+        object: item.klass?.split(".").pop(),
     }))
     return formattedData
 }
