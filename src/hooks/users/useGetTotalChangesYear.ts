@@ -1,11 +1,11 @@
 import { useDataEngine } from '@dhis2/app-runtime';
 import { useState, useEffect } from 'react';
 
-const TOTAL_CHANGES_QUERY = {
+const TOTAL_CHANGES_QUERY: any = {
   changes: {
     resource: 'sqlViews/sGPipQDLMgy/data',
     params: {
-      var: ['startDate:2026-01-01', 'endDate:2027-01-01'],
+      var: [['startDate:2026-01-01'], ['endDate:2027-01-01']],
     },
   },
 };
