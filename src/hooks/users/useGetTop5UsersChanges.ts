@@ -26,34 +26,45 @@ export const useGetTop5UsersChanges = () => {
         
         const rows = response.topUsers?.listGrid?.rows || response.topUsers?.rows || [];
         
-        // Estrutura fornecida pelo usuário:
-        // Coluna 0: period (data)
-        // Coluna 1: username
-        // Coluna 2: audit_count
-        
         const dataMap: Record<string, ChartData> = {};
         const uniqueUsernames = new Set<string>();
+        const allPeriods = new Set<string>();
 
         rows.forEach((row: any[]) => {
           const period = row[0];
           const username = row[1];
           const count = Number(row[2]) || 0;
 
+          allPeriods.add(period);
+          uniqueUsernames.add(username);
+
           if (!dataMap[period]) {
             dataMap[period] = { name: period };
           }
 
           dataMap[period][username] = count;
-          uniqueUsernames.add(username);
         });
 
-        // Converter o mapa para array ordenado por data
-        const mappedData = Object.values(dataMap).sort((a, b) => 
-          new Date(a.name).getTime() - new Date(b.name).getTime()
+        // Converter o Set de períodos para array ordenado por data
+        const sortedPeriods = Array.from(allPeriods).sort((a, b) => 
+          new Date(a).getTime() - new Date(b).getTime()
         );
 
-        setUsernames(Array.from(uniqueUsernames));
-        setChartData(mappedData);
+        // Garantir que todos os períodos tenham dados para todos os usernames (preencher com 0 onde faltar)
+        const usernamesArray = Array.from(uniqueUsernames);
+        const completeData = sortedPeriods.map(period => {
+          const periodData = dataMap[period] || { name: period };
+          const completePeriodData: ChartData = { name: period };
+          
+          usernamesArray.forEach(username => {
+            completePeriodData[username] = periodData[username] || 0;
+          });
+          
+          return completePeriodData;
+        });
+
+        setUsernames(usernamesArray);
+        setChartData(completeData);
       } catch (err) {
         setError(err);
       } finally {

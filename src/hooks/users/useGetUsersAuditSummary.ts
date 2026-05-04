@@ -4,68 +4,70 @@ import { useState, useEffect } from 'react';
 const USERS_AUDIT_SUMMARY_QUERY: any = {
   summary: {
     resource: 'sqlViews/B7DrTkhIYld/data',
-    params: ({ startDate, endDate, username }: any) => ({
+    params: ({ startDate, endDate, offset }: any) => ({
       var: [
         `startDate:${startDate}`,
         `endDate:${endDate}`,
-        ...(username ? [`username:${username}`] : []),
+        `offset:${offset}`,
       ],
     }),
   },
 };
 
-export const useGetUsersAuditSummary = (usernames: string[]) => {
+export const useGetUsersAuditSummary = (pageSize: number = 10) => {
   const engine = useDataEngine();
   const [auditSummary, setAuditSummary] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [currentOffset, setCurrentOffset] = useState(0);
+
+  const fetchAuditSummary = async (offset: number) => {
+    setLoading(true);
+    try {
+      const response: any = await engine.query(USERS_AUDIT_SUMMARY_QUERY, {
+        variables: {
+          startDate: '2026-01-01',
+          endDate: '2027-01-01',
+          offset: offset.toString(),
+        },
+      });
+      
+      const rows = response.summary?.listGrid?.rows || response.summary?.rows || [];
+      
+      // Use functional update to avoid stale state issues
+      setAuditSummary(prevSummary => {
+        const newSummary: Record<string, number> = { ...prevSummary };
+        rows.forEach((row: any[]) => {
+          const username = row[0];
+          const count = Number(row[1]) || 0;
+          newSummary[username] = count;
+        });
+        return newSummary;
+      });
+
+      // Check if we have more data
+      if (rows.length < pageSize) {
+        setHasMore(false);
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      const nextOffset = currentOffset + pageSize;
+      setCurrentOffset(nextOffset);
+      fetchAuditSummary(nextOffset);
+    }
+  };
 
   useEffect(() => {
-    if (usernames.length === 0) return;
+    fetchAuditSummary(0);
+  }, [engine]);
 
-    const fetchSummaries = async () => {
-      setLoading(true);
-      try {
-        const results: Record<string, number> = { ...auditSummary };
-        
-        // Filtrar apenas usernames que ainda não temos no estado para evitar requisições duplicadas
-        const missingUsernames = usernames.filter(u => results[u] === undefined);
-        
-        if (missingUsernames.length === 0) {
-          setLoading(false);
-          return;
-        }
-
-        // Fazer requisições em paralelo para cada username faltante
-        // Nota: Em um sistema real com muitos usuários, o ideal seria uma SQL View que aceitasse múltiplos IDs
-        // ou fazer o fetch em lotes para não sobrecarregar o servidor.
-        await Promise.all(missingUsernames.map(async (username) => {
-          const response: any = await engine.query(USERS_AUDIT_SUMMARY_QUERY, {
-            variables: {
-              startDate: '2026-01-01',
-              endDate: '2027-01-01',
-              username: username,
-            },
-          });
-          
-          const rows = response.summary?.listGrid?.rows || response.summary?.rows || [];
-          if (rows.length > 0) {
-            results[username] = Number(rows[0][1]) || 0;
-          } else {
-            results[username] = 0;
-          }
-        }));
-
-        setAuditSummary(results);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSummaries();
-  }, [engine, usernames]);
-
-  return { auditSummary, loading, error };
+  return { auditSummary, loading, error, hasMore, loadMore };
 };
