@@ -1,8 +1,8 @@
-import { useRecoilState, useSetRecoilState } from "recoil"
+import { useRecoilState } from "recoil"
 import { dataStoreKey } from "../../config"
 import useShowAlerts from "../alert/useShowAlert"
 import { DataStoreConfigState } from "../../types/DataStoreSchema"
-import { type FetchError, useDataEngine, useDataQuery } from "@dhis2/app-runtime"
+import { useDataEngine } from "@dhis2/app-runtime"
 import { useEffect, useState } from "react"
 
 const query = {
@@ -11,7 +11,7 @@ const query = {
     }
 }
 
-export function useGetDataStore(lazy: boolean = false) {
+export function useGetDataStore() {
     const engine = useDataEngine()
     const { show, hide } = useShowAlerts()
     const [error, setError] = useState<boolean>(false)
