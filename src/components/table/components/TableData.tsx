@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Eye } from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, Trash } from "lucide-react";
 import React, { useState } from "react";
 import { Column } from "./TableHeader";
 import TableCell from "./TableCell";
@@ -13,12 +13,15 @@ interface TableDataProps {
     data: Record<string, any>[];
     loading: boolean;
     header: Column[];
-    setSelectedChange: (selectedChange: SelectedAuditProps) => void;
+    onRowClick?: (row: any) => void;
+    setSelectedChange?: (selectedChange: SelectedAuditProps) => void;
     dependenceHeaders?: Column[];
+    onDelete?: (id: string) => void
+    hasDelete?: boolean
 }
 
 const TableData = (props: TableDataProps) => {
-    const { data, header, setSelectedChange, loading, dependenceHeaders } = props;
+    const { data, header, onRowClick, setSelectedChange, loading, dependenceHeaders, onDelete, hasDelete } = props;
     const [expandedRows, setExpandedRows] = useState<Set<any>>(new Set());
     const [expandedData, setExpandedData] = useState<any>({});
     const [isLoading, setIsLoading] = useState<any>({});
@@ -82,7 +85,7 @@ const TableData = (props: TableDataProps) => {
                                     {isLoading[row.id] ? <CircularLoader small /> :
                                         <button
                                             onClick={() => toggleRow(row)}
-                                            className="inline-flex items-center justify-cente w-5 h-5 rounde text-[#94a3b8] hover:text-[#475569 hover:bg-[#e2e8f0 transition-colors duration-10 cursor-pointer"
+                                            className="inline-flex items-center justify-center w-5 h-5 rounded text-[#94a3b8] hover:text-[#475569] hover:bg-[#e2e8f0] transition-colors duration-150 cursor-pointer"
                                         >
                                             {expandedRows.has(row.id)
                                                 ? <ChevronUp size={13} />
@@ -99,17 +102,24 @@ const TableData = (props: TableDataProps) => {
 
                             {/* Eye button */}
                             {!row.hasDependencies && (
-                                <td className="px-4 py-3.5">
+                                <td className="px-4 py-3.5 flex">
                                     <button
-                                        onClick={() =>
-                                            setSelectedChange({
+                                        onClick={() => {
+                                            onRowClick?.(row)
+                                            setSelectedChange?.({
                                                 date: row?.time, type: row?.type, user: row?.user, id: row?.id, action: row?.action, object: row?.object,
                                             })
-                                        }
-                                        className=" inline-flex items-center justify-center w-6 h-6 rounded text-[#cbd5e1] hover:text-[#475569] hover:bg-[#f1f5f9] transition-colors duration-150 cursor-pointer"
+                                        }}
+                                        className=" inline-flex items-center justify-center w-6 h-6 rounded text-[#98a8bb] hover:text-[#475569] hover:bg-[#f1f5f9] transition-colors duration-150 cursor-pointer"
                                     >
                                         <Eye size={14} />
                                     </button>
+                                    {hasDelete && <button
+                                        onClick={() => onDelete?.(row?.id)}
+                                        className=" inline-flex items-center justify-center w-6 h-6 rounded text-[#df1e4298] hover:text-[#d02472] hover:bg-[#f1f5f9] transition-colors duration-150 cursor-pointer"
+                                    >
+                                        <Trash size={14} />
+                                    </button>}
                                 </td>
                             )}
                         </tr>
@@ -136,7 +146,7 @@ const TableData = (props: TableDataProps) => {
                                         expandedData={expandedData}
                                         index={index}
                                         row={row}
-                                        setSelectedChange={setSelectedChange}
+                                        setSelectedChange={setSelectedChange!}
                                     />
                                 )}
 

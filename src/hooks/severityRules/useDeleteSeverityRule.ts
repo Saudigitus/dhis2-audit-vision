@@ -4,43 +4,30 @@ import { useRecoilValue } from "recoil"
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
 
-export interface DataProps {
-    id: number
-    auditType: string
-    createdBy: string
-    updated_at: string
-    auditScope: string
-    klass: string
-}
-
-export const usePostSeverityRules = () => {
+export const useDeleteSeverityRule = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
     const { hide, show } = useShowAlerts()
 
-    const postAuditRules = async (form: any) => {
+    const deleteSeverityRule = async (id: string) => {
         setLoading(true)
         try {
-            await axios.post(`${dataStoreDataState.auditApi}/api/notifications/create`, form)
+            await axios.delete(`${dataStoreDataState.auditApi}/api/notifications/${id}`)
             show({
-                message: `Rule created successfully`,
+                message: `Rule deleted successfully`,
                 type: { success: true }
             });
             setTimeout(hide, 5000);
-            
-        } catch (error: any) {
-            const detail = error?.response?.data?.detail?.[0]?.msg || 'Rule creation failed';
+        } catch (error) {
             show({
-                message: detail,
+                message: `Rule deletion failed`,
                 type: { critical: true }
             });
             setTimeout(hide, 5000);
-
-            return { error: true }
         } finally {
             setLoading(false)
         }
     }
 
-    return { postAuditRules, loading }
+    return { deleteSeverityRule, loading }
 }

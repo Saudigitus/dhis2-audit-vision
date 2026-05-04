@@ -4,19 +4,22 @@ import { Edit2, Mail, MessageSquare, Plus, Save, Trash2, X } from "lucide-react"
 import { usePostSeverityRules } from "../../hooks/severityRules/usePostSeverityRules";
 import { metadataTypes } from "../../constants/common/dhis2Objects";
 
-export default function SeverityForm() {
+export default function SeverityForm({ setOpenForm, onSave, row }: { setOpenForm: (args: boolean) => void, onSave: () => Promise<void>, row: any }) {
     const { loading, postAuditRules } = usePostSeverityRules()
     const [form, setForm] = useState<any>({
         isOpen: false,
+        ...(row ? row : {})
     });
 
-    const resetForm = () => setForm({ isOpen: false });
+    const resetForm = () => setForm({ isOpen: false, ...(row ? row : {}) });
 
     const saveRule = async () => {
         const { contactEmail, contactWA, contactWALabel, contacts, isOpen, ...rest } = form
         const payLoad = { ...rest, recipients: { cc: [], bcc: [], to: contacts?.filter((x: any) => x.type == 'email')?.map((x: any) => x.value) || [] } }
 
-        await postAuditRules(payLoad)
+        const { error }: any = await postAuditRules(payLoad)
+
+        if (!error) { setOpenForm(false); await onSave() }
     };
 
     const addOrUpdateContact = (type: 'email' | 'whatsapp', value: string, label: string) => {
@@ -37,8 +40,8 @@ export default function SeverityForm() {
         }
     };
 
-    const removeContact = (id: string) => {
-        setForm((prev: any) => ({ ...prev, contacts: prev.contacts?.filter((c: any) => c.id !== id) }))
+    const removeContact = (value: string) => {
+        setForm((prev: any) => ({ ...prev, contacts: prev.contacts?.filter((c: any) => c.value !== value) }))
     };
 
     const handleInputChange = (field: string, value: any) => {
@@ -173,7 +176,7 @@ export default function SeverityForm() {
                                                     <Edit2 size={14} />
                                                 </button>
                                                 <button
-                                                    onClick={() => removeContact(contact.id)}
+                                                    onClick={() => removeContact(contact.value)}
                                                     className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
                                                 >
                                                     <Trash2 size={14} />
@@ -234,7 +237,7 @@ export default function SeverityForm() {
                                                     <Edit2 size={14} />
                                                 </button>
                                                 <button
-                                                    onClick={() => removeContact(contact.id)}
+                                                    onClick={() => removeContact(contact.value)}
                                                     className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
                                                 >
                                                     <Trash2 size={14} />
@@ -261,7 +264,7 @@ export default function SeverityForm() {
                         </svg>
                     )}
                     {!loading && <Save size={16} />}
-                    {form.editingRuleId ? 'Update Rule' : loading ? 'Saving Rule...' : 'Save Rule'}
+                    {row != null ? 'Update Rule' : loading ? 'Saving Rule...' : 'Save Rule'}
                 </button>
                 <button
                     onClick={resetForm}
