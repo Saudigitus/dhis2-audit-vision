@@ -5,20 +5,20 @@ import { DataStoreConfigState } from '../packages/wrapper/types/DataStoreSchema'
 import { useRecoilValue } from 'recoil';
 import useShowAlerts from '../packages/wrapper/hooks/alert/useShowAlert';
 
-function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
-  return (
-    <button
-      onClick={onToggle}
-      className={`relative w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer ${enabled ? 'bg-[#3b82f6]' : 'bg-[#cbd5e1]'
-        }`}
-    >
-      <span
-        className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${enabled ? 'left-[22px]' : 'left-0.5'
-          }`}
-      />
-    </button>
-  );
-}
+// function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
+//   return (
+//     <button
+//       onClick={onToggle}
+//       className={`relative w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer ${enabled ? 'bg-[#3b82f6]' : 'bg-[#cbd5e1]'
+//         }`}
+//     >
+//       <span
+//         className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${enabled ? 'left-[22px]' : 'left-0.5'
+//           }`}
+//       />
+//     </button>
+//   );
+// }
 
 export default function SettingsPage() {
   // const [emailAlerts, setEmailAlerts] = useState(true);
@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const [retention, setRetention] = useState(dataStoreDataState?.auditApi ?? '');
   const { hide, show } = useShowAlerts()
 
-  const { loading, error, updateApi } = useAuditApi()
+  const { loading, updateApi } = useAuditApi()
   // const [autoBackup, setAutoBackup] = useState(true);
 
   return (
