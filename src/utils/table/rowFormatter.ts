@@ -25,14 +25,22 @@ function filterValuesFormatter() {
             label: 'User',
             inputType: 'text'
         },
-        // klass: {
-        //     label: 'Object',
-        //     inputType: 'text'
-        // },
-        // auditScope: {
-        //     label: 'Type',
-        //     inputType: 'text'
-        // },
     }
 }
-export { rowsFormatter, filterValuesFormatter }
+
+function severityRulesFormater(data: any[]) {
+    if (!data) return []
+
+    const formattedData = data?.map((item) => {
+        const template = item?.messageTemplate?.replace(/\\n/g, '\n') || '';
+       
+        return {
+            ...item,
+            numberOfEmails: item?.recipients?.to?.length,
+            objectType: item?.objectType?.replace(/([A-Z])/g, ' $1').trim(),
+            messageTemplate: template.length > 100 ? template.substring(0, 100) + '...' : template,
+        }
+    })
+    return formattedData
+}
+export { rowsFormatter, filterValuesFormatter, severityRulesFormater }

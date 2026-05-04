@@ -8,13 +8,13 @@ import { useParams } from "../../hooks/common/useQueryParams"
 interface TableProps {
     title?: string
     description?: string
-    loading: boolean
+    loading?: boolean
     header: Array<{
         id: string,
         displayName: string
     }>
     tabledata: Record<string, any>[]
-    setSelectedChange: (selectedChange: SelectedAuditProps) => void
+    setSelectedChange?: (selectedChange: SelectedAuditProps) => void
     dependenceHeaders?: Array<{ id: string, displayName: string }>
     pagination?: {
         total: number
@@ -45,10 +45,10 @@ const Table: FC<TableProps> = (props) => {
 
             <table className="w-full">
                 <TableHeader hasDependence={dependenceHeaders?.length! > 0} header={header} />
-                <TableData dependenceHeaders={dependenceHeaders} loading={loading} data={tabledata} header={header} setSelectedChange={setSelectedChange} />
+                <TableData dependenceHeaders={dependenceHeaders} loading={loading!} data={tabledata} header={header} setSelectedChange={setSelectedChange!} />
             </table>
             <div className="py-5 px-10">
-                {(pagination && !loading && pagination.page) && <Pagination pagination={pagination} />}
+                {(pagination && !loading! && pagination.page) && <Pagination pagination={pagination} />}
             </div>
         </div>
     )
