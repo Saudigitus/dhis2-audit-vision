@@ -1,9 +1,13 @@
+import { useGetDashboardData } from '../hooks/dashboard/useGetDashboardData';
 import CardContainer from '../components/card/CardContainer';
-import { TrendingUp, AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
+import GlobalAuditFilter from '../components/GlobalAuditFilter';
+import { TrendingUp, AlertTriangle, ShieldCheck, Activity, LayoutDashboard } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, BarChart, Bar,
 } from 'recharts';
+import { useEffect } from 'react';
+import { useParams } from '../hooks/common/useQueryParams';
 
 const userActivityData = [
   { name: 'Alice', CREATE: 30, UPDATE: 50, DELETE: 20 },
@@ -41,19 +45,45 @@ const pieData = [
   { name: 'DELETE', value: 10, color: '#ef4444' },
 ];
 
-const stats = [
-  { label: 'TOTAL CHANGES TODAY', value: '15', change: '+5% vs yesterday', changeColor: 'text-[#22c55e]', icon: <TrendingUp size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
-  { label: 'TOTAL CHANGES', value: '50', change: '+12% vs last week', changeColor: 'text-[#22c55e]', icon: <Activity size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
-  { label: 'TOTAL UPDATES', value: '25', change: '+8% vs last week', changeColor: 'text-[#f59e0b]', icon: <ShieldCheck size={20} className="text-[#f59e0b]" />, iconBg: 'bg-[#fffbeb]' },
-  { label: 'TOTAL RISK CHANGES', value: '21', change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
-];
+const stats = ({ changesToday, totalChanges, riskChanges, totalUpdates }: { changesToday: any, totalChanges: any, riskChanges: any, totalUpdates: any }) => ([
+  { label: 'TOTAL CHANGES TODAY', value: changesToday, change: '+5% vs yesterday', changeColor: 'text-[#22c55e]', icon: <TrendingUp size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
+  { label: 'TOTAL CHANGES', value: totalChanges, change: '+12% vs last week', changeColor: 'text-[#22c55e]', icon: <Activity size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
+  { label: 'TOTAL UPDATES', value: totalUpdates, change: '+8% vs last week', changeColor: 'text-[#f59e0b]', icon: <ShieldCheck size={20} className="text-[#f59e0b]" />, iconBg: 'bg-[#fffbeb]' },
+  { label: 'TOTAL RISK CHANGES', value: riskChanges, change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
+]);
 
 export default function Dashboard() {
+  const { startDate, endDate } = useParams()
+  const { getDashboardData, loading, data } = useGetDashboardData()
+
+
+  useEffect(() => {
+    getDashboardData({ startDate: startDate!, endDate: endDate! })
+  }, [startDate, endDate])
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Header Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <LayoutDashboard size={20} className="text-[#3b82f6]" />
+            <span className="text-lg font-bold text-[#0f172a]">Dashboard</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <GlobalAuditFilter value={{} as any} onChange={() => { }} />
+        </div>
+      </div>
+
       {/* Stat Cards */}
       <div className="grid grid-cols-4 gap-5">
-        {stats.map((s, i) => (
+        {stats({
+          changesToday: data?.todayTotalChanges,
+          totalChanges: data?.totalChanges,
+          riskChanges: data?.riskChanges,
+          totalUpdates: data?.totalUpdates,
+        }).map((s, i) => (
           <>
             <CardContainer
               key={i}

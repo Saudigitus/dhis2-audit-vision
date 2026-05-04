@@ -31,6 +31,8 @@ const useParams = () => {
             tab: query.get('tab') ?? null,
             group: query.get('group') ?? null,
             groupName: query.get('groupName') ?? null,
+            startDate: query.get('startDate') as string,
+            endDate: query.get('endDate') as string,
         }
     }
 
