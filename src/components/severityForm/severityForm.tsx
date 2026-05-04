@@ -13,10 +13,9 @@ export default function SeverityForm() {
 
     const saveRule = async () => {
         const { contactEmail, contactWA, contactWALabel, contacts, isOpen, ...rest } = form
-        const payLoad = { ...rest, recipients: contacts?.filter((x: any) => x.type == 'email')?.map((x: any) => x.value) }
+        const payLoad = { ...rest, recipients: { to: contacts?.filter((x: any) => x.type == 'email')?.map((x: any) => x.value) || [] } }
 
-        const response = await postAuditRules(payLoad)
-        console.log(response)
+        await postAuditRules(payLoad)
     };
 
     const addOrUpdateContact = (type: 'email' | 'whatsapp', value: string, label: string) => {
@@ -71,13 +70,53 @@ export default function SeverityForm() {
                                 className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                             >
                                 <option></option>
-                                <option>organisationUnit</option>
-                                <option>dataElement</option>
-                                <option>indicator</option>
-                                <option>dataSet</option>
-                                <option>program</option>
-                                <option>categoryCombo</option>
-                                <option>trackedEntityType</option>
+                                <option value="attribute">attribute</option>
+                                <option value="category">category</option>
+                                <option value="categoryCombo">categoryCombo</option>
+                                <option value="categoryOption">categoryOption</option>
+                                <option value="categoryOptionCombo">categoryOptionCombo</option>
+                                <option value="categoryOptionGroup">categoryOptionGroup</option>
+                                <option value="categoryOptionGroupSet">categoryOptionGroupSet</option>
+                                <option value="constant">constant</option>
+                                <option value="dashboard">dashboard</option>
+                                <option value="dashboardItem">dashboardItem</option>
+                                <option value="dataElement">dataElement</option>
+                                <option value="dataElementGroup">dataElementGroup</option>
+                                <option value="dataElementGroupSet">dataElementGroupSet</option>
+                                <option value="dataSet">dataSet</option>
+                                <option value="indicator">indicator</option>
+                                <option value="indicatorGroup">indicatorGroup</option>
+                                <option value="indicatorGroupSet">indicatorGroupSet</option>
+                                <option value="indicatorType">indicatorType</option>
+                                <option value="legendSet">legendSet</option>
+                                <option value="map">map</option>
+                                <option value="option">option</option>
+                                <option value="optionSet">optionSet</option>
+                                <option value="organisationUnit">organisationUnit</option>
+                                <option value="organisationUnitGroup">organisationUnitGroup</option>
+                                <option value="organisationUnitGroupSet">organisationUnitGroupSet</option>
+                                <option value="organisationUnitLevel">organisationUnitLevel</option>
+                                <option value="program">program</option>
+                                <option value="programIndicator">programIndicator</option>
+                                <option value="programIndicatorGroup">programIndicatorGroup</option>
+                                <option value="programRule">programRule</option>
+                                <option value="programRuleAction">programRuleAction</option>
+                                <option value="programRuleVariable">programRuleVariable</option>
+                                <option value="programStage">programStage</option>
+                                <option value="programStageDataElement">programStageDataElement</option>
+                                <option value="relationshipType">relationshipType</option>
+                                <option value="report">report</option>
+                                <option value="section">section</option>
+                                <option value="sqlView">sqlView</option>
+                                <option value="trackedEntityAttribute">trackedEntityAttribute</option>
+                                <option value="trackedEntityAttributeGroup">trackedEntityAttributeGroup</option>
+                                <option value="trackedEntityType">trackedEntityType</option>
+                                <option value="user">user</option>
+                                <option value="userGroup">userGroup</option>
+                                <option value="userRole">userRole</option>
+                                <option value="validationRule">validationRule</option>
+                                <option value="validationRuleGroup">validationRuleGroup</option>
+                                <option value="visualization">visualization</option>
                             </select>
                         </div>
                         <div>
@@ -88,9 +127,9 @@ export default function SeverityForm() {
                                 className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                             >
                                 <option></option>
-                                <option value="High">High</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Low">Low</option>
+                                <option value="HIGH">High</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="LOW">Low</option>
                             </select>
                         </div>
                     </div>

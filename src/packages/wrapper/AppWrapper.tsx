@@ -2,10 +2,14 @@ import React from "react"
 import { AppWrapperProps } from "./types"
 import useAppConfig from "./hooks/useAppConfig"
 import { CircularLoader } from "@dhis2/ui"
+import { DataStoreConfigState } from "./types/DataStoreSchema"
+import { useRecoilValue } from "recoil"
+import RulesWrapper from "./rulesWrapper/rulesWrapper"
 
 const AppWrapper = (props: AppWrapperProps) => {
     const { loading, error } = useAppConfig()
     const { children, errorComponent, loadingComponent } = props
+    const dataStoreData = useRecoilValue(DataStoreConfigState)
 
     if (error) {
         return (
@@ -20,7 +24,7 @@ const AppWrapper = (props: AppWrapperProps) => {
         )
     }
 
-    if (loading) {
+    if (loading || !dataStoreData) {
         return (
             <React.Fragment>
                 {
@@ -35,7 +39,9 @@ const AppWrapper = (props: AppWrapperProps) => {
 
     return (
         <React.Fragment>
-            {children}
+            <RulesWrapper>
+                {children}
+            </RulesWrapper>
         </React.Fragment>
     )
 }
