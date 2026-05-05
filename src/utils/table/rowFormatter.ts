@@ -29,11 +29,12 @@ function filterValuesFormatter() {
 }
 
 function severityRulesFormater(data: any[]) {
-    if (!data) return []
+    const copydata = [...data]
+    if (!copydata) return []
 
-    const formattedData = data?.map((item) => {
+    const formattedData = copydata?.map((item) => {
         const template = item?.messageTemplate?.replace(/\\n/g, '\n') || '';
-       
+
         return {
             ...item,
             numberOfEmails: item?.recipients?.to?.length,

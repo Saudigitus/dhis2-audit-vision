@@ -18,9 +18,10 @@ export const useDeleteSeverityRule = () => {
                 type: { success: true }
             });
             setTimeout(hide, 5000);
-        } catch (error) {
+        } catch (error: any) {
+            const detail = error?.response?.data?.detail?.[0]?.msg || 'Rule deletion failed';
             show({
-                message: `Rule deletion failed`,
+                message: detail,
                 type: { critical: true }
             });
             setTimeout(hide, 5000);

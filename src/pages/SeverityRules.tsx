@@ -10,7 +10,6 @@ import ConfirmDialog from '../components/confirm/confirmDialog';
 import { useDeleteSeverityRule } from '../hooks/severityRules/useDeleteSeverityRule';
 import { useGetSeverityRules } from '../hooks/severityRules/useGetSeverityRules';
 
-
 const SeverityRules = () => {
   const [openForm, setOpenForm] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -22,8 +21,15 @@ const SeverityRules = () => {
   const { deleteSeverityRule, loading } = useDeleteSeverityRule()
   const { getSeverityRules, loading: loadingRules } = useGetSeverityRules()
 
-  const onRowClick = (data: any) => {
-    setSelectedRow({ ...data, objectType: data?.objectType?.replace(/\s+/g, ''), contacts: data?.recipients?.to?.map((x: string) => ({ value: x, label: x, type: 'email' })) })
+  const notifications = data?.notifications ?? [];
+  const total = data?.pager?.total!;
+  const pageCount = Math.ceil(total / pageSize);
+  const slicedNotifications = notifications.slice((page - 1) * pageSize, page * pageSize);
+
+  const onRowClick = (selected: any) => {
+    const originalData = slicedNotifications.find((x: any) => x.id == selected.id)
+    if (!originalData) return
+    setSelectedRow({ ...selected, messageTemplate: originalData?.messageTemplate, objectType: originalData?.objectType, contacts: originalData?.recipients?.to?.map((x: string) => ({ value: x, label: x, type: 'email' })) })
     setOpenForm(true)
   }
 
@@ -69,7 +75,7 @@ const SeverityRules = () => {
         <Table
           loading={loadingRules || false}
           onRowClick={onRowClick}
-          pagination={{ ...data?.pager!, setPage, setPageSize }}
+          pagination={{ total, page, pageSize, pageCount, setPage, setPageSize }}
           header={severityHeaders}
           hasDelete
           onDelete={(id: string) => {
@@ -78,7 +84,7 @@ const SeverityRules = () => {
           }}
           title='Severity rules'
           description='Manage your DHIS2 Audit Vision severity rules.'
-          tabledata={severityRulesFormater(data?.notifications ?? [])}
+          tabledata={severityRulesFormater(slicedNotifications)}
         />
       ) : (
         <SeverityForm setOpenForm={setOpenForm} onSave={getSeverityRules} row={row} />
