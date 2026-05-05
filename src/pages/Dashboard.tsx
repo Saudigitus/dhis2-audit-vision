@@ -1,67 +1,64 @@
+import { useEffect } from 'react';
+import { CircularLoader } from '@dhis2/ui';
+import { useParams } from '../hooks/common/useQueryParams';
 import CardContainer from '../components/card/CardContainer';
-import { TrendingUp, AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
+import GlobalAuditFilter from '../components/GlobalAuditFilter';
+import { useGetDashboardData } from '../hooks/dashboard/useGetDashboardData';
+import { TrendingUp, AlertTriangle, ShieldCheck, Activity, LayoutDashboard } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, BarChart, Bar,
 } from 'recharts';
 
-const userActivityData = [
-  { name: 'Alice', CREATE: 30, UPDATE: 50, DELETE: 20 },
-  { name: 'Bob', CREATE: 40, UPDATE: 30, DELETE: 30 },
-  { name: 'Charlie', CREATE: 25, UPDATE: 45, DELETE: 30 },
-  { name: 'David', CREATE: 50, UPDATE: 20, DELETE: 30 },
-  { name: 'Eve', CREATE: 35, UPDATE: 40, DELETE: 25 },
-  { name: 'Frank', CREATE: 20, UPDATE: 60, DELETE: 20 },
-  { name: 'Grace', CREATE: 45, UPDATE: 25, DELETE: 30 },
-  { name: 'Heidi', CREATE: 30, UPDATE: 30, DELETE: 40 },
-  { name: 'Ivan', CREATE: 55, UPDATE: 30, DELETE: 15 },
-  { name: 'Judy', CREATE: 25, UPDATE: 55, DELETE: 20 },
-];
 
-const lineData = [
-  { name: 'Mar 27', value: 42 },
-  { name: 'Mar 28', value: 24 },
-  { name: 'Mar 29', value: 28 },
-  { name: 'Mar 30', value: 25 },
-  { name: 'Mar 31', value: 45 },
-  { name: 'Apr 01', value: 46 },
-  { name: 'Apr 02', value: 38 },
-  { name: 'Apr 03', value: 25 },
-  { name: 'Apr 04', value: 45 },
-  { name: 'Apr 05', value: 40 },
-  { name: 'Apr 06', value: 38 },
-  { name: 'Apr 07', value: 35 },
-  { name: 'Apr 08', value: 28 },
-  { name: 'Apr 09', value: 34 },
-];
+const stats = ({ changesToday, totalChanges, riskChanges, totalUpdates }: { changesToday: any, totalChanges: any, riskChanges: any, totalUpdates: any }) => ([
+  { label: 'TOTAL CHANGES TODAY', value: changesToday, change: '+5% vs yesterday', changeColor: 'text-[#22c55e]', icon: <TrendingUp size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
+  { label: 'TOTAL CHANGES', value: totalChanges, change: '+12% vs last week', changeColor: 'text-[#22c55e]', icon: <Activity size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
+  { label: 'TOTAL UPDATES', value: totalUpdates, change: '+8% vs last week', changeColor: 'text-[#f59e0b]', icon: <ShieldCheck size={20} className="text-[#f59e0b]" />, iconBg: 'bg-[#fffbeb]' },
+  { label: 'TOTAL RISK CHANGES', value: riskChanges, change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
+]);
 
-const pieData = [
-  { name: 'CREATE', value: 27, color: '#3b82f6' },
-  { name: 'UPDATE', value: 63, color: '#f59e0b' },
-  { name: 'DELETE', value: 10, color: '#ef4444' },
-];
-
-const stats = [
-  { label: 'TOTAL CHANGES TODAY', value: '15', change: '+5% vs yesterday', changeColor: 'text-[#22c55e]', icon: <TrendingUp size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
-  { label: 'TOTAL CHANGES', value: '50', change: '+12% vs last week', changeColor: 'text-[#22c55e]', icon: <Activity size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
-  { label: 'TOTAL UPDATES', value: '25', change: '+8% vs last week', changeColor: 'text-[#f59e0b]', icon: <ShieldCheck size={20} className="text-[#f59e0b]" />, iconBg: 'bg-[#fffbeb]' },
-  { label: 'TOTAL RISK CHANGES', value: '21', change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
-];
 
 export default function Dashboard() {
+  const { startDate, endDate } = useParams()
+  const { getDashboardData, loading, data } = useGetDashboardData()
+
+  useEffect(() => {
+    getDashboardData({ startDate: startDate!, endDate: endDate! })
+  }, [startDate, endDate])
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Header Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <LayoutDashboard size={20} className="text-[#3b82f6]" />
+            <span className="text-lg font-bold text-[#0f172a]">Dashboard</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <GlobalAuditFilter value={{} as any} onChange={() => { }} />
+        </div>
+      </div>
+
       {/* Stat Cards */}
       <div className="grid grid-cols-4 gap-5">
-        {stats.map((s, i) => (
+        {stats({
+          changesToday: data?.todayChanges,
+          totalChanges: data?.totalChanges,
+          riskChanges: data?.riskChanges,
+          totalUpdates: data?.totalUpdates,
+        }).map((s, i) => (
           <>
             <CardContainer
-              key={i}
+              key={s?.value}
               icon={s.icon}
-              variant='dashboard-card'
-              indicator={s.change}
+              indicator={''}
               label={s.label}
               value={s.value}
+              loading={loading}
+              variant='dashboard-card'
               iconBgColor={s.iconBg}
               indicatorColor={s.changeColor}
             />
@@ -74,44 +71,54 @@ export default function Dashboard() {
         {/* Line Chart */}
         <div className="col-span-2 bg-white rounded-xl border border-[#e2e8f0] p-5">
           <h3 className="font-bold text-[15px] text-[#0f172a] mb-4">Changes Over Time</h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={lineData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={{ stroke: '#e2e8f0' }} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={{ stroke: '#e2e8f0' }} tickLine={false} domain={[0, 60]} />
-              <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={{ r: 1, fill: '#3b82f6' }} activeDot={{ r: 1 }} />
-            </LineChart>
+          <ResponsiveContainer width="100%" height={280} className={loading ? 'flex justify-center items-center' : ''}>
+            {
+              loading ?
+                <CircularLoader small />
+                :
+                <LineChart data={data?.changesOverTime}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={{ stroke: '#e2e8f0' }} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={{ stroke: '#e2e8f0' }} tickLine={false} domain={[0, 60]} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={{ r: 1, fill: '#3b82f6' }} activeDot={{ r: 1 }} />
+                </LineChart>
+            }
           </ResponsiveContainer>
         </div>
 
         {/* Donut Chart */}
         <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
           <h3 className="font-bold text-[15px] text-[#0f172a] mb-2">Changes by Type</h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="45%"
-                innerRadius={65}
-                outerRadius={95}
-                paddingAngle={2}
-                dataKey="value"
-                style={{ fontSize: 8 }}
-                label={({ name, value }) => `${name} ${value}%`}
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={index} fill={entry.color} />
-                ))}
-              </Pie>
-              <Legend
-                verticalAlign="bottom"
-                formatter={(value: string) => <span className="text-sm text-[#64748b]">{value}</span>}
-                iconType="circle"
-                iconSize={8}
-              />
-            </PieChart>
+          <ResponsiveContainer width="100%" height={280} className={loading ? 'flex justify-center items-center' : ''}>
+            {
+              loading ?
+                <CircularLoader small />
+                :
+                <PieChart>
+                  <Pie
+                    data={data?.changesByType}
+                    cx="50%"
+                    cy="45%"
+                    innerRadius={65}
+                    outerRadius={95}
+                    paddingAngle={2}
+                    dataKey="value"
+                    style={{ fontSize: 10 }}
+                    label={({ name, value }) => `${name} ${value}%`}
+                  >
+                    {data?.changesByType?.map((entry, index) => (
+                      <Cell key={index} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Legend
+                    verticalAlign="bottom"
+                    formatter={(value: string) => <span className="text-xs text-[#64748b]">{value}</span>}
+                    iconType="circle"
+                    iconSize={8}
+                  />
+                </PieChart>
+            }
           </ResponsiveContainer>
         </div>
       </div>
@@ -119,25 +126,30 @@ export default function Dashboard() {
       {/* Most Active Users Actions */}
       <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
         <h3 className="font-bold text-[15px] text-[#0f172a] mb-4">Most Active Users Actions</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            layout="vertical"
-            data={userActivityData}
-            stackOffset="expand"
-            barCategoryGap="20%"
-            margin={{
-              top: 5, right: 30, left: 20, bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" tickFormatter={(tick) => `${tick * 100}%`} />
-            <YAxis dataKey="name" type="category" />
-            <Tooltip formatter={(value,) => typeof value === 'number' ? `${value.toFixed(1)}%` : ''} />
-            <Legend />
-            <Bar dataKey="CREATE" fill="#3b82f6" stackId="a" />
-            <Bar dataKey="UPDATE" fill="#f59e0b" stackId="a" />
-            <Bar dataKey="DELETE" fill="#ef4444" stackId="a" />
-          </BarChart>
+        <ResponsiveContainer width="100%" height={300} className={loading ? 'flex justify-center items-center' : ''}>
+          {
+            loading ?
+              <CircularLoader small />
+              :
+              <BarChart
+                layout="vertical"
+                data={data?.mostActiveUsers as any}
+                stackOffset="expand"
+                barCategoryGap="20%"
+                margin={{
+                  top: 5, right: 30, left: 20, bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" tickFormatter={(tick) => `${tick * 100}%`} />
+                <YAxis dataKey="name" type="category" />
+                <Tooltip formatter={(value,) => typeof value === 'number' ? `${value.toFixed(1)}%` : ''} />
+                <Legend />
+                <Bar dataKey="CREATE" fill="#3b82f6" stackId="a" />
+                <Bar dataKey="UPDATE" fill="#f59e0b" stackId="a" />
+                <Bar dataKey="DELETE" fill="#ef4444" stackId="a" />
+              </BarChart>
+          }
         </ResponsiveContainer>
       </div>
     </div>

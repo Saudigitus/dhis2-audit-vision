@@ -4,6 +4,13 @@ export { dataStoreKey }
 type DataStoreType = {
     key: string
     auditApi: string
+    reports: {
+        changesByType: string
+        mostActiveUsers: string
+        changesByPeriod: string
+        updatesByPeriod: string
+        changesOverTime: string
+    }
     monitoringGroups: Array<{
         id: string,
         name: string,
