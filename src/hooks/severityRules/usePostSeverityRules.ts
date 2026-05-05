@@ -28,6 +28,7 @@ export const usePostSeverityRules = () => {
             });
             setTimeout(hide, 5000);
             
+            return { error: false }
         } catch (error: any) {
             const detail = error?.response?.data?.detail?.[0]?.msg || 'Rule creation failed';
             show({
