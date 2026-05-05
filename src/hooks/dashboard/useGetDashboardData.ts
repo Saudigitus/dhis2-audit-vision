@@ -1,68 +1,94 @@
 import { useState } from "react";
-import { useRecoilValue } from "recoil"
+import { useRecoilValue } from "recoil";
+import { format, addDays } from "date-fns";
 import { useDataEngine } from "@dhis2/app-runtime";
-import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
-import { format, subDays } from "date-fns";
+import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema";
+import { buildParams, getSingleValue, mapChangesByType, mapRowsToSeries, mapUserActions } from "../../utils/formater/dashboardDataFormater";
 
-const TOTAL_CHANGES_QUERY = ({ id, startDate, endDate, actionType }: { id: string, startDate: string, endDate: string, actionType?: string }) => ({
-    values: {
+
+const QUERY = ({ id, ...rest }: any) => ({
+    results: {
         resource: `sqlViews/${id}/data`,
         params: {
-            var: [`startDate:${startDate}`, `endDate:${endDate}`, actionType ? `actionType:${actionType || ''}` : ''],
+            var: buildParams(rest),
         },
     },
 });
 
+type DashboardData = {
+    riskChanges: number;
+    todayChanges: number;
+    totalUpdates: number;
+    totalChanges: number;
+
+    changesByType: {
+        value: number;
+        name: string;
+        color: string;
+    }[];
+
+    changesOverTime: {
+        name: string;
+        value: number;
+    }[];
+
+    mostActiveUsers: {
+        name: string;
+        CREATE: number;
+        UPDATE: number;
+        DELETE: number;
+    }[];
+};
 
 const useGetDashboardData = () => {
-    const engine = useDataEngine()
-    const [data, setData] = useState({})
-    const [loading, setLoading] = useState(false)
-    const dataStoreConfig = useRecoilValue(DataStoreConfigState)
-    const { reports } = dataStoreConfig
+    const engine = useDataEngine();
+    const [loading, setLoading] = useState(true);
+    const dataStoreConfig = useRecoilValue(DataStoreConfigState);
+    const { reports } = dataStoreConfig;
 
-    const today = format(new Date(), 'yyyy-MM-dd')
-    const yesterday = format(subDays(new Date(today), 1), 'yyyy-MM-dd')
+    const [data, setData] = useState<DashboardData>({
+        riskChanges: 0,
+        todayChanges: 0,
+        totalUpdates: 0,
+        totalChanges: 0,
+        changesOverTime: [],
+        mostActiveUsers: [],
+        changesByType: mapChangesByType([]),
+    });
 
-    const getDashboardData = async ({ startDate, endDate }: { startDate: string, endDate: string }) => {
-        setLoading(true)
-        const todayChanges: any = await engine.query(TOTAL_CHANGES_QUERY({ id: reports?.changesByPeriod, startDate: today, endDate: yesterday }), {})
+    const today = format(new Date(), "yyyy-MM-dd");
+    const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
 
-        const totalChanges: any = await engine.query(TOTAL_CHANGES_QUERY({ id: reports?.changesByPeriod, startDate, endDate }), {})
+    const getDashboardData = async ({ startDate, endDate }: any) => {
+        setLoading(true);
 
-        const changesByType = await engine.query(TOTAL_CHANGES_QUERY({ id: reports?.changesByType, startDate, endDate }), {})
+        try {
+            const [totalChanges, totalUpdates, todayChanges, changesByType, changesOverTime, mostActiveUsers]: any = await Promise.all([
+                engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "ALL" })),
+                engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "UPDATE" })),
+                engine.query(QUERY({ id: reports?.changesByPeriod, startDate: today, endDate: tomorrow, actionType: "ALL" })),
+                engine.query(QUERY({ id: reports?.changesByType, startDate, endDate })),
+                engine.query(QUERY({ id: reports?.changesOverTime, startDate, endDate })),
+                engine.query(QUERY({ id: reports?.mostActiveUsers, startDate, endDate, offset: 0 })),
+            ]);
 
-        const updatesByPeriod = await engine.query(TOTAL_CHANGES_QUERY({ id: reports?.updatesByPeriod, startDate, endDate }), {})
-
-        const changesOverTime = await engine.query(TOTAL_CHANGES_QUERY({ id: reports?.changesOverTime, startDate, endDate, actionType: 'all' }), {})
-
-        const mostActiveUsers = await engine.query(TOTAL_CHANGES_QUERY({ id: reports?.mostActiveUsers, startDate, endDate }), {})
-
-        setData({
-            todayChanges: todayChanges?.results?.listGrid?.rows?.[0][0],
-            changesByType,
-            totalChanges: totalChanges?.results?.listGrid?.rows?.[0][0],
-            updatesByPeriod,
-            changesOverTime,
-            mostActiveUsers,
-        })
-
-        setLoading(false)
-
-        return {
-            data: {
-                todayChanges: todayChanges?.results?.listGrid?.rows?.[0][0],
-                changesByType,
-                totalChanges: totalChanges?.results?.listGrid?.rows?.[0][0],
-                updatesByPeriod,
-                changesOverTime,
-                mostActiveUsers,
-            }
+            setData({
+                riskChanges: 0,
+                totalChanges: getSingleValue(totalChanges),
+                totalUpdates: getSingleValue(totalUpdates),
+                todayChanges: getSingleValue(todayChanges),
+                changesByType: mapChangesByType(changesByType?.results?.listGrid?.rows),
+                mostActiveUsers: mapUserActions(mostActiveUsers?.results?.listGrid?.rows),
+                changesOverTime: mapRowsToSeries(changesOverTime?.results?.listGrid?.rows),
+            });
+        } catch (e) {
+            console.error("Dashboard error:", e);
         }
 
-    }
+        setLoading(false);
+    };
 
-    return { getDashboardData, loading, data }
-}
+    return { getDashboardData, loading, data };
+};
 
-export { useGetDashboardData }
+export { useGetDashboardData };
