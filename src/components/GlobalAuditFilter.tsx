@@ -2,7 +2,7 @@ import { cn } from '../utils/cn';
 import { useEffect, useMemo, useState } from 'react';
 import { Layers, Filter, X, ChevronDown } from 'lucide-react';
 import { useParams } from '../hooks/common/useQueryParams';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 
 export type AuditDomain = 'metadata' | 'tracker';
 export type AuditPeriod = 'today' | '7d' | '30d' | '90d' | 'custom';
@@ -62,10 +62,10 @@ const defaultFilter: AuditFilterState = {
 
 const periods: AuditPeriod[] = ['today', '7d', '30d', '90d', 'custom'];
 
-export default function GlobalAuditFilter({ value, onChange, className }: GlobalAuditFilterProps) {
+export default function GlobalAuditFilter() {
   const [isOpen, setIsOpen] = useState(false);
   const { add, startDate, endDate } = useParams();
-  const [draft, setDraft] = useState<AuditFilterState>(value);
+  const [draft, setDraft] = useState<AuditFilterState>({ customFrom: startDate!, customTo: endDate || '' });
 
   // const objectTypes = useMemo(
   //   () => (draft.domain === 'metadata' ? metadataTypes : trackerTypes),
@@ -74,16 +74,16 @@ export default function GlobalAuditFilter({ value, onChange, className }: Global
 
   useEffect(() => {
     if (!startDate || !endDate) {
-      add("startDate", format(new Date(), "yyyy-MM-dd"));
+      add("startDate", format(subDays(new Date(), 365), "yyyy-MM-dd"));
       add("endDate", format(new Date(), "yyyy-MM-dd"));
     }
-  }, [])
+  }, [startDate, endDate])
 
   // const triggerDomainLabel = value.domain === 'metadata' ? 'Metadata' : 'Tracker Domain';
   // const triggerPeriodLabel = periodLabels[value.period];
 
   const openModal = () => {
-    setDraft(value);
+    setDraft({ customFrom: startDate!, customTo: endDate || '' });
     setIsOpen(true);
   };
 
@@ -92,7 +92,8 @@ export default function GlobalAuditFilter({ value, onChange, className }: Global
   const resetDraft = () => setDraft(defaultFilter);
 
   const applyFilters = () => {
-    onChange(draft);
+    add("startDate", format(new Date(draft.customFrom), "yyyy-MM-dd"));
+    add("endDate", format(new Date(draft.customTo), "yyyy-MM-dd"));
     setIsOpen(false);
   };
 
@@ -111,13 +112,12 @@ export default function GlobalAuditFilter({ value, onChange, className }: Global
         onClick={openModal}
         className={cn(
           'flex items-center gap-2 rounded-xl border border-[#dbe4f0] bg-white px-3 py-2 text-xs font-medium text-[#0f172a] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:bg-[#f8fafc] cursor-pointer',
-          className,
         )}
       >
         <Filter size={15} className="text-[#0f172a]" />
         {/* <span>{triggerDomainLabel}</span>*/}
         <span className="text-[#94a3b8]">·</span>
-        <span className="text-[#0f172a] text-xs">{startDate} - {endDate}</span>
+        <span className="text-[#0f172a] text-xs">{format(new Date(startDate), "dd MMM yyyy")} - {format(new Date(endDate), "dd MMM yyyy")}</span>
       </button>
 
       {isOpen && (
