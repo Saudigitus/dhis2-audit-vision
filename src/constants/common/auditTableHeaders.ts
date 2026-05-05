@@ -43,3 +43,27 @@ export const metadataGroupAudit = [
         displayName: "Last  operations",
     }
 ];
+
+
+export const severityHeaders = [
+    {
+        id: "action",
+        displayName: "Action",
+    },
+    {
+        id: "objectType",
+        displayName: "Object Type",
+    },
+    {
+        id: "subject",
+        displayName: "Subject",
+    },
+    {
+        id: "messageTemplate",
+        displayName: "Message Template",
+    },
+    {
+        id: "numberOfEmails",
+        displayName: "Number of Emails",
+    }
+];

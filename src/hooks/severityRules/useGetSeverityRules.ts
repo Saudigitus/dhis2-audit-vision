@@ -4,15 +4,6 @@ import { useRecoilValue, useSetRecoilState } from "recoil"
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 import { SeverityRulesSchema } from "../../schema/severityRulesSchema"
 
-export interface DataProps {
-    id: number
-    auditType: string
-    createdBy: string
-    updated_at: string
-    auditScope: string
-    klass: string
-}
-
 export const useGetSeverityRules = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
@@ -22,10 +13,8 @@ export const useGetSeverityRules = () => {
         setLoading(true)
         try {
             const response = await axios.get(`${dataStoreDataState.auditApi}/api/notifications`)
-            console.log('called')
-            console.log(response,'yowee')
-            setSeverityRules(response.data)
 
+            setSeverityRules(response.data)
         } catch (error) {
             throw error
         } finally {

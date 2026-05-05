@@ -8,13 +8,15 @@ import { useParams } from "../../hooks/common/useQueryParams"
 interface TableProps {
     title?: string
     description?: string
-    loading: boolean
+    loading?: boolean
+    hasDelete?: boolean
+    onDelete?: (id: string) => void
     header: Array<{
         id: string,
         displayName: string
     }>
     tabledata: Record<string, any>[]
-    setSelectedChange: (selectedChange: SelectedAuditProps) => void
+    setSelectedChange?: (selectedChange: SelectedAuditProps) => void
     dependenceHeaders?: Array<{ id: string, displayName: string }>
     pagination?: {
         total: number
@@ -28,7 +30,7 @@ interface TableProps {
 }
 
 const Table: FC<TableProps> = (props) => {
-    const { header, tabledata, setSelectedChange, pagination, title, description, loading, dependenceHeaders } = props
+    const { onDelete, hasDelete = false, onRowClick, header, tabledata, setSelectedChange, pagination, title, description, loading, dependenceHeaders } = props
     const { groupName } = useParams()
 
     return (
@@ -45,10 +47,19 @@ const Table: FC<TableProps> = (props) => {
 
             <table className="w-full">
                 <TableHeader hasDependence={dependenceHeaders?.length! > 0} header={header} />
-                <TableData dependenceHeaders={dependenceHeaders} loading={loading} data={tabledata} header={header} setSelectedChange={setSelectedChange} />
+                <TableData
+                    onRowClick={onRowClick!}
+                    setSelectedChange={setSelectedChange!}
+                    dependenceHeaders={dependenceHeaders}
+                    loading={loading!}
+                    data={tabledata}
+                    header={header}
+                    hasDelete={hasDelete}
+                    onDelete={onDelete}
+                />
             </table>
             <div className="py-5 px-10">
-                {(pagination && !loading && pagination.page) && <Pagination pagination={pagination} />}
+                {(pagination && !loading! && pagination.page) && <Pagination pagination={pagination} />}
             </div>
         </div>
     )

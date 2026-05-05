@@ -2,47 +2,63 @@ import { useState } from "react";
 import { NotificationContact } from "../../types/severityRules/severityRules";
 import { Edit2, Mail, MessageSquare, Plus, Save, Trash2, X } from "lucide-react";
 import { usePostSeverityRules } from "../../hooks/severityRules/usePostSeverityRules";
+import { metadataTypes } from "../../constants/common/dhis2Objects";
 
-export default function SeverityForm() {
+export default function SeverityForm({ setOpenForm, onSave, row }: { setOpenForm: (args: boolean) => void, onSave: () => Promise<void>, row: any }) {
     const { loading, postAuditRules } = usePostSeverityRules()
     const [form, setForm] = useState<any>({
         isOpen: false,
+        ...(row ? row : {})
     });
-
-    const resetForm = () => setForm({ isOpen: false });
 
     const saveRule = async () => {
         const { contactEmail, contactWA, contactWALabel, contacts, isOpen, ...rest } = form
-        const payLoad = { ...rest, recipients: { to: contacts?.filter((x: any) => x.type == 'email')?.map((x: any) => x.value) || [] } }
+        const payLoad = { ...rest, recipients: { cc: [], bcc: [], to: contacts?.filter((x: NotificationContact) => x.type == 'email')?.map((x: NotificationContact) => x.value) || [] } }
 
-        await postAuditRules(payLoad)
+        const { error }: any = await postAuditRules(payLoad)
+
+        if (!error) { setOpenForm(false); await onSave() }
     };
 
     const addOrUpdateContact = (type: 'email' | 'whatsapp', value: string, label: string) => {
         if (!value) return;
 
-        if (form.editingContactId) {
-            setForm((prev: any) => ({ ...prev, editingContactId: null, contactEmail: '', contactWA: '', contactWALabel: '' }));
-        } else {
-            const newContact: NotificationContact = {
-                id: Math.random().toString(36).slice(2, 11),
-                type,
-                value,
-                label: label || value
-            };
+        const newContact: NotificationContact = {
+            id: Math.random().toString(36).slice(2, 11),
+            type,
+            value,
+            label: label || value
+        };
 
-            // Add the new contact to the contacts array
+        if (form.editingContactId) {
+            setForm((prev: any) => ({ ...prev, contacts: [...prev.contacts?.filter((x: NotificationContact) => x.value !== form.editingContactId) || [], newContact], contactEmail: '', contactWA: '', contactWALabel: '' }));
+        } else {
             setForm((prev: any) => ({ ...prev, contacts: [...prev.contacts || [], newContact], contactEmail: '', contactWA: '', contactWALabel: '' }));
         }
     };
 
-    const removeContact = (id: string) => {
-        setForm((prev: any) => ({ ...prev, contacts: prev.contacts?.filter((c: any) => c.id !== id) }))
+    const removeContact = (value: string) => {
+        setForm((prev: any) => ({ ...prev, contacts: prev.contacts?.filter((c: NotificationContact) => c.value !== value) }))
     };
 
-    const handleInputChange = (field: string, value: any) => {
+    const handleInputChange = (field: string, value: string) => {
         setForm((prev: any) => ({ ...prev, [field]: value }));
     };
+
+    const startEdit = (contact: NotificationContact) => {
+        if (!contact) return;
+        setForm((prev: any) => ({
+            ...prev,
+            editingContactId: contact.value,
+            contactEmail: contact.type === 'email' ? contact.value : '',
+            contactWA: contact.type === 'whatsapp' ? contact.value : '',
+            contactWALabel: contact.type === 'whatsapp' ? contact.label : '',
+        }));
+    }
+
+    const cancelEdit = () => setForm((prev: any) => ({ ...prev, editingContactId: '', contactEmail: '', contactWA: '', contactWALabel: '' }));
+
+
     return (
         <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
@@ -70,53 +86,11 @@ export default function SeverityForm() {
                                 className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
                             >
                                 <option></option>
-                                <option value="attribute">attribute</option>
-                                <option value="category">category</option>
-                                <option value="categoryCombo">categoryCombo</option>
-                                <option value="categoryOption">categoryOption</option>
-                                <option value="categoryOptionCombo">categoryOptionCombo</option>
-                                <option value="categoryOptionGroup">categoryOptionGroup</option>
-                                <option value="categoryOptionGroupSet">categoryOptionGroupSet</option>
-                                <option value="constant">constant</option>
-                                <option value="dashboard">dashboard</option>
-                                <option value="dashboardItem">dashboardItem</option>
-                                <option value="dataElement">dataElement</option>
-                                <option value="dataElementGroup">dataElementGroup</option>
-                                <option value="dataElementGroupSet">dataElementGroupSet</option>
-                                <option value="dataSet">dataSet</option>
-                                <option value="indicator">indicator</option>
-                                <option value="indicatorGroup">indicatorGroup</option>
-                                <option value="indicatorGroupSet">indicatorGroupSet</option>
-                                <option value="indicatorType">indicatorType</option>
-                                <option value="legendSet">legendSet</option>
-                                <option value="map">map</option>
-                                <option value="option">option</option>
-                                <option value="optionSet">optionSet</option>
-                                <option value="organisationUnit">organisationUnit</option>
-                                <option value="organisationUnitGroup">organisationUnitGroup</option>
-                                <option value="organisationUnitGroupSet">organisationUnitGroupSet</option>
-                                <option value="organisationUnitLevel">organisationUnitLevel</option>
-                                <option value="program">program</option>
-                                <option value="programIndicator">programIndicator</option>
-                                <option value="programIndicatorGroup">programIndicatorGroup</option>
-                                <option value="programRule">programRule</option>
-                                <option value="programRuleAction">programRuleAction</option>
-                                <option value="programRuleVariable">programRuleVariable</option>
-                                <option value="programStage">programStage</option>
-                                <option value="programStageDataElement">programStageDataElement</option>
-                                <option value="relationshipType">relationshipType</option>
-                                <option value="report">report</option>
-                                <option value="section">section</option>
-                                <option value="sqlView">sqlView</option>
-                                <option value="trackedEntityAttribute">trackedEntityAttribute</option>
-                                <option value="trackedEntityAttributeGroup">trackedEntityAttributeGroup</option>
-                                <option value="trackedEntityType">trackedEntityType</option>
-                                <option value="user">user</option>
-                                <option value="userGroup">userGroup</option>
-                                <option value="userRole">userRole</option>
-                                <option value="validationRule">validationRule</option>
-                                <option value="validationRuleGroup">validationRuleGroup</option>
-                                <option value="visualization">visualization</option>
+                                {metadataTypes.map((x) => (
+                                    <option key={x} value={x}>
+                                        {x.replace(/([A-Z])/g, ' $1').trim()}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -187,13 +161,13 @@ export default function SeverityForm() {
                                     />
                                     <button
                                         onClick={() => addOrUpdateContact('email', form.contactEmail, '')}
-                                        className={`p-2.5 text-white rounded-xl transition-colors shadow-sm ${form.editingContactId && form?.contacts?.find((c: any) => c.id === form.editingContactId)?.type === 'email' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                        className={`p-2.5 text-white rounded-xl transition-colors shadow-sm ${form.editingContactId && form?.contacts?.find((c: NotificationContact) => c.value === form.editingContactId)?.type === 'email' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                                     >
-                                        {form.editingContactId && form?.contacts?.find((c: any) => c.id === form.editingContactId)?.type === 'email' ? <Save size={18} /> : <Plus size={18} />}
+                                        {form.editingContactId && form?.contacts?.find((c: any) => c.value === form.editingContactId)?.type === 'email' ? <Save size={18} /> : <Plus size={18} />}
                                     </button>
-                                    {form.editingContactId && form?.contacts?.find((c: any) => c.id === form.editingContactId)?.type === 'email' && (
+                                    {form.editingContactId && form?.contacts?.find((c: NotificationContact) => c.value === form.editingContactId)?.type === 'email' && (
                                         <button
-                                            // onClick={cancelEdit}
+                                            onClick={cancelEdit}
                                             className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300 transition-colors"
                                         >
                                             <X size={18} />
@@ -201,20 +175,20 @@ export default function SeverityForm() {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    {form?.contacts?.filter((c: any) => c.type === 'email').map((contact: any) => (
+                                    {form?.contacts?.filter((c: NotificationContact) => c.type === 'email').map((contact: NotificationContact) => (
                                         <div key={contact.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl group">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-semibold text-slate-900">{contact.value}</span>
                                             </div>
                                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
-                                                    // onClick={() => startEdit(contact)}
+                                                    onClick={() => startEdit(contact)}
                                                     className="p-1.5 text-slate-400 hover:text-blue-600 transition-colors"
                                                 >
                                                     <Edit2 size={14} />
                                                 </button>
                                                 <button
-                                                    onClick={() => removeContact(contact.id)}
+                                                    onClick={() => removeContact(contact.value)}
                                                     className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
                                                 >
                                                     <Trash2 size={14} />
@@ -227,33 +201,34 @@ export default function SeverityForm() {
                         </div>
 
                         {/* WhatsApp Notifications */}
-                        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                            <div className="p-[10px_0_10px_20px] border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
-                                <div className="p-2 bg-green-100 text-green-600 rounded-lg">
-                                    <MessageSquare size={20} />
+                        <div className="bg-[#f6f6f65a] rounded-2xl border border-slate-200 overflow-hidden cursor-not-allowed">
+                            <div className="p-[10px_0_10px_20px] /*border-b border-slate-100 bg-slate-50/50*/ flex items-center gap-3">
+                                <div className="p-2 /*bg-green-100*/ text-green-600 rounded-lg">
+                                    <MessageSquare className="text-[#ebebeb]" size={20} />
                                 </div>
-                                <h2 className="text-lg font-bold text-slate-900">WhatsApp Groups to Notify</h2>
+                                <h2 className="text-lg /*font-bold*/ text-[#dfdfdf] /*text-slate-900*/">WhatsApp Groups to Notify</h2>
                             </div>
                             <div className="p-[10px_20px] space-y-4">
                                 <div className="space-y-2">
                                     <div className="flex gap-2">
                                         <input
                                             type="text"
-                                            placeholder="WhatsApp Group ID"
-                                            className="flex-1 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-sm"
+                                            disabled
+                                            // placeholder="WhatsApp Group ID"
+                                            className="flex-1 px-4 py-2 rounded-xl border border-[#ebebeb] focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-sm"
                                             value={form.contactWA}
                                             onChange={(e) => handleInputChange('contactWA', e.target.value)}
                                         />
                                         <button
                                             onClick={() => addOrUpdateContact('whatsapp', form.contactWA, form.contactWALabel)}
-                                            className={`p-2.5 text-white rounded-xl transition-colors shadow-sm ${form.editingContactId && form?.contacts?.find((c: any) => c.id === form.editingContactId)?.type === 'whatsapp' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-green-600 hover:bg-green-700'}`}
+                                            className={`p-2.5 text-white rounded-xl transition-colors shadow-sm ${form.editingContactId && form?.contacts?.find((c: NotificationContact) => c.value === form.editingContactId)?.type === 'whatsapp' ? 'bg-[#ebebeb] /*hover:bg-orange-700*/' : 'bg-[#ebebeb] /*hover:bg-green-700*/'}`}
                                         >
-                                            {form.editingContactId && form?.contacts?.find((c: any) => c.id === form.editingContactId)?.type === 'whatsapp' ? <Save size={18} /> : <Plus size={18} />}
+                                            {form.editingContactId && form?.contacts?.find((c: NotificationContact) => c.value === form.editingContactId)?.type === 'whatsapp' ? <Save size={18} /> : <Plus size={18} />}
                                         </button>
-                                        {form.editingContactId && form?.contacts?.find((c: any) => c.id === form.editingContactId)?.type === 'whatsapp' && (
+                                        {form.editingContactId && form?.contacts?.find((c: NotificationContact) => c.value === form.editingContactId)?.type === 'whatsapp' && (
                                             <button
-                                                // onClick={cancelEdit}
-                                                className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300 transition-colors"
+                                                onClick={cancelEdit}
+                                                className="p-2.5 /*bg-slate-200*/ text-slate-600 rounded-xl hover:bg-slate-300 transition-colors"
                                             >
                                                 <X size={18} />
                                             </button>
@@ -261,7 +236,7 @@ export default function SeverityForm() {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    {form?.contacts?.filter((c: any) => c.type === 'whatsapp').map((contact: any) => (
+                                    {form?.contacts?.filter((c: NotificationContact) => c.type === 'whatsapp').map((contact: NotificationContact) => (
                                         <div key={contact.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl group">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-semibold text-slate-900">{contact.label}</span>
@@ -269,13 +244,13 @@ export default function SeverityForm() {
                                             </div>
                                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
-                                                    // onClick={() => startEdit(contact)}
+                                                    onClick={() => startEdit(contact)}
                                                     className="p-1.5 text-slate-400 hover:text-blue-600 transition-colors"
                                                 >
                                                     <Edit2 size={14} />
                                                 </button>
                                                 <button
-                                                    onClick={() => removeContact(contact.id)}
+                                                    onClick={() => removeContact(contact.value)}
                                                     className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
                                                 >
                                                     <Trash2 size={14} />
@@ -302,10 +277,10 @@ export default function SeverityForm() {
                         </svg>
                     )}
                     {!loading && <Save size={16} />}
-                    {form.editingRuleId ? 'Update Rule' : loading ? 'Saving Rule...' : 'Save Rule'}
+                    {row != null ? 'Update Rule' : loading ? 'Saving Rule...' : 'Save Rule'}
                 </button>
                 <button
-                    onClick={resetForm}
+                    onClick={() => setOpenForm(false)}
                     className="text-sm font-bold text-slate-500 hover:text-slate-700 px-4 py-2"
                 >
                     Cancel
