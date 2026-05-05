@@ -23,6 +23,8 @@ export default function Dashboard() {
   const { startDate, endDate } = useParams()
   const { getDashboardData, loading, data } = useGetDashboardData()
 
+  console.log(data)
+
   useEffect(() => {
     getDashboardData({ startDate: startDate!, endDate: endDate! })
   }, [startDate, endDate])
@@ -38,7 +40,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <GlobalAuditFilter value={{} as any} onChange={() => { }} />
+          <GlobalAuditFilter />
         </div>
       </div>
 
@@ -143,7 +145,7 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" tickFormatter={(tick) => `${tick * 100}%`} />
                 <YAxis dataKey="name" type="category" />
-                <Tooltip formatter={(value,) => typeof value === 'number' ? `${value.toFixed(1)}%` : ''} />
+                <Tooltip formatter={(value,) => typeof value === 'number' ? `${value.toFixed(1)}` : ''} />
                 <Legend />
                 <Bar dataKey="CREATE" fill="#3b82f6" stackId="a" />
                 <Bar dataKey="UPDATE" fill="#f59e0b" stackId="a" />
