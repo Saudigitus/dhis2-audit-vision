@@ -43,7 +43,7 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
         rows.forEach((row: any[]) => {
           const username = row[0];
           const count = Number(row[2]) || 0;
-          newSummary[username] = count;
+          newSummary[username] = (newSummary[username] || 0) + count;
         });
         return newSummary;
       });
@@ -69,7 +69,7 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
 
   useEffect(() => {
     fetchAuditSummary(0);
-  }, [engine]);
+  }, []);
 
   return { auditSummary, loading, error, hasMore, loadMore };
 };
