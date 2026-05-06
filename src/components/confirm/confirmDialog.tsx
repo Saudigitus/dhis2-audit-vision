@@ -3,7 +3,18 @@ import { X } from 'lucide-react';
 import { ConfirmDialogProps } from 'src/types/confirm/confirm';
 import { defaultIcons, variantStyles } from '../../constants/confirm/confirm';
 
-export default function ConfirmDialog({ open, onConfirm, onCancel, title, message, confirmLabel = 'Confirm', cancelLabel = 'Cancel', variant = 'warning', icon: customIcon, loading = false,
+export default function ConfirmDialog({
+    open,
+    onConfirm,
+    onCancel,
+    title,
+    message,
+    confirmLabel = 'Confirm',
+    cancelLabel = 'Cancel',
+    variant = 'warning',
+    icon: customIcon,
+    loading = false,
+    confirmOnly = false,
 }: ConfirmDialogProps) {
     const [visible, setVisible] = useState(false);
     const [animating, setAnimating] = useState(false);
@@ -91,14 +102,15 @@ export default function ConfirmDialog({ open, onConfirm, onCancel, title, messag
 
                 {/* Actions */}
                 <div className="flex items-center justify-end gap-3 p-6">
-                    <button
+                    {!confirmOnly && 
+                        <button
                         ref={cancelRef}
                         onClick={onCancel}
                         disabled={loading}
                         className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {cancelLabel}
-                    </button>
+                    </button>}
                     <button
                         ref={confirmRef}
                         onClick={onConfirm}

@@ -1,0 +1,227 @@
+[
+    {
+        "name": "audit_with_filter",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "sqlQuery": "WITH latest AS (\n    SELECT *,\n           ROW_NUMBER() OVER (PARTITION BY uid ORDER BY createdat DESC) AS rn\n    FROM audit\n    WHERE createdat >= TO_TIMESTAMP('${since_datetime}', 'YYYY-MM-DD HH24:MI:SS') - INTERVAL '${offset_hours} hours'\n)\nSELECT *\nFROM latest\nWHERE rn = 1 and createdby <> 'system-process'\nORDER BY createdat DESC\n",
+        "type": "QUERY",
+        "cacheStrategy": "NO_CACHE",
+        "displayName": "audit_with_filter",
+        "favorite": false,
+        "id": "yzUJJJzDYkM",
+        "attributeValues": []
+    },
+    {
+        "name": "single_audit",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "description": "single_audit",
+        "sqlQuery": "SELECT *\nFROM audit\n WHERE  uid = '${resource_uid}'  and createdby <> 'system-process'\nORDER BY createdat DESC\nLIMIT 1\n",
+        "type": "QUERY",
+        "cacheStrategy": "NO_CACHE",
+        "displayName": "single_audit",
+        "favorite": false,
+        "id": "aloNfrH2RGq",
+        "attributeValues": []
+    },
+    {
+        "name": "audit_totals",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "sqlQuery": "SELECT\n    COUNT(*) AS total\nFROM audit a\nWHERE a.auditscope = 'METADATA'\n  AND a.createdat >= '${startDate}'\n  AND a.createdat < '${endDate}'\n  AND (\n        '${actionType}' = 'ALL'\n        OR a.audittype = '${actionType}'\n      );",
+        "type": "QUERY",
+        "cacheStrategy": "RESPECT_SYSTEM_SETTING",
+        "displayName": "audit_totals",
+        "favorite": false,
+        "id": "uOPaRDAtwFi",
+        "attributeValues": []
+    },
+    {
+        "name": "audit_by_types",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "sqlQuery": "SELECT\n    a.audittype AS action,\n    COUNT(a.audittype) AS total\nFROM audit a\nWHERE a.auditscope = 'METADATA'\n  AND a.createdat >= '${startDate}'\n  AND a.createdat < '${endDate}'\nGROUP BY a.audittype\nORDER BY total DESC;",
+        "type": "QUERY",
+        "cacheStrategy": "NO_CACHE",
+        "displayName": "audit_by_types",
+        "favorite": false,
+        "id": "ssta0egVkH9",
+        "attributeValues": []
+    },
+    {
+        "name": "audit_daily",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "sqlQuery": "SELECT\n    DATE(a.createdat) AS day,\n    COUNT(*) AS total_changes\nFROM audit a\nWHERE a.auditscope = 'METADATA'\n  AND a.createdat >= '${startDate}'\n  AND a.createdat < '${endDate}'\nGROUP BY DATE(a.createdat)\nORDER BY day ASC;",
+        "type": "QUERY",
+        "cacheStrategy": "RESPECT_SYSTEM_SETTING",
+        "displayName": "audit_daily",
+        "favorite": false,
+        "id": "cWp81fDdg4s",
+        "attributeValues": []
+    },
+    {
+        "name": "audit_total_per_user",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "sqlQuery": "SELECT\n  createdby AS username,\n  audittype AS actionType,\n  COUNT(*) AS total_changes\nFROM audit\nWHERE createdat >= '${startDate}'\n  AND createdat < ('${endDate}'::date + INTERVAL '1 day')\nGROUP BY createdby, audittype\nORDER BY total_changes DESC\nLIMIT 10 OFFSET ${offset};",
+        "type": "QUERY",
+        "cacheStrategy": "NO_CACHE",
+        "displayName": "audit_total_per_user",
+        "favorite": false,
+        "id": "B7DrTkhIYld",
+        "attributeValues": []
+    },
+    {
+        "name": "audit_total_risk",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "sqlQuery": "SELECT\n    a.klass AS objectType,\n    a.audittype AS action,\n    COUNT(*) AS total\nFROM audit a\nWHERE a.auditscope = 'METADATA'\n  AND a.createdat >= '${startDate}'\n  AND a.createdat < '${endDate}'\nGROUP BY a.klass, a.audittype;",
+        "type": "QUERY",
+        "cacheStrategy": "RESPECT_SYSTEM_SETTING",
+        "displayName": "audit_total_risk",
+        "favorite": false,
+        "id": "fD1pIBbXIAo",
+        "attributeValues": []
+    },
+    {
+        "name": "audit_top_5_by_date",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "sqlQuery": "WITH top_users AS (\n  SELECT createdby\n  FROM audit\n  WHERE createdat >= '${startDate}'::timestamp\n    AND createdat < ('${endDate}'::date + INTERVAL '1 day')\n  GROUP BY createdby\n  ORDER BY COUNT(*) DESC\n  LIMIT 5\n)\n\nSELECT\n  DATE(a.createdat) AS period,\n  a.createdby AS username,\n  COUNT(*) AS audit_count\nFROM audit a\nJOIN top_users tu ON a.createdby = tu.createdby\nWHERE a.createdat >= '${startDate}'::timestamp\n  AND a.createdat < ('${endDate}'::date + INTERVAL '1 day')\nGROUP BY period, a.createdby\nORDER BY period ASC, audit_count DESC;",
+        "type": "QUERY",
+        "cacheStrategy": "NO_CACHE",
+        "displayName": "audit_top_5_by_date",
+        "favorite": false,
+        "id": "xZQp6Isnhkj",
+        "attributeValues": []
+    }
+]
