@@ -1,19 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { useParams } from '../common/useQueryParams';
+import { buildParams } from '../../utils/formater/dashboardDataFormater';
+import { useRecoilValue } from 'recoil';
+import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSchema';
 
-const USERS_AUDIT_SUMMARY_QUERY: any = {
+const USERS_AUDIT_SUMMARY_QUERY = ({ id, ...rest }: any) => ({
   summary: {
-    resource: 'sqlViews/B7DrTkhIYld/data',
-    params: ({ startDate, endDate, offset }: any) => ({
-      var: [
-        `startDate:${startDate}`,
-        `endDate:${endDate}`,
-        `offset:${offset}`,
-      ],
-    }),
+    resource: `sqlViews/${id}/data`,
+    params: {
+      var: buildParams({ ...rest }),
+    },
   },
-};
+});
 
 export const useGetUsersAuditSummary = (pageSize: number = 10) => {
   const engine = useDataEngine();
@@ -23,17 +22,18 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
   const [hasMore, setHasMore] = useState(true);
   const [currentOffset, setCurrentOffset] = useState(0);
   const { startDate, endDate } = useParams();
+  const dataStoreConfig = useRecoilValue(DataStoreConfigState)
 
   const fetchAuditSummary = async (offset: number) => {
-    setLoading(true);
+    if (!startDate || !endDate)
+      return;
     try {
-      const response: any = await engine.query(USERS_AUDIT_SUMMARY_QUERY, {
-        variables: {
-          startDate: startDate,
-          endDate: endDate,
-          offset: offset.toString(),
-        },
-      });
+      const response: any = await engine.query(USERS_AUDIT_SUMMARY_QUERY({
+        id: dataStoreConfig?.reports?.mostActiveUsers,
+        startDate: startDate,
+        endDate: endDate,
+        offset: offset.toString()
+      }));
 
       const rows = response.summary?.listGrid?.rows || response.summary?.rows || [];
 
@@ -69,7 +69,7 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
 
   useEffect(() => {
     fetchAuditSummary(0);
-  }, []);
+  }, [engine, startDate, endDate, dataStoreConfig?.reports?.mostActiveUsers]);
 
   return { auditSummary, loading, error, hasMore, loadMore };
 };

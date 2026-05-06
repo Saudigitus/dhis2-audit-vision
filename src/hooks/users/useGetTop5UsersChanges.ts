@@ -26,8 +26,9 @@ export const useGetTop5UsersChanges = () => {
 
   useEffect(() => {
     const fetchTopUsers = async () => {
+      if (!startDate || !endDate)
+        return;
       try {
-        setLoading(true);
         const response: any = await engine.query(TOP_USERS_QUERY({
           id: dataStoreConfig?.reports?.topUsersChanges,
           startDate: startDate,
@@ -83,7 +84,7 @@ export const useGetTop5UsersChanges = () => {
     };
 
     fetchTopUsers();
-  }, [engine]);
+  }, [engine, startDate, endDate, dataStoreConfig?.reports?.topUsersChanges]);
 
   return { chartData, usernames, loading, error };
 };

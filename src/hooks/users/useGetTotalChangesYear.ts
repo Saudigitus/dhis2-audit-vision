@@ -25,6 +25,8 @@ export const useGetTotalChangesYear = () => {
 
   useEffect(() => {
     const fetchTotalChanges = async () => {
+      if (!startDate || !endDate)
+        return;
       try {
         const response: any = await engine.query(
           TOTAL_CHANGES_QUERY({
@@ -51,7 +53,7 @@ export const useGetTotalChangesYear = () => {
     };
 
     fetchTotalChanges();
-  }, []);
+  }, [engine, startDate, endDate, dataStoreConfig?.reports?.changesByPeriod]);
 
   return { totalChanges, loading, error };
 };

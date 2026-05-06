@@ -31,7 +31,7 @@ const useGetDashboardData = () => {
     const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
 
     const getDashboardData = async ({ startDate, endDate }: any) => {
-        if (!severityrules?.notifications?.length)
+        if (!severityrules?.notifications?.length || !Object.keys(reports).length)
             return;
 
         try {

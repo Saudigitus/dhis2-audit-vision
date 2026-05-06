@@ -50,6 +50,8 @@ export default function Dashboard() {
   const { getDashboardData, loading, data } = useGetDashboardData()
 
   useEffect(() => {
+    if (!startDate || !endDate)
+      return;
     getDashboardData({ startDate: startDate!, endDate: endDate! })
   }, [startDate, endDate])
 
