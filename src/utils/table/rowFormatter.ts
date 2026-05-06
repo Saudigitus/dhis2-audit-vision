@@ -1,5 +1,5 @@
 import { metadataTypes } from "../../constants/common/dhis2Objects";
-import { DataProps } from "../../hooks/audit/useGetudit";
+import { DataProps } from "../../hooks/audit/useGetAudit";
 
 function rowsFormatter(data: DataProps[]) {
     if (!data) return []

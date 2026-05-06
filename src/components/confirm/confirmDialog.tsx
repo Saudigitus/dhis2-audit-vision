@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
-import { ConfirmDialogProps } from 'src/types/confirm/confirm';
+import { ConfirmDialogProps } from '../../types/confirm/confirm';
 import { defaultIcons, variantStyles } from '../../constants/confirm/confirm';
 
 export default function ConfirmDialog({

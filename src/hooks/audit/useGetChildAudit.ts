@@ -14,7 +14,7 @@ export interface DataProps {
 export const useGetchildAudit = () => {
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
 
-    const getAudit = async (page: number, pageSize: number, id: string, type: string) => {
+    const getAudit = async ({ page, pageSize, id, type }: { page: number, pageSize: number, id: string, type: string }) => {
         try {
             const response = await axios.get(`${dataStoreDataState.auditApi}/api/audits/metadata/${id}?page=${page}&pageSize=${pageSize}&type=${type.toUpperCase()}`)
 

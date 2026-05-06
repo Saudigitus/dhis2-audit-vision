@@ -1,18 +1,18 @@
-import { useDataEngine } from '@dhis2/app-runtime';
 import { useState, useEffect } from 'react';
+import { useDataEngine } from '@dhis2/app-runtime';
+import { useParams } from '../common/useQueryParams';
+import { buildParams } from '../../utils/formater/dashboardDataFormater';
+import { useRecoilValue } from 'recoil';
+import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSchema';
 
-const USERS_AUDIT_SUMMARY_QUERY: any = {
+const USERS_AUDIT_SUMMARY_QUERY = ({ id, ...rest }: any) => ({
   summary: {
-    resource: 'sqlViews/B7DrTkhIYld/data',
-    params: ({ startDate, endDate, offset }: any) => ({
-      var: [
-        `startDate:${startDate}`,
-        `endDate:${endDate}`,
-        `offset:${offset}`,
-      ],
-    }),
+    resource: `sqlViews/${id}/data`,
+    params: {
+      var: buildParams({ ...rest }),
+    },
   },
-};
+});
 
 export const useGetUsersAuditSummary = (pageSize: number = 10) => {
   const engine = useDataEngine();
@@ -21,27 +21,29 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
   const [error, setError] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
   const [currentOffset, setCurrentOffset] = useState(0);
+  const { startDate, endDate } = useParams();
+  const dataStoreConfig = useRecoilValue(DataStoreConfigState)
 
   const fetchAuditSummary = async (offset: number) => {
-    setLoading(true);
+    if (!startDate || !endDate)
+      return;
     try {
-      const response: any = await engine.query(USERS_AUDIT_SUMMARY_QUERY, {
-        variables: {
-          startDate: '2026-01-01',
-          endDate: '2027-01-01',
-          offset: offset.toString(),
-        },
-      });
-      
+      const response: any = await engine.query(USERS_AUDIT_SUMMARY_QUERY({
+        id: dataStoreConfig?.reports?.mostActiveUsers,
+        startDate: startDate,
+        endDate: endDate,
+        offset: offset.toString()
+      }));
+
       const rows = response.summary?.listGrid?.rows || response.summary?.rows || [];
-      
+
       // Use functional update to avoid stale state issues
       setAuditSummary(prevSummary => {
         const newSummary: Record<string, number> = { ...prevSummary };
         rows.forEach((row: any[]) => {
           const username = row[0];
-          const count = Number(row[1]) || 0;
-          newSummary[username] = count;
+          const count = Number(row[2]) || 0;
+          newSummary[username] = (newSummary[username] || 0) + count;
         });
         return newSummary;
       });
@@ -67,7 +69,7 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
 
   useEffect(() => {
     fetchAuditSummary(0);
-  }, [engine]);
+  }, [engine, startDate, endDate, dataStoreConfig?.reports?.mostActiveUsers]);
 
   return { auditSummary, loading, error, hasMore, loadMore };
 };

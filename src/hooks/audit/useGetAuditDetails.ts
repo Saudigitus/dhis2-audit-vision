@@ -12,7 +12,7 @@ export interface DataProps {
     klass: string
 }
 
-export const useGetuditDetails = () => {
+export const useGetAuditDetails = () => {
     const [data, setData] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)

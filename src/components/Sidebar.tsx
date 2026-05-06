@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarProps {
@@ -11,6 +11,16 @@ export default function Sidebar({ navItems }: SidebarProps) {
   const location = useLocation()
   const [collapsed, setCollapsed] = useState(false)
 
+  // Auto-collapse on small viewports
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px)');
+    const onChange = (e: MediaQueryListEvent) => setCollapsed(e.matches);
+    mql.addEventListener('change', onChange);
+    setCollapsed(mql.matches);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
+  
   return (
     <aside className={`bg-[#2c6693] text-white flex flex-col shrink-0 transition-all duration-300 ease-in-out ${collapsed ? "w-[68px]" : "w-60"}`}>
       {/* Navigation */}

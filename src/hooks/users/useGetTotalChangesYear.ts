@@ -1,26 +1,40 @@
-import { useDataEngine } from '@dhis2/app-runtime';
 import { useState, useEffect } from 'react';
+import { useDataEngine } from '@dhis2/app-runtime';
+import { buildParams } from '../../utils/formater/dashboardDataFormater';
+import { useParams } from '../common/useQueryParams';
+import { useRecoilValue } from 'recoil';
+import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSchema';
 
-const TOTAL_CHANGES_QUERY: any = {
+const TOTAL_CHANGES_QUERY = ({ id, ...rest }: any) => ({
   changes: {
-    resource: 'sqlViews/sGPipQDLMgy/data',
+    resource: `sqlViews/${id}/data`,
     params: {
-      var: [['startDate:2026-01-01'], ['endDate:2027-01-01']],
+      var: buildParams(rest),
     },
   },
-};
+});
+
 
 export const useGetTotalChangesYear = () => {
   const engine = useDataEngine();
   const [totalChanges, setTotalChanges] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const { startDate, endDate } = useParams()
+  const dataStoreConfig = useRecoilValue(DataStoreConfigState)
 
   useEffect(() => {
     const fetchTotalChanges = async () => {
+      if (!startDate || !endDate)
+        return;
       try {
-        setLoading(true);
-        const response: any = await engine.query(TOTAL_CHANGES_QUERY);
+        const response: any = await engine.query(
+          TOTAL_CHANGES_QUERY({
+            endDate: endDate,
+            actionType: "ALL",
+            startDate: startDate,
+            id: dataStoreConfig?.reports?.changesByPeriod,
+          }));
         // SQL Views typically return data in listGrid or rows. 
         // Assuming the first row, first column contains the count if it's an aggregate view.
         // Or if it's a list of changes, we might need the length.
@@ -39,7 +53,7 @@ export const useGetTotalChangesYear = () => {
     };
 
     fetchTotalChanges();
-  }, [engine]);
+  }, [engine, startDate, endDate, dataStoreConfig?.reports?.changesByPeriod]);
 
   return { totalChanges, loading, error };
 };

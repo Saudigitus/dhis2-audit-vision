@@ -1,5 +1,5 @@
 import { AlertTriangle, Info, ShieldAlert, Trash2 } from "lucide-react";
-import { ConfirmVariant } from "src/types/confirm/confirm";
+import { ConfirmVariant } from "../../types/confirm/confirm";
 
 export const variantStyles: Record<ConfirmVariant, { iconBg: string; iconColor: string; buttonBg: string; buttonHover: string; ring: string }> = {
     danger: {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import Table from '../../components/table/Table';
 import ChangeExplorerDrawer from '../../components/drawer/changeExlorerDrawer';
-import { useGetudit } from '../../hooks/audit/useGetudit';
+import { useGetAudit } from '../../hooks/audit/useGetAudit';
 import { filterValuesFormatter, rowsFormatter } from '../../utils/table/rowFormatter';
 import TableFilter from '../../components/filter/TableFilter';
 import { changeExplorerHeader, metadataGroupAudit } from '../../constants/common/auditTableHeaders';
@@ -27,17 +27,17 @@ export default function ChangeExplorer() {
   const [parentChange, setParentChange] = useState<any | null>(null);
   const [page, setPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
-  const { getAudit, data, loading } = useGetudit();
+  const { getAudit, data, loading } = useGetAudit();
   const { group } = useParams()
 
   useEffect(() => {
-    getAudit(page, pageSize, filterQuery!)
+    getAudit({ page, pageSize, filterQuery: filterQuery! })
   }, [page, pageSize, filterQuery, group])
 
   return (
     <div className="space-y-5 relative">
       {/* Header Actions */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Search size={20} className="text-[#3b82f6]" />

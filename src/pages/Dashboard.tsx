@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { CircularLoader } from '@dhis2/ui';
 import { useParams } from '../hooks/common/useQueryParams';
 import CardContainer from '../components/card/CardContainer';
@@ -9,6 +9,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, BarChart, Bar,
 } from 'recharts';
+import { mapChangesByType } from '../utils/formater/dashboardDataFormater';
 
 
 const stats = ({ changesToday, totalChanges, riskChanges, totalUpdates }: { changesToday: any, totalChanges: any, riskChanges: any, totalUpdates: any }) => ([
@@ -18,21 +19,46 @@ const stats = ({ changesToday, totalChanges, riskChanges, totalUpdates }: { chan
   { label: 'TOTAL RISK CHANGES', value: riskChanges, change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
 ]);
 
+export type DashboardData = {
+  riskChanges: number;
+  todayChanges: number;
+  totalUpdates: number;
+  totalChanges: number;
+
+  changesByType: {
+    value: number;
+    name: string;
+    color: string;
+  }[];
+
+  changesOverTime: {
+    name: string;
+    value: number;
+  }[];
+
+  mostActiveUsers: {
+    name: string;
+    CREATE: number;
+    UPDATE: number;
+    DELETE: number;
+  }[];
+};
+
 
 export default function Dashboard() {
   const { startDate, endDate } = useParams()
   const { getDashboardData, loading, data } = useGetDashboardData()
 
-  console.log(data)
-
   useEffect(() => {
+    if (!startDate || !endDate)
+      return;
     getDashboardData({ startDate: startDate!, endDate: endDate! })
   }, [startDate, endDate])
 
   return (
     <div className="space-y-5">
       {/* Header Actions */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <LayoutDashboard size={20} className="text-[#3b82f6]" />
@@ -45,7 +71,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
         {stats({
           changesToday: data?.todayChanges,
           totalChanges: data?.totalChanges,
@@ -69,7 +95,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Line Chart */}
         <div className="col-span-2 bg-white rounded-xl border border-[#e2e8f0] p-5">
           <h3 className="font-bold text-[15px] text-[#0f172a] mb-4">Changes Over Time</h3>
@@ -107,7 +133,7 @@ export default function Dashboard() {
                     paddingAngle={2}
                     dataKey="value"
                     style={{ fontSize: 10 }}
-                    label={({ name, value }) => `${name} ${value}%`}
+                    label={({ name, value }) => `${name} ${value}`}
                   >
                     {data?.changesByType?.map((entry, index) => (
                       <Cell key={index} fill={entry.color} />
@@ -141,6 +167,7 @@ export default function Dashboard() {
                 margin={{
                   top: 5, right: 30, left: 20, bottom: 5,
                 }}
+
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" tickFormatter={(tick) => `${tick * 100}%`} />
