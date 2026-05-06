@@ -10,7 +10,6 @@ import {
 } from "../../utils/formater/dashboardDataFormater";
 import { DashboardData } from "../../pages/Dashboard";
 
-
 const QUERY = ({ id, ...rest }: any) => ({
     results: {
         resource: `sqlViews/${id}/data`,
@@ -20,13 +19,13 @@ const QUERY = ({ id, ...rest }: any) => ({
     },
 });
 
-
-const useGetDashboardData = (setData: (data: DashboardData) => void) => {
+const useGetDashboardData = () => {
     const engine = useDataEngine();
     const [loading, setLoading] = useState(true);
     const severityrules = useRecoilValue(SeverityRulesSchema);
     const dataStoreConfig = useRecoilValue(DataStoreConfigState);
     const { reports } = dataStoreConfig;
+    const [data, setData] = useState<DashboardData>({} as DashboardData);
 
     const today = format(new Date(), "yyyy-MM-dd");
     const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
@@ -36,8 +35,7 @@ const useGetDashboardData = (setData: (data: DashboardData) => void) => {
             return;
 
         try {
-            const [
-                totalChanges, totalUpdates, todayChanges, changesByType, changesOverTime, mostActiveUsers, riskChanges] =
+            const [totalChanges, totalUpdates, todayChanges, changesByType, changesOverTime, mostActiveUsers, riskChanges] =
                 await Promise.all([
                     engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "ALL" })).catch(() => null),
                     engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "UPDATE" })).catch(() => null),
@@ -61,11 +59,11 @@ const useGetDashboardData = (setData: (data: DashboardData) => void) => {
             console.error("Dashboard error:", e);
         }
         finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
-    return { getDashboardData, loading };
+    return { getDashboardData, loading, data };
 };
 
 export { useGetDashboardData };

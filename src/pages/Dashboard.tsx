@@ -47,17 +47,9 @@ export type DashboardData = {
 
 export default function Dashboard() {
   const { startDate, endDate } = useParams()
-  const [data, setData] = useState<DashboardData>({
-    riskChanges: 0, todayChanges: 0, totalUpdates: 0, totalChanges: 0,
-    changesOverTime: [], mostActiveUsers: [], changesByType: mapChangesByType([]),
-  });
-  const { getDashboardData, loading, } = useGetDashboardData(setData)
-
-  console.log(data)
+  const { getDashboardData, loading, data } = useGetDashboardData()
 
   useEffect(() => {
-    if (data?.changesOverTime?.length)
-      return
     getDashboardData({ startDate: startDate!, endDate: endDate! })
   }, [startDate, endDate])
 
@@ -101,7 +93,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Line Chart */}
         <div className="col-span-2 bg-white rounded-xl border border-[#e2e8f0] p-5">
           <h3 className="font-bold text-[15px] text-[#0f172a] mb-4">Changes Over Time</h3>

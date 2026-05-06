@@ -10,6 +10,7 @@ type DataStoreType = {
         changesByPeriod: string
         riskChanges: string
         changesOverTime: string
+        topUsersChanges: string
     }
     monitoringGroups: Array<{
         id: string,

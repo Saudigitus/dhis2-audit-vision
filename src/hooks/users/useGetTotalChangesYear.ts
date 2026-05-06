@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { buildParams } from '../../utils/formater/dashboardDataFormater';
 import { useParams } from '../common/useQueryParams';
+import { useRecoilValue } from 'recoil';
+import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSchema';
 
-const TOTAL_CHANGES_QUERY = ({ ...rest }: any) => ({
+const TOTAL_CHANGES_QUERY = ({ id, ...rest }: any) => ({
   changes: {
-    resource: 'sqlViews/sGPipQDLMgy/data',
+    resource: `sqlViews/${id}/data`,
     params: {
       var: buildParams(rest),
     },
   },
 });
+
 
 export const useGetTotalChangesYear = () => {
   const engine = useDataEngine();
@@ -18,11 +21,18 @@ export const useGetTotalChangesYear = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
   const { startDate, endDate } = useParams()
+  const dataStoreConfig = useRecoilValue(DataStoreConfigState)
 
   useEffect(() => {
     const fetchTotalChanges = async () => {
       try {
-        const response: any = await engine.query(TOTAL_CHANGES_QUERY({ startDate: startDate, endDate: endDate }));
+        const response: any = await engine.query(
+          TOTAL_CHANGES_QUERY({
+            endDate: endDate,
+            actionType: "ALL",
+            startDate: startDate,
+            id: dataStoreConfig?.reports?.changesByPeriod,
+          }));
         // SQL Views typically return data in listGrid or rows. 
         // Assuming the first row, first column contains the count if it's an aggregate view.
         // Or if it's a list of changes, we might need the length.
