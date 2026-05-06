@@ -2,8 +2,12 @@ import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { format, addDays } from "date-fns";
 import { useDataEngine } from "@dhis2/app-runtime";
+import { SeverityRulesSchema } from "../../schema/severityRulesSchema";
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema";
-import { buildParams, getSingleValue, mapChangesByType, mapRowsToSeries, mapUserActions } from "../../utils/formater/dashboardDataFormater";
+import {
+    buildParams, countRiskChanges, getSingleValue,
+    mapChangesByType, mapRowsToSeries, mapUserActions
+} from "../../utils/formater/dashboardDataFormater";
 
 
 const QUERY = ({ id, ...rest }: any) => ({
@@ -43,17 +47,13 @@ type DashboardData = {
 const useGetDashboardData = () => {
     const engine = useDataEngine();
     const [loading, setLoading] = useState(true);
+    const severityrules = useRecoilValue(SeverityRulesSchema);
     const dataStoreConfig = useRecoilValue(DataStoreConfigState);
     const { reports } = dataStoreConfig;
 
     const [data, setData] = useState<DashboardData>({
-        riskChanges: 0,
-        todayChanges: 0,
-        totalUpdates: 0,
-        totalChanges: 0,
-        changesOverTime: [],
-        mostActiveUsers: [],
-        changesByType: mapChangesByType([]),
+        riskChanges: 0, todayChanges: 0, totalUpdates: 0, totalChanges: 0,
+        changesOverTime: [], mostActiveUsers: [], changesByType: mapChangesByType([]),
     });
 
     const today = format(new Date(), "yyyy-MM-dd");
@@ -62,24 +62,30 @@ const useGetDashboardData = () => {
     const getDashboardData = async ({ startDate, endDate }: any) => {
         setLoading(true);
 
+        if (!severityrules?.notifications?.length)
+            return;
+
         try {
-            const [totalChanges, totalUpdates, todayChanges, changesByType, changesOverTime, mostActiveUsers]: any = await Promise.all([
-                engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "ALL" })),
-                engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "UPDATE" })),
-                engine.query(QUERY({ id: reports?.changesByPeriod, startDate: today, endDate: tomorrow, actionType: "ALL" })),
-                engine.query(QUERY({ id: reports?.changesByType, startDate, endDate })),
-                engine.query(QUERY({ id: reports?.changesOverTime, startDate, endDate })),
-                engine.query(QUERY({ id: reports?.mostActiveUsers, startDate, endDate, offset: 0 })),
-            ]);
+            const [
+                totalChanges, totalUpdates, todayChanges, changesByType, changesOverTime, mostActiveUsers, riskChanges] =
+                await Promise.all([
+                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "ALL" })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "UPDATE" })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate: today, endDate: tomorrow, actionType: "ALL" })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.changesByType, startDate, endDate })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.changesOverTime, startDate, endDate })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.mostActiveUsers, startDate, endDate, offset: 1 })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.riskChanges, startDate, endDate })).catch(() => null),
+                ]);
 
             setData({
-                riskChanges: 0,
                 totalChanges: getSingleValue(totalChanges),
                 totalUpdates: getSingleValue(totalUpdates),
                 todayChanges: getSingleValue(todayChanges),
-                changesByType: mapChangesByType(changesByType?.results?.listGrid?.rows),
-                mostActiveUsers: mapUserActions(mostActiveUsers?.results?.listGrid?.rows),
-                changesOverTime: mapRowsToSeries(changesOverTime?.results?.listGrid?.rows),
+                changesByType: mapChangesByType(changesByType),
+                mostActiveUsers: mapUserActions(mostActiveUsers),
+                changesOverTime: mapRowsToSeries(changesOverTime),
+                riskChanges: countRiskChanges({ severityRules: severityrules?.notifications, res: riskChanges }),
             });
         } catch (e) {
             console.error("Dashboard error:", e);
