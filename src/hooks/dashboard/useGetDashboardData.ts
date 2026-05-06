@@ -52,13 +52,8 @@ const useGetDashboardData = () => {
     const { reports } = dataStoreConfig;
 
     const [data, setData] = useState<DashboardData>({
-        riskChanges: 0,
-        todayChanges: 0,
-        totalUpdates: 0,
-        totalChanges: 0,
-        changesOverTime: [],
-        mostActiveUsers: [],
-        changesByType: mapChangesByType([]),
+        riskChanges: 0, todayChanges: 0, totalUpdates: 0, totalChanges: 0,
+        changesOverTime: [], mostActiveUsers: [], changesByType: mapChangesByType([]),
     });
 
     const today = format(new Date(), "yyyy-MM-dd");
@@ -67,19 +62,21 @@ const useGetDashboardData = () => {
     const getDashboardData = async ({ startDate, endDate }: any) => {
         setLoading(true);
 
-        if (!severityrules?.notifications?.length) {
+        if (!severityrules?.notifications?.length)
             return;
-        }
 
         try {
-            const totalChanges = await engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "ALL" })).catch(() => null);
-            const totalUpdates = await engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "UPDATE" })).catch(() => null);
-            const todayChanges = await engine.query(QUERY({ id: reports?.changesByPeriod, startDate: today, endDate: tomorrow, actionType: "ALL" })).catch(() => null);
-            const changesByType = await engine.query(QUERY({ id: reports?.changesByType, startDate, endDate })).catch(() => null);
-            const changesOverTime = await engine.query(QUERY({ id: reports?.changesOverTime, startDate, endDate })).catch(() => null);
-            const mostActiveUsers = await engine.query(QUERY({ id: reports?.mostActiveUsers, startDate, endDate, offset: 1 })).catch(() => null);
-            const riskChanges: any = await engine.query(QUERY({ id: reports?.riskChanges, startDate, endDate })).catch(() => null);
-
+            const [
+                totalChanges, totalUpdates, todayChanges, changesByType, changesOverTime, mostActiveUsers, riskChanges] =
+                await Promise.all([
+                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "ALL" })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "UPDATE" })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate: today, endDate: tomorrow, actionType: "ALL" })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.changesByType, startDate, endDate })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.changesOverTime, startDate, endDate })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.mostActiveUsers, startDate, endDate, offset: 1 })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.riskChanges, startDate, endDate })).catch(() => null),
+                ]);
 
             setData({
                 totalChanges: getSingleValue(totalChanges),

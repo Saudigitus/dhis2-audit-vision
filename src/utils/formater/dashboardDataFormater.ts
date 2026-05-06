@@ -63,18 +63,22 @@ const countRiskChanges = ({ severityRules, res }: { severityRules: SeverityRuleT
     let total = 0;
     const rows = res?.results?.listGrid?.rows || [];
 
-    severityRules
-        ?.filter((item) => item?.severity === "HIGH")
-        ?.forEach((item) => {
-            const match = rows.find(([name, action]: any[]) =>
-                name === item?.objectType?.split('.').pop() &&
-                action === item?.action
-            );
-            
-            if (match) {
-                total += Number(match[2] ?? 0);
-            }
-        });
+    if (!rows.length) return 0;
+
+    const highRules = severityRules?.filter((item) => item?.severity === "HIGH") ?? [];
+    const objectTypeMap = new Map<string, Map<string, number>>();
+    rows.forEach(([name, action, changes]: any) => {
+        if (!objectTypeMap.has(name.split('.').pop())) objectTypeMap.set(name.split('.').pop(), new Map());
+        objectTypeMap.get(name.split('.').pop())!.set(action, Number(changes ?? 0));
+    });
+
+    for (const rule of highRules) {
+        const objectType = rule.objectType?.split('.').pop();
+        const action = rule.action;
+        const changes = objectTypeMap.get(objectType || '')?.get(action);
+        console.log(changes, objectType, action, objectTypeMap)
+        if (changes !== undefined) total += changes;
+    }
 
     return total;
 }
