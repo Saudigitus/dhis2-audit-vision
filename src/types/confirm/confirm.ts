@@ -13,4 +13,5 @@ export interface ConfirmDialogProps {
     variant?: ConfirmVariant;
     icon?: React.ElementType;
     loading?: boolean;
+    confirmOnly?: boolean;
 }

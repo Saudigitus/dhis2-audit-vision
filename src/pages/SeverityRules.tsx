@@ -81,7 +81,10 @@ const SeverityRules = () => {
             Filters
           </button>
           <button
-            onClick={() => setOpenForm(!openForm)}
+            onClick={() => {
+              setOpenForm(!openForm)
+              if (openForm) setSelectedRow(null)
+            }}
             className={`flex items-center  gap-2 text-sm font-bold rounded-xl px-4 py-3 transition-all active:scale-95 border  cursor-pointer ${openForm
               ? 'text-red-600 bg-red-100 border-[#e2e8f0]'
               : 'text-blue-600 bg-blue-100 border-[#e2e8f08f]'

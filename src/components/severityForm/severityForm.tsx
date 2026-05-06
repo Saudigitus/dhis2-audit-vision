@@ -3,9 +3,15 @@ import { NotificationContact } from "../../types/severityRules/severityRules";
 import { Edit2, Mail, MessageSquare, Plus, Save, Trash2, X } from "lucide-react";
 import { usePostSeverityRules } from "../../hooks/severityRules/usePostSeverityRules";
 import { metadataTypes } from "../../constants/common/dhis2Objects";
+import { SeverityRulesSchema } from "../../schema/severityRulesSchema";
+import { useRecoilValue } from "recoil";
+import ConfirmDialog from "../confirm/confirmDialog";
 
 export default function SeverityForm({ setOpenForm, onSave, row }: { setOpenForm: (args: boolean) => void, onSave: () => Promise<void>, row: any }) {
     const { loading, postAuditRules } = usePostSeverityRules()
+    const data = useRecoilValue(SeverityRulesSchema)
+    const [openConfirm, setOpenConfirm] = useState(false);
+
     const [form, setForm] = useState<any>({
         isOpen: false,
         ...(row ? row : {})
@@ -13,7 +19,22 @@ export default function SeverityForm({ setOpenForm, onSave, row }: { setOpenForm
 
     const saveRule = async () => {
         const { contactEmail, contactWA, contactWALabel, contacts, isOpen, ...rest } = form
-        const payLoad = { ...rest, recipients: { cc: [], bcc: [], to: contacts?.filter((x: NotificationContact) => x.type == 'email')?.map((x: NotificationContact) => x.value) || [] } }
+        const severity = data
+            ?.notifications
+            ?.filter((x: any) => x?.id != row?.id)
+            ?.find((x: any) => x?.severity === rest?.severity && x?.objectType === rest?.objectType && x?.action === rest?.action)
+
+        if (severity) {
+            setOpenConfirm(true)
+            return
+        }
+
+        const payLoad = {
+            ...rest,
+            recipients: {
+                cc: [], bcc: [], to: contacts?.filter((x: NotificationContact) => x.type == 'email')?.map((x: NotificationContact) => x.value) || []
+            }
+        }
 
         const { error }: any = await postAuditRules(payLoad)
 
@@ -58,11 +79,21 @@ export default function SeverityForm({ setOpenForm, onSave, row }: { setOpenForm
 
     const cancelEdit = () => setForm((prev: any) => ({ ...prev, editingContactId: '', contactEmail: '', contactWA: '', contactWALabel: '' }));
 
-
     return (
         <div className="lg:col-span-2 space-y-6">
+            {
+                openConfirm && <ConfirmDialog
+                    message={`Rule with same object type, severity and action already exists! You're not allowed to add duplicate rule.`}
+                    onCancel={() => setOpenConfirm(false)}
+                    onConfirm={() => setOpenConfirm(false)}
+                    open={openConfirm}
+                    title='Duplicated Rule'
+                    variant="warning"
+                    confirmLabel="Close"
+                    confirmOnly={true}
+                />
+            }
             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-
                 <div className="p-3 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 space-y-4">
                         <div>
