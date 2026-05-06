@@ -57,95 +57,95 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
 - Docker and Docker Compose (recommended for production deployment)
 - A configured DHIS2 instance with auditing enabled
 
-#### Opção 1: Configuração com Docker (Contêineres - Recomendado para Produção)
+#### Option 1: Configuration with Docker (Containers - Recommended for Production)
 
-Esta é a forma recomendada para ambientes de produção, pois automatiza a instalação e gerenciamento dos serviços em contêineres.
+This is the recommended approach for production environments as it automates the installation and management of services in containers.
 
-**Pré-requisito**: Docker e Docker Compose já instalados no servidor Linux.
+**Prerequisite**: Docker and Docker Compose already installed on the Linux server.
 
-1. **Clonar o repositório da API**:
+1. **Clone the API repository**:
    ```bash
    git clone https://github.com/Saudigitus/dhis-audit-vision-api.git
    cd dhis-audit-vision-api
    ```
 
-2. **Configurar variáveis de ambiente**:
-   Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis (ajuste os valores conforme sua instalação):
+2. **Configure environment variables**:
+   Create a `.env` file in the project root with the following variables (adjust values according to your installation):
    ```env
-   DHIS2_INSTANCE_URL=https://seu-dhis2-instancia.org
-   DHIS2_USERNAME=seu-usuario
-   DHIS2_PASSWORD=sua-senha
+   DHIS2_INSTANCE_URL=https://your-dhis2-instance.org
+   DHIS2_USERNAME=your-username
+   DHIS2_PASSWORD=your-password
    DB_NAME=dhis2_audit
    DB_USER=postgres
-   DB_PASSWORD=sua-senha-do-banco
+   DB_PASSWORD=your-db-password
    DB_HOST=db
    DB_PORT=5432
    ```
 
-3. **Iniciar os serviços com Docker Compose**:
+3. **Start services with Docker Compose**:
    ```bash
    docker compose up -d
    ```
 
-4. **Verificar se os serviços estão rodando**:
+4. **Verify services are running**:
    ```bash
    docker compose ps
    ```
 
 ---
 
-#### Opção 2: Configuração Manual (Sem Docker)
+#### Option 2: Manual Configuration (Without Docker)
 
-Use esta opção se preferir instalar e gerenciar os componentes diretamente no servidor Linux sem contêineres (funciona para desenvolvimento e produção).
+Use this option if you prefer to install and manage components directly on the Linux server without containers (works for both development and production).
 
-##### Pré-requisitos adicionais:
+##### Additional prerequisites:
 - Python 3.11+
 - pip (Python package installer)
-- PostgreSQL instalado e configurado no servidor
+- PostgreSQL installed and configured on the server
 
-##### Passos de instalação:
+##### Installation steps:
 
-1. **Criar ambiente virtual**:
+1. **Create virtual environment**:
    ```bash
    python -m venv .venv
    ```
 
-2. **Ativar o ambiente virtual**:
+2. **Activate virtual environment**:
    ```bash
    # Linux/Mac
    source .venv/bin/activate
    ```
 
-3. **Instalar dependências**:
+3. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configurar variáveis de ambiente**:
-   Crie um arquivo `.env` na raiz do projeto com as mesmas variáveis da configuração Docker, mas ajuste `DB_HOST` para o endereço do seu PostgreSQL (ex: `localhost`):
+4. **Configure environment variables**:
+   Create a `.env` file in the project root with the same variables as the Docker configuration, but adjust `DB_HOST` to your PostgreSQL address (e.g., `localhost`):
    ```env
-   DHIS2_INSTANCE_URL=https://seu-dhis2-instancia.org
-   DHIS2_USERNAME=seu-usuario
-   DHIS2_PASSWORD=sua-senha
+   DHIS2_INSTANCE_URL=https://your-dhis2-instance.org
+   DHIS2_USERNAME=your-username
+   DHIS2_PASSWORD=your-password
    DB_NAME=dhis2_audit
    DB_USER=postgres
-   DB_PASSWORD=sua-senha-do-banco
+   DB_PASSWORD=your-db-password
    DB_HOST=localhost
    DB_PORT=5432
    ```
 
-5. **Executar migrações do banco de dados**:
+5. **Run database migrations**:
    ```bash
    alembic revision --autogenerate -m "Create all tables"
    alembic upgrade head
    ```
 
-6. **Executar seeders** (dados iniciais):
+6. **Run seeders** (initial data):
    ```bash
    python commands.py
    ```
 
-7. **Iniciar o servidor**:
+7. **Start the server**:
    ```bash
    python runserver.py
    ```
@@ -250,7 +250,7 @@ DHIS2 records these audit logs directly into your PostgreSQL database in the res
    ```
 
 5. **Configure environment variables**:
-   Create a `.env` file in the root of the project with the database and DHIS2 instance variables (see "Configuração Manual (Sem Docker)" section for an example).
+   Create a `.env` file in the root of the project with the database and DHIS2 instance variables (see "Manual Configuration (Without Docker)" section for an example).
 
 6. **Run database migrations**:
    ```bash
