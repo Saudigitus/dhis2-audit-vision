@@ -51,6 +51,10 @@ export const severityHeaders = [
         displayName: "Action",
     },
     {
+        id: 'severity',
+        displayName: 'Severity'
+    },
+    {
         id: "objectType",
         displayName: "Object Type",
     },
