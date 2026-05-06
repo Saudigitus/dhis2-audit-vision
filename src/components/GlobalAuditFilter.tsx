@@ -112,6 +112,7 @@ export default function GlobalAuditFilter() {
         onClick={openModal}
         className={cn(
           'flex items-center gap-2 rounded-xl border border-[#dbe4f0] bg-white px-3 py-2 text-xs font-medium text-[#0f172a] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:bg-[#f8fafc] cursor-pointer',
+          'max-sm:w-full max-sm:justify-center'
         )}
       >
         <Filter size={15} className="text-[#0f172a]" />

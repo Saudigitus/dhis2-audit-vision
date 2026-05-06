@@ -10,7 +10,7 @@ interface CardContainerProps {
     label?: string;
     value?: string;
     indicator?: string;
-    loading?: boolean;
+    loading: boolean;
 }
 
 interface DashboardCardProps {
@@ -20,6 +20,7 @@ interface DashboardCardProps {
     label: string;
     value: string;
     indicator: string
+    loading?: boolean;
 }
 
 
@@ -28,6 +29,7 @@ interface SystemHealthCardProps {
     iconBgColor?: string;
     label: string;
     value: string
+    loading?: boolean;
 }
 
 export { type CardContainerProps, type CardVariant, type DashboardCardProps, type SystemHealthCardProps }

@@ -1,4 +1,4 @@
-import { Card, Center, CircularLoader } from '@dhis2/ui'
+import { Card } from '@dhis2/ui'
 import SystemHealthCard from './cardType/SystemHealthCard';
 import { FC } from 'react';
 import DashboardCard from './cardType/DashboardCard';
@@ -8,15 +8,15 @@ import SecurityAuditCard from './cardType/SecurityAuditCard';
 const CardContainer: FC<CardContainerProps> = (props) => {
     const { icon, label, value, variant, indicator, loading, iconBgColor, indicatorColor } = props;
 
-    const renderCardContent = (variant: CardVariant) => {
+    const renderCardContent = ({ variant, loading }: { variant: CardVariant, loading: boolean }) => {
         switch (variant) {
             case 'system-healt-card': return <SystemHealthCard
-                icon={icon!} label={label!} value={value!} />;
+                icon={icon!} label={label!} value={value!} loading={loading} />;
             case 'dashboard-card': return <DashboardCard
                 icon={icon} indicator={indicator!} label={label!} value={value!}
-                iconBgColor={iconBgColor} indicatorColor={indicatorColor} />;
+                iconBgColor={iconBgColor} indicatorColor={indicatorColor} loading={loading} />;
             case 'security-audit-card': return <SecurityAuditCard
-                icon={icon} indicator={indicator!} label={label!} value={value!} />;
+                icon={icon} indicator={indicator!} label={label!} value={value!} loading={loading} />;
         }
     }
 
@@ -29,8 +29,7 @@ const CardContainer: FC<CardContainerProps> = (props) => {
     return (
         <Card className={`shadow-none! rounded-xl!  p-5 ${cardStyles[variant]}`}>
             {
-                loading ? <Center><CircularLoader small /></Center> :
-                    renderCardContent(variant)
+                renderCardContent({ variant, loading })
             }
         </Card>
     )

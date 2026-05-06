@@ -37,7 +37,7 @@ export default function ChangeExplorer() {
   return (
     <div className="space-y-5 relative">
       {/* Header Actions */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Search size={20} className="text-[#3b82f6]" />

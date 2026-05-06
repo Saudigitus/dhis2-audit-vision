@@ -1,5 +1,6 @@
-import { useDataEngine } from '@dhis2/app-runtime';
 import { useState, useEffect } from 'react';
+import { useDataEngine } from '@dhis2/app-runtime';
+import { useParams } from '../common/useQueryParams';
 
 const USERS_AUDIT_SUMMARY_QUERY: any = {
   summary: {
@@ -21,26 +22,27 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
   const [error, setError] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
   const [currentOffset, setCurrentOffset] = useState(0);
+  const { startDate, endDate } = useParams();
 
   const fetchAuditSummary = async (offset: number) => {
     setLoading(true);
     try {
       const response: any = await engine.query(USERS_AUDIT_SUMMARY_QUERY, {
         variables: {
-          startDate: '2026-01-01',
-          endDate: '2027-01-01',
+          startDate: startDate,
+          endDate: endDate,
           offset: offset.toString(),
         },
       });
-      
+
       const rows = response.summary?.listGrid?.rows || response.summary?.rows || [];
-      
+
       // Use functional update to avoid stale state issues
       setAuditSummary(prevSummary => {
         const newSummary: Record<string, number> = { ...prevSummary };
         rows.forEach((row: any[]) => {
           const username = row[0];
-          const count = Number(row[1]) || 0;
+          const count = Number(row[2]) || 0;
           newSummary[username] = count;
         });
         return newSummary;

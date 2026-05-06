@@ -8,6 +8,7 @@ import {
     buildParams, countRiskChanges, getSingleValue,
     mapChangesByType, mapRowsToSeries, mapUserActions
 } from "../../utils/formater/dashboardDataFormater";
+import { DashboardData } from "../../pages/Dashboard";
 
 
 const QUERY = ({ id, ...rest }: any) => ({
@@ -19,49 +20,18 @@ const QUERY = ({ id, ...rest }: any) => ({
     },
 });
 
-type DashboardData = {
-    riskChanges: number;
-    todayChanges: number;
-    totalUpdates: number;
-    totalChanges: number;
 
-    changesByType: {
-        value: number;
-        name: string;
-        color: string;
-    }[];
-
-    changesOverTime: {
-        name: string;
-        value: number;
-    }[];
-
-    mostActiveUsers: {
-        name: string;
-        CREATE: number;
-        UPDATE: number;
-        DELETE: number;
-    }[];
-};
-
-const useGetDashboardData = () => {
+const useGetDashboardData = (setData: (data: DashboardData) => void) => {
     const engine = useDataEngine();
     const [loading, setLoading] = useState(true);
     const severityrules = useRecoilValue(SeverityRulesSchema);
     const dataStoreConfig = useRecoilValue(DataStoreConfigState);
     const { reports } = dataStoreConfig;
 
-    const [data, setData] = useState<DashboardData>({
-        riskChanges: 0, todayChanges: 0, totalUpdates: 0, totalChanges: 0,
-        changesOverTime: [], mostActiveUsers: [], changesByType: mapChangesByType([]),
-    });
-
     const today = format(new Date(), "yyyy-MM-dd");
     const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
 
     const getDashboardData = async ({ startDate, endDate }: any) => {
-        setLoading(true);
-
         if (!severityrules?.notifications?.length)
             return;
 
@@ -90,11 +60,12 @@ const useGetDashboardData = () => {
         } catch (e) {
             console.error("Dashboard error:", e);
         }
-
+        finally {
+        }
         setLoading(false);
     };
 
-    return { getDashboardData, loading, data };
+    return { getDashboardData, loading };
 };
 
 export { useGetDashboardData };
