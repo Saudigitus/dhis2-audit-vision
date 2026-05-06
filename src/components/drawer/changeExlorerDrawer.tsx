@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Center, CircularLoader } from "@dhis2/ui";
 import { SelectedAuditProps } from "../../pages/changeExplorer/ChangeExplorer";
-import { useGetuditDetails } from "../../hooks/audit/useGetAuditDetails";
+import { useGetAuditDetails } from "../../hooks/audit/useGetAuditDetails";
 import AuditDiffViewer from "./newDiffViewer";
 
 interface ChangeExplorerDrawerProps {
@@ -12,7 +12,7 @@ interface ChangeExplorerDrawerProps {
 }
 
 export default function ChangeExplorerDrawer({ setSelectedChange, selectedChange }: ChangeExplorerDrawerProps) {
-    const { getAuditDetails, auditDetails, loadingDetails } = useGetuditDetails()
+    const { getAuditDetails, auditDetails, loadingDetails } = useGetAuditDetails()
     const [refetch, setRefecth] = useState(false)
 
     useEffect(() => {

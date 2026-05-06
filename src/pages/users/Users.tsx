@@ -19,16 +19,6 @@ const actionColors: Record<string, string> = {
   DELETE: 'bg-[#fee2e2] text-[#ef4444] border border-[#fca5a5]',
 };
 
-const userActivity = [
-  { date: '2026-04-09 08:50', type: 'organisationUnit', object: 'organisationUnit_783', action: 'CREATE' },
-  { date: '2026-04-09 07:52', type: 'organisationUnit', object: 'organisationUnit_553', action: 'DELETE' },
-  { date: '2026-04-09 07:23', type: 'optionSet', object: 'optionSet_539', action: 'DELETE' },
-  { date: '2026-04-09 05:01', type: 'dataElement', object: 'dataElement_945', action: 'UPDATE' },
-  { date: '2026-04-09 01:48', type: 'trackedEntityType', object: 'trackedEntityType_276', action: 'CREATE' },
-  { date: '2026-04-08 23:15', type: 'organisationUnit', object: 'organisationUnit_291', action: 'UPDATE' },
-  { date: '2026-04-08 23:06', type: 'dataSet', object: 'dataSet_649', action: 'DELETE' },
-];
-
 export default function UsersPage() {
   const { superUsers, loading: superUsersLoading } = useGetSuperUsers();
   const { activeUsersCount, loading: activeUsersLoading } = useGetActiveUsersToday();
@@ -117,9 +107,8 @@ export default function UsersPage() {
       {selectedUser && (
         <UserDetailPanel
           user={selectedUser}
-          onClose={() => setSelectedUser(null)}
-          activities={userActivity}
           actionColors={actionColors}
+          onClose={() => setSelectedUser(null)}
         />
       )}
     </div>

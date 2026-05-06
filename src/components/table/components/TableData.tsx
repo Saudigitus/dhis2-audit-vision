@@ -31,7 +31,7 @@ const TableData = (props: TableDataProps) => {
     const fetchExpandedData = async (rowId: string, type: string, page: number, pageSize: number) => {
         setIsLoading((prev: any) => ({ ...prev, [rowId]: true }));
         try {
-            const auditResult = await getAudit(page, pageSize, rowId, type);
+            const auditResult = await getAudit({ page, pageSize, id: rowId, type });
             setExpandedData((prev: any) => ({ ...prev, [rowId]: auditResult?.data }));
 
             if (auditResult?.data?.pager) {

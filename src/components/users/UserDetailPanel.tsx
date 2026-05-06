@@ -1,15 +1,34 @@
-import React from 'react';
-import { X, ChevronRight } from 'lucide-react';
-import { User, UserActivity } from '../../types/users/users';
+import { X } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { User } from '../../types/users/users';
+import { Center, CircularLoader } from '@dhis2/ui';
+import { useGetAudit } from '../../hooks/audit/useGetAudit';
+import { rowsFormatter } from '../../utils/table/rowFormatter';
 
 interface UserDetailPanelProps {
   user: User;
   onClose: () => void;
-  activities: UserActivity[];
   actionColors: Record<string, string>;
 }
 
-const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onClose, activities, actionColors }) => {
+const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onClose, actionColors }) => {
+  const { getAudit, data, loading } = useGetAudit();
+
+  const header = [
+    { id: 'date', displayName: 'Date', },
+    { id: 'type', displayName: 'Type', },
+    { id: 'object', displayName: 'Object Name', },
+    { id: 'action', displayName: 'Action', },
+  ];
+
+  useEffect(() => {
+    getAudit({
+      page: 1,
+      pageSize: user?.changes,
+      filterQuery: new URLSearchParams({ ['createdBy']: user.username as string })?.toString()
+    });
+  }, [user.username])
+
   return (
     <>
       {/* Backdrop */}
@@ -35,17 +54,17 @@ const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onClose, activi
         {/* Panel Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {/* Summary badges */}
-          <div className="flex items-center gap-2 flex-wrap mb-5">
+          {/* <div className="flex items-center gap-2 flex-wrap mb-5">
             <span className="text-xs font-bold px-3 py-1 rounded border border-[#3b82f6] text-[#3b82f6]">CREATE  2</span>
             <span className="text-xs font-bold px-3 py-1 rounded border border-[#d97706] text-[#d97706]">UPDATE  2</span>
             <span className="text-xs font-bold px-3 py-1 rounded border border-[#ef4444] text-[#ef4444]">DELETE  3</span>
             <span className="text-xs font-medium px-3 py-1 rounded border border-[#e2e8f0] text-[#0f172a]">Total  7</span>
-          </div>
+          </div> */}
 
           {/* Activity section */}
           <div className="mb-3">
             <div className="text-[11px] font-bold text-[#0f172a] uppercase tracking-wider mb-1">
-              All Activity — Click row to expand
+              All Activity
             </div>
           </div>
 
@@ -54,31 +73,34 @@ const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onClose, activi
             <table className="w-full">
               <thead>
                 <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Date</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Type</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Object</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">Action</th>
-                  <th className="w-8"></th>
+                  {header.map((item, i) => (
+                    <th key={i} className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-wider text-[#64748b] uppercase">{item.displayName}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {activities.map((row, i) => (
-                  <tr key={i} className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] cursor-pointer">
-                    <td className="px-4 py-3 text-xs text-[#64748b]">{row.date}</td>
-                    <td className="px-4 py-3">
-                      <span className="text-xs font-mono bg-[#f1f5f9] px-1.5 py-0.5 rounded text-[#475569]">{row.type}</span>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-[#0f172a]">{row.object}</td>
-                    <td className="px-4 py-3">
-                      <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded ${actionColors[row.action]}`}>
-                        {row.action}
-                      </span>
-                    </td>
-                    <td className="px-2 py-3">
-                      <ChevronRight size={14} className="text-[#94a3b8]" />
-                    </td>
-                  </tr>
-                ))}
+
+                {
+                  loading ?
+                    <tr className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] cursor-pointer">
+                      <td colSpan={header?.length} className="px-4 py-3 text-xs text-[#64748b]">
+                        <Center><CircularLoader small /></Center>
+                      </td>
+                    </tr> :
+                    rowsFormatter(data?.audits || [] as any)?.map((row, i) => (
+                      <tr key={i} className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] cursor-pointer">
+                        <td className="px-4 py-3 text-xs text-[#64748b]">{row.time}</td>
+                        <td className="px-4 py-3">
+                          <span className="text-xs font-mono bg-[#f1f5f9] px-1.5 py-0.5 rounded text-[#475569]">{row.type}</span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-[#0f172a]">{row.object}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded ${actionColors[row.action]}`}>
+                            {row.action}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>

@@ -23,13 +23,13 @@ interface GetAuditProps {
     }
 }
 
-export const useGetudit = () => {
+export const useGetAudit = () => {
     const [data, setData] = useState<GetAuditProps | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const { group } = useParams()
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
 
-    const getAudit = async (page: number, pageSize: number, filterQuery?: string) => {
+    const getAudit = async ({ page, pageSize, filterQuery }: { page: number, pageSize: number, filterQuery?: string }) => {
         setLoading(true)
         try {
             if (group) {
@@ -53,7 +53,7 @@ export const useGetudit = () => {
                     enrichedItems.push(enrichedItem)
                 }
 
-                console.log(paginatedItems,dataStoreDataState)
+                console.log(paginatedItems, dataStoreDataState)
                 setData({
                     audits: enrichedItems,
                     pager: { page, pageCount, pageSize, total }
