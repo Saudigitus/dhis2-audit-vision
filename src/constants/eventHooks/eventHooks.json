@@ -1,0 +1,35 @@
+{
+ "name": "webhook-audit-vision",
+    "translations": [],
+    "externalAccess": false,
+    "publicAccess": "rw------",
+    "userGroupAccesses": [],
+    "userAccesses": [],
+    "access": {
+        "manage": true,
+        "externalize": false,
+        "write": true,
+        "read": true,
+        "update": true,
+        "delete": true
+    },
+    "favorites": [],
+    "disabled": false,
+    "source": {
+        "path": "metadata",
+        "fields": "ALL"
+    },
+    "targets": [
+        {
+            "type": "webhook",
+            "clientId": "dhis2-webhook-YftAQBzIzTi",
+            "url": "",
+            "contentType": "application/json",
+            "headers": {}
+        }
+    ],
+    "displayName": "webhook-audit-vision",
+    "favorite": false,
+    "id": "jThEpGkXaDc",
+    "attributeValues": []
+}
