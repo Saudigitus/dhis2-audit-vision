@@ -50,11 +50,10 @@ const buildParams = ({ startDate, endDate, actionType, offset }: any) => {
     return params;
 };
 
-const countRiskChanges = ({ severityRules, res }: { severityRules: SeverityRuleType[], res: any }) => {
-    let total = 0;
-    const rows = res?.results?.listGrid?.rows || [];
-
+const countRiskChanges = (severityRules: SeverityRuleType[], rows: any[]) => {
     if (!rows.length) return 0;
+    
+    let total = 0;
 
     const highRules = severityRules?.filter((item) => item?.severity === "HIGH") ?? [];
     const objectTypeMap = new Map<string, Map<string, number>>();

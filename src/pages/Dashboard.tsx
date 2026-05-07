@@ -15,7 +15,7 @@ const stats = ({ changesToday, totalChanges, riskChanges, totalUpdates }: { chan
   { label: 'TOTAL CHANGES TODAY', value: changesToday, change: '+5% vs yesterday', changeColor: 'text-[#22c55e]', icon: <TrendingUp size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
   { label: 'TOTAL CHANGES', value: totalChanges, change: '+12% vs last week', changeColor: 'text-[#22c55e]', icon: <Activity size={20} className="text-[#3b82f6]" />, iconBg: 'bg-[#eff6ff]' },
   { label: 'TOTAL UPDATES', value: totalUpdates, change: '+8% vs last week', changeColor: 'text-[#f59e0b]', icon: <ShieldCheck size={20} className="text-[#f59e0b]" />, iconBg: 'bg-[#fffbeb]' },
-  { label: 'TOTAL RISK CHANGES', value: riskChanges, change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
+  { label: 'TOTAL RISKY CHANGES', value: riskChanges, change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
 ]);
 
 

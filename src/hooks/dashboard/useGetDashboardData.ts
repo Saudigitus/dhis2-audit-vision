@@ -64,7 +64,7 @@ const useGetDashboardData = () => {
                 changesOverTime: mapSeries(getRows(result.changesOverTime)),
                 changesByType: mapChangesByType(getRows(result.changesByType)),
                 mostActiveUsers: mapUserActivity(getRows(result.mostActiveUsers)),
-                riskChanges: countRiskChanges({ severityRules: severityrules?.notifications || [], res: result.riskChanges }),
+                riskChanges: countRiskChanges(severityrules?.notifications || [], getRows(result.riskChanges)),
             });
         } catch (error) {
             console.error("Audit dashboard error:", error);
