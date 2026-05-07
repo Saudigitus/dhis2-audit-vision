@@ -72,7 +72,7 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    sudo apt install git
    cd /var/www/
    git clone https://github.com/Saudigitus/dhis-audit-vision-api.git
-   cd dhis_audit_vision/
+   cd dhis-audit-vision-api/
    git checkout develop
    ```
 
