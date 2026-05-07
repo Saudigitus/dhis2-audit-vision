@@ -9,6 +9,7 @@ const USERS_AUDIT_SUMMARY_QUERY = ({ id, ...rest }: any) => ({
   summary: {
     resource: `sqlViews/${id}/data`,
     params: {
+      // paging: 'false',
       var: buildParams({ ...rest }),
     },
   },

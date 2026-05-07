@@ -5,6 +5,7 @@ type DataStoreType = {
     key: string
     auditApi: string
     reports: {
+        users: string
         changesByType: string
         mostActiveUsers: string
         changesByPeriod: string
