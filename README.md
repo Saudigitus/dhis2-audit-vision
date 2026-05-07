@@ -157,6 +157,7 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    ```bash
    nano /etc/nginx/sites-available/default
    ```
+   ```bash
    server {
         listen 80;
         server_name your_server_ip_or_domain;
@@ -167,7 +168,8 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
             proxy_set_header X-Real-IP $remote_addr;
         }
     }
-   
+   ```
+
 11. **Validate and reload**:
    ```bash
    sudo nginx -t
