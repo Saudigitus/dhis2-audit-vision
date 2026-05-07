@@ -14,6 +14,7 @@ const QUERY = ({ id, ...rest }: any) => ({
     results: {
         resource: `sqlViews/${id}/data`,
         params: {
+            paging: 'false',
             var: buildParams(rest),
         },
     },
@@ -42,7 +43,7 @@ const useGetDashboardData = () => {
                     engine.query(QUERY({ id: reports?.changesByPeriod, startDate: today, endDate: tomorrow, actionType: "ALL" })).catch(() => null),
                     engine.query(QUERY({ id: reports?.changesByType, startDate, endDate })).catch(() => null),
                     engine.query(QUERY({ id: reports?.changesOverTime, startDate, endDate })).catch(() => null),
-                    engine.query(QUERY({ id: reports?.mostActiveUsers, startDate, endDate, offset: 1 })).catch(() => null),
+                    engine.query(QUERY({ id: reports?.mostActiveUsers, startDate, endDate, offset: 0 })).catch(() => null),
                     engine.query(QUERY({ id: reports?.riskChanges, startDate, endDate })).catch(() => null),
                 ]);
 

@@ -9,6 +9,7 @@ const TOTAL_CHANGES_QUERY = ({ id, ...rest }: any) => ({
   changes: {
     resource: `sqlViews/${id}/data`,
     params: {
+      paging: 'false',
       var: buildParams(rest),
     },
   },

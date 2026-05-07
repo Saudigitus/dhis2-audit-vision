@@ -7,6 +7,7 @@ import { filterValuesFormatter, rowsFormatter } from '../../utils/table/rowForma
 import TableFilter from '../../components/filter/TableFilter';
 import { changeExplorerHeader, metadataGroupAudit } from '../../constants/common/auditTableHeaders';
 import { useParams } from '../../hooks/common/useQueryParams';
+import { useGetUsers } from '../../hooks/users/useGetUsers';
 
 export interface SelectedAuditProps {
   id: string;
@@ -29,6 +30,9 @@ export default function ChangeExplorer() {
   const [pageSize, setPageSize] = useState<number>(10)
   const { getAudit, data, loading } = useGetAudit();
   const { group } = useParams()
+  const { users, loading: usersLoading } = useGetUsers();
+
+  console.log(users)
 
   useEffect(() => {
     getAudit({ page, pageSize, filterQuery: filterQuery! })
@@ -60,7 +64,7 @@ export default function ChangeExplorer() {
           />
         </div>
         <button
-          disabled={loading || !!group}
+          disabled={loading || usersLoading || !!group}
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 px-4 py-3 border border-[#e2e8f0] rounded-xl bg-white text-sm font-medium text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer"
         >
@@ -71,11 +75,11 @@ export default function ChangeExplorer() {
 
       <div className="flex gap-5">
         {showFilters && (
-          <TableFilter query={query} setQuery={setQuery} setFilteQuery={setFilteQuery} filters={filterValuesFormatter()} />
+          <TableFilter query={query} setQuery={setQuery} setFilteQuery={setFilteQuery} filters={filterValuesFormatter({ users })} />
         )}
 
         <Table
-          loading={loading}
+          loading={loading || usersLoading}
           pagination={{ ...data?.pager!, setPage, setPageSize }}
           setSelectedChange={setSelectedChange}
           header={group ? metadataGroupAudit : changeExplorerHeader}
