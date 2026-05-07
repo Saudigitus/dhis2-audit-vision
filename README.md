@@ -52,103 +52,130 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
 
 #### Prerequisites
 
-- Python 3.11+
-- pip (Python package installer)
-- Docker and Docker Compose (recommended for production deployment)
-- A configured DHIS2 instance with auditing enabled
-
-#### Option 1: Configuration with Docker (Containers - Recommended for Production)
-
-This is the recommended approach for production environments as it automates the installation and management of services in containers.
-
-**Prerequisite**: Docker and Docker Compose already installed on the Linux server.
-
-1. **Clone the API repository**:
-   ```bash
-   git clone https://github.com/Saudigitus/dhis-audit-vision-api.git
-   cd dhis-audit-vision-api
-   ```
-
-2. **Configure environment variables**:
-   Create a `.env` file in the project root with the following variables (adjust values according to your installation):
-   ```env
-   DHIS2_INSTANCE_URL=https://your-dhis2-instance.org
-   DHIS2_USERNAME=your-username
-   DHIS2_PASSWORD=your-password
-   DB_NAME=dhis2_audit
-   DB_USER=postgres
-   DB_PASSWORD=your-db-password
-   DB_HOST=db
-   DB_PORT=5432
-   ```
-
-3. **Start services with Docker Compose**:
-   ```bash
-   docker compose up -d
-   ```
-
-4. **Verify services are running**:
-   ```bash
-   docker compose ps
-   ```
-
----
-
-#### Option 2: Manual Configuration (Without Docker)
-
-Use this option if you prefer to install and manage components directly on the Linux server without containers (works for both development and production).
-
-##### Additional prerequisites:
+- Ubuntu 22.04 LTS server (fresh install recommended)
+- Git access to the repository
 - Python 3.11+
 - pip (Python package installer)
 - PostgreSQL installed and configured on the server
 
-##### Installation steps:
+#### Installation steps
 
-1. **Create virtual environment**:
+1. **Install Nginx**:
    ```bash
-   python -m venv .venv
+   sudo apt install nginx
+   sudo ufw allow 'Nginx HTTP'
+   systemctl status nginx
    ```
 
-2. **Activate virtual environment**:
+2. **Install Git and clone the repository**:
    ```bash
-   # Linux/Mac
-   source .venv/bin/activate
+   sudo apt install git
+   cd /var/www/
+   git clone https://github.com/Saudigitus/dhis_audit_vision.git
+   cd dhis_audit_vision/
+   git checkout develop
    ```
 
-3. **Install dependencies**:
+3. **Install PostgreSQL**:
+   ```bash
+   sudo apt install postgresql postgresql-contrib
+   sudo -u postgres psql
+   ```
+
+4. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
+   pip install alembic psycopg2-binary
    ```
-
-4. **Configure environment variables**:
-   Create a `.env` file in the project root with the same variables as the Docker configuration, but adjust `DB_HOST` to your PostgreSQL address (e.g., `localhost`):
-   ```env
-   DHIS2_INSTANCE_URL=https://your-dhis2-instance.org
-   DHIS2_USERNAME=your-username
-   DHIS2_PASSWORD=your-password
-   DB_NAME=dhis2_audit
-   DB_USER=postgres
-   DB_PASSWORD=your-db-password
-   DB_HOST=localhost
+   
+5. **Configure environment variables**:
+   ```bash
+   nano /var/www/dhis_audit_vision/.env
+   ```
+   ```bash
+   #Database config
+   DB_NAME=your_database_name
+   DB_USER=your_db_user
+   DB_PASSWORD=your_db_password
+   DB_HOST=127.0.0.1
    DB_PORT=5432
-   ```
+   ENVIRONMENT=development
 
-5. **Run database migrations**:
+   #Server config
+   HOST=0.0.0.0
+   PORT=8000
+   SERVER_DHIS2_URL=https://your-dhis2-instance-url
+   SERVER_DHIS2_AUTH=your_base64_encoded_credentials
+   SQL_VIEW_ID=your_sql_view_id
+   CONTROL_FILE_PATH=./data/control_file.json
+   DATA_BASE_DIR=./data
+
+   #Security
+   SECRET_KEY=your_secret_key_here
+   TOKEN_EXPIRE_MINUTES=60
+
+   #Admin account
+   ADMIN_USERNAME=your_admin_username
+   ADMIN_EMAIL=your_admin_email
+   ADMIN_PASSWORD=your_admin_password
+   ```
+   
+7. **Run database migrations and seeders**:
    ```bash
    alembic revision --autogenerate -m "Create all tables"
    alembic upgrade head
+   python3 commands.py start-audit
+   ```
+   
+8. **Configure the systemd service**:
+   ```bash
+   nano /etc/systemd/system/auditapi.service
+   ```
+    ```bash
+    [Unit]
+    Description=AuditAPI FastAPI Service
+    After=network.target
+
+    [Service]
+    User=root
+    WorkingDirectory=/var/www/dhis_audit_vision
+    ExecStart=/var/www/dhis_audit_vision/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+   
+9. **Enable and start the service**:
+   ```bash
+   systemctl daemon-reload
+   systemctl enable auditapi.service
+   systemctl restart auditapi.service
    ```
 
-6. **Run seeders** (initial data):
+10. **Configure Nginx as a reverse proxy**:
    ```bash
-   python commands.py
+   nano /etc/nginx/sites-available/default
+   ```
+   ```bash
+   server {
+        listen 80;
+        server_name your_server_ip_or_domain;
+
+        location / {
+            proxy_pass http://127.0.0.1:8000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
    ```
 
-7. **Start the server**:
+11. **Validate and reload**:
    ```bash
-   python runserver.py
+   sudo nginx -t
+   sudo systemctl reload nginx
    ```
+---
 
 ## DHIS2 Instance Configuration
 
