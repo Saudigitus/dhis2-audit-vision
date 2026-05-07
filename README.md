@@ -92,7 +92,7 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    ```bash
    nano /var/www/dhis_audit_vision/.env
    ```
-   # Database config
+   #Database config
    DB_NAME=your_database_name
    DB_USER=your_db_user
    DB_PASSWORD=your_db_password
@@ -100,7 +100,7 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    DB_PORT=5432
    ENVIRONMENT=development
 
-   # Server config
+   #Server config
    HOST=0.0.0.0
    PORT=8000
    SERVER_DHIS2_URL=https://your-dhis2-instance-url
@@ -109,11 +109,11 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    CONTROL_FILE_PATH=./data/control_file.json
    DATA_BASE_DIR=./data
 
-   # Security
+   #Security
    SECRET_KEY=your_secret_key_here
    TOKEN_EXPIRE_MINUTES=60
 
-   # Admin account
+   #Admin account
    ADMIN_USERNAME=your_admin_username
    ADMIN_EMAIL=your_admin_email
    ADMIN_PASSWORD=your_admin_password
