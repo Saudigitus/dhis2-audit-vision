@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDataEngine } from '@dhis2/app-runtime'
 import sqlviews from '../../constants/sqlviews/sqlviews.json'
 import { SqlView } from '../../types/sqlView/sqlView'
+import { useInitializeEventHook } from './useInitializeEventHook'
 
 const GET_SQL_VIEW_QUERY = (id: string) => ({
     sqlView: {
@@ -23,6 +24,7 @@ const CREATE_OR_UPDATE_SQL_VIEW_MUTATION = {
 export const useInitializer = () => {
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
+    const { initialize: initializeEventHooks, loading: eventHookLoading } = useInitializeEventHook()
 
     const verifySqlViews = async () => {
         setLoading(true)
@@ -69,10 +71,11 @@ export const useInitializer = () => {
 
     const initialize = async () => {
         await verifySqlViews()
+        await initializeEventHooks()
     }
 
     return {
         initialize,
-        loading
+        loading: loading || eventHookLoading
     }
 }
