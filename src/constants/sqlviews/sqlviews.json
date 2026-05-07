@@ -223,5 +223,33 @@
         "favorite": false,
         "id": "xZQp6Isnhkj",
         "attributeValues": []
+    },
+    {
+        "name": "users_with_audits",
+        "translations": [],
+        "externalAccess": false,
+        "publicAccess": "rwrw----",
+        "userGroupAccesses": [],
+        "userAccesses": [],
+        "access": {
+            "manage": true,
+            "externalize": true,
+            "write": true,
+            "read": true,
+            "update": true,
+            "delete": true,
+            "data": {
+                "write": true,
+                "read": true
+            }
+        },
+        "favorites": [],
+        "sqlQuery": "SELECT DISTINCT\n    createdby AS username\nFROM audit\nWHERE auditscope = 'METADATA'\n  AND createdby IS NOT NULL\n  AND createdby <> ''\n  AND createdby NOT IN ('system', 'system-process')\nORDER BY username ASC;",
+        "type": "QUERY",
+        "cacheStrategy": "NO_CACHE",
+        "displayName": "users_with_audits",
+        "favorite": false,
+        "id": "rLkml5V4zSF",
+        "attributeValues": []
     }
 ]
