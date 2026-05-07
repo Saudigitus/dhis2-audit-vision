@@ -15,7 +15,7 @@ function rowsFormatter(data: DataProps[]) {
     return formattedData
 }
 
-function filterValuesFormatter() {
+function filterValuesFormatter({ users }: { users: string[] }) {
     return {
         auditType: {
             values: ['UPDATE', 'CREATE', 'DELETE'],
@@ -23,8 +23,9 @@ function filterValuesFormatter() {
             inputType: 'select'
         },
         createdBy: {
+            values: users,
             label: 'User',
-            inputType: 'text'
+            inputType: 'select'
         },
     }
 }
@@ -69,7 +70,7 @@ function filterNotifications(notifications: any[], filterQuery: string | null) {
     if (!filterQuery) return notifications;
 
     const params = new URLSearchParams(filterQuery);
-    
+
     // Map filter keys to actual object properties if they differ
     const keyMap: Record<string, string> = {
         auditType: 'action',
