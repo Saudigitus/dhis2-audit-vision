@@ -92,6 +92,7 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    ```bash
    nano /var/www/dhis_audit_vision/.env
    ```
+   ```bash
    #Database config
    DB_NAME=your_database_name
    DB_USER=your_db_user
@@ -117,18 +118,20 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    ADMIN_USERNAME=your_admin_username
    ADMIN_EMAIL=your_admin_email
    ADMIN_PASSWORD=your_admin_password
+   ```
    
-6. **Run database migrations and seeders**:
+7. **Run database migrations and seeders**:
    ```bash
    alembic revision --autogenerate -m "Create all tables"
    alembic upgrade head
    python3 commands.py start-audit
    ```
    
-7. **Configure the systemd service**:
+8. **Configure the systemd service**:
    ```bash
    nano /etc/systemd/system/auditapi.service
    ```
+    ```bash
     [Unit]
     Description=AuditAPI FastAPI Service
     After=network.target
@@ -141,15 +144,16 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
 
     [Install]
     WantedBy=multi-user.target
+    ```
    
-8. **Enable and start the service**:
+9. **Enable and start the service**:
    ```bash
    systemctl daemon-reload
    systemctl enable auditapi.service
    systemctl restart auditapi.service
    ```
 
-9. **Configure Nginx as a reverse proxy**:
+10. **Configure Nginx as a reverse proxy**:
    ```bash
    nano /etc/nginx/sites-available/default
    ```
@@ -164,7 +168,7 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
         }
     }
    
-10. **Validate and reload**:
+11. **Validate and reload**:
    ```bash
    sudo nginx -t
    sudo systemctl reload nginx
