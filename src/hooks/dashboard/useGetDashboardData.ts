@@ -3,68 +3,77 @@ import { useRecoilValue } from "recoil";
 import { format, addDays } from "date-fns";
 import { useDataEngine } from "@dhis2/app-runtime";
 import { SeverityRulesSchema } from "../../schema/severityRulesSchema";
+import { CHANGE_TYPES, DashboardData } from "../../types/dashboard/DashboardTypes";
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema";
 import {
-    buildParams, countRiskChanges, getSingleValue,
-    mapChangesByType, mapRowsToSeries, mapUserActions
+    buildParams, countRiskChanges, getRows,
+    getSingleValue, mapChangesByType, mapSeries, mapUserActivity
 } from "../../utils/formater/dashboardDataFormater";
-import { DashboardData } from "../../pages/Dashboard";
 
-const QUERY = ({ id, ...rest }: any) => ({
-    results: {
-        resource: `sqlViews/${id}/data`,
-        params: {
-            paging: 'false',
-            var: buildParams(rest),
-        },
+
+const sqlView = (id: string, vars?: Record<string, any>) => ({
+    resource: `sqlViews/${id}/data`,
+    params: {
+        paging: false,
+        var: buildParams(vars || {}),
     },
 });
 
 const useGetDashboardData = () => {
     const engine = useDataEngine();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const { reports } = useRecoilValue(DataStoreConfigState);
     const severityrules = useRecoilValue(SeverityRulesSchema);
-    const dataStoreConfig = useRecoilValue(DataStoreConfigState);
-    const { reports } = dataStoreConfig;
-    const [data, setData] = useState<DashboardData>({} as DashboardData);
+    const [data, setData] = useState<DashboardData>({
+        riskChanges: 0,
+        totalChanges: 0,
+        totalUpdates: 0,
+        todayChanges: 0,
+        changesOverTime: [],
+        mostActiveUsers: [],
+        changesByType: CHANGE_TYPES.map((type) => ({
+            ...type,
+            value: 0,
+        })),
+    });
 
-    const today = format(new Date(), "yyyy-MM-dd");
-    const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
+    const getDashboardData = async ({ startDate, endDate,
+    }: { startDate: string; endDate: string; }) => {
+        if (!startDate || !endDate) return;
 
-    const getDashboardData = async ({ startDate, endDate }: any) => {
-        if (!severityrules?.notifications?.length || !Object.keys(reports).length)
-            return;
+        setLoading(true);
 
         try {
-            const [totalChanges, totalUpdates, todayChanges, changesByType, changesOverTime, mostActiveUsers, riskChanges] =
-                await Promise.all([
-                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "ALL" })).catch(() => null),
-                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate, endDate, actionType: "UPDATE" })).catch(() => null),
-                    engine.query(QUERY({ id: reports?.changesByPeriod, startDate: today, endDate: tomorrow, actionType: "ALL" })).catch(() => null),
-                    engine.query(QUERY({ id: reports?.changesByType, startDate, endDate })).catch(() => null),
-                    engine.query(QUERY({ id: reports?.changesOverTime, startDate, endDate })).catch(() => null),
-                    engine.query(QUERY({ id: reports?.mostActiveUsers, startDate, endDate, offset: 0 })).catch(() => null),
-                    engine.query(QUERY({ id: reports?.riskChanges, startDate, endDate })).catch(() => null),
-                ]);
+            const today = format(new Date(), "yyyy-MM-dd");
+            const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
+
+            const result: any = await engine.query({
+                totalChanges: sqlView(reports?.changesByPeriod, { startDate, endDate, actionType: "ALL", }),
+                totalUpdates: sqlView(reports?.changesByPeriod, { startDate, endDate, actionType: "UPDATE", }),
+                todayChanges: sqlView(reports?.changesByPeriod, { startDate: today, endDate: tomorrow, actionType: "ALL", }),
+                changesByType: sqlView(reports?.changesByType, { startDate, endDate, }),
+                changesOverTime: sqlView(reports?.changesOverTime, { startDate, endDate, }),
+                mostActiveUsers: sqlView(reports?.mostActiveUsers, { startDate, endDate, limit: 10, offset: 0, }),
+                riskChanges: sqlView(reports?.riskChanges, { startDate, endDate }),
+            });
 
             setData({
-                totalChanges: getSingleValue(totalChanges),
-                totalUpdates: getSingleValue(totalUpdates),
-                todayChanges: getSingleValue(todayChanges),
-                changesByType: mapChangesByType(changesByType),
-                mostActiveUsers: mapUserActions(mostActiveUsers),
-                changesOverTime: mapRowsToSeries(changesOverTime),
-                riskChanges: countRiskChanges({ severityRules: severityrules?.notifications, res: riskChanges }),
+                totalChanges: getSingleValue(result.totalChanges),
+                totalUpdates: getSingleValue(result.totalUpdates),
+                todayChanges: getSingleValue(result.todayChanges),
+                changesOverTime: mapSeries(getRows(result.changesOverTime)),
+                changesByType: mapChangesByType(getRows(result.changesByType)),
+                mostActiveUsers: mapUserActivity(getRows(result.mostActiveUsers)),
+                riskChanges: countRiskChanges({ severityRules: severityrules?.notifications || [], res: result.riskChanges }),
             });
-        } catch (e) {
-            console.error("Dashboard error:", e);
-        }
-        finally {
+        } catch (error) {
+            console.error("Audit dashboard error:", error);
+        } finally {
             setLoading(false);
         }
     };
 
-    return { getDashboardData, loading, data };
+    return { data, loading, getDashboardData };
 };
 
 export { useGetDashboardData };

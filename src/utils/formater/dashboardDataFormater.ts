@@ -1,51 +1,42 @@
 import { SeverityRuleType } from "../../schema/severityRulesSchema";
+import { CHANGE_TYPES, ChangeType, ChartItem, UserActivity } from "../../types/dashboard/DashboardTypes";
 
-const getSingleValue = (res: any) =>
-    Number(res?.results?.listGrid?.rows?.[0]?.[0] ?? 0);
+const getRows = (response: any) => response?.listGrid?.rows || [];
 
-const mapRowsToSeries = (res: any) => {
-    const rows = res?.results?.listGrid?.rows || [];
+const getSingleValue = (response: any) => Number(getRows(response)?.[0]?.[0] ?? 0);
 
-    return rows.map((r: any[]) => ({
-        name: r?.[0],
-        value: Number(r?.[1] ?? 0),
+const mapSeries = (rows: any[]): ChartItem[] =>
+    rows.map(([name, value]) => ({
+        name,
+        value: Number(value),
     }));
-}
 
-const mapUserActions = (res: any) => {
-    const rows = res?.results?.listGrid?.rows || [];
-    const result: Record<string, any> = {};
+const mapChangesByType = (rows: any[]) =>
+    CHANGE_TYPES.map((type) => ({
+        ...type,
+        value: Number(
+            rows.find(([action]) => action === type.name)?.[1] ?? 0
+        ),
+    }));
 
-    rows.forEach(([username, action, total]: any[]) => {
-        if (!result[username]) {
-            result[username] = {
-                name: username,
+const mapUserActivity = (rows: any[]): UserActivity[] => {
+    const users: Record<string, UserActivity> = {};
+
+    rows.forEach(([username, action, total]) => {
+        if (!users[username]) {
+            users[username] = {
                 CREATE: 0,
                 UPDATE: 0,
                 DELETE: 0,
+                name: username,
             };
         }
-        result[username][action] = Number(total);
+
+        users[username][action as ChangeType] = Number(total);
     });
 
-    return Object.values(result);
+    return Object.values(users);
 };
-
-const changesByTypeHelper = [
-    { name: "CREATE", color: "#3b82f6" },
-    { name: "UPDATE", color: "#f59e0b" },
-    { name: "DELETE", color: "#ef4444" },
-];
-
-const mapChangesByType = (res: any) => {
-    const rows = res?.results?.listGrid?.rows || [];
-
-    return changesByTypeHelper.map((item) => ({
-        ...item,
-        value: Number(rows.find((r: any) => r?.includes(item.name))?.[1] ?? 0),
-    }));
-
-}
 
 const buildParams = ({ startDate, endDate, actionType, offset }: any) => {
     const params = [
@@ -83,5 +74,4 @@ const countRiskChanges = ({ severityRules, res }: { severityRules: SeverityRuleT
     return total;
 }
 
-
-export { getSingleValue, mapRowsToSeries, mapChangesByType, mapUserActions, buildParams, countRiskChanges }
+export { getSingleValue, mapSeries, mapChangesByType, mapUserActivity, buildParams, countRiskChanges, getRows }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { CircularLoader } from '@dhis2/ui';
 import { useParams } from '../hooks/common/useQueryParams';
 import CardContainer from '../components/card/CardContainer';
@@ -9,7 +9,6 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, BarChart, Bar,
 } from 'recharts';
-import { mapChangesByType } from '../utils/formater/dashboardDataFormater';
 
 
 const stats = ({ changesToday, totalChanges, riskChanges, totalUpdates }: { changesToday: any, totalChanges: any, riskChanges: any, totalUpdates: any }) => ([
@@ -18,31 +17,6 @@ const stats = ({ changesToday, totalChanges, riskChanges, totalUpdates }: { chan
   { label: 'TOTAL UPDATES', value: totalUpdates, change: '+8% vs last week', changeColor: 'text-[#f59e0b]', icon: <ShieldCheck size={20} className="text-[#f59e0b]" />, iconBg: 'bg-[#fffbeb]' },
   { label: 'TOTAL RISK CHANGES', value: riskChanges, change: 'Requires review', changeColor: 'text-[#ef4444]', icon: <AlertTriangle size={20} className="text-[#ef4444]" />, iconBg: 'bg-[#fef2f2]', cardBg: 'bg-[#fef2f2] border-[#fecaca]' },
 ]);
-
-export type DashboardData = {
-  riskChanges: number;
-  todayChanges: number;
-  totalUpdates: number;
-  totalChanges: number;
-
-  changesByType: {
-    value: number;
-    name: string;
-    color: string;
-  }[];
-
-  changesOverTime: {
-    name: string;
-    value: number;
-  }[];
-
-  mostActiveUsers: {
-    name: string;
-    CREATE: number;
-    UPDATE: number;
-    DELETE: number;
-  }[];
-};
 
 
 export default function Dashboard() {
