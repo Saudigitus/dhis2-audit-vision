@@ -106,7 +106,7 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    PORT=8000
    SERVER_DHIS2_URL=https://your-dhis2-instance-url
    SERVER_DHIS2_AUTH=your_base64_encoded_credentials
-   SQL_VIEW_ID=your_sql_view_id
+   SQL_VIEW_ID=InoZ6MNulN4
    CONTROL_FILE_PATH=./data/control_file.json
    DATA_BASE_DIR=./data
 
