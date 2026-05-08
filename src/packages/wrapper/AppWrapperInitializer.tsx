@@ -13,15 +13,19 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
     const { getSeverityRules, loading: loadingRules } = useGetSeverityRules()
 
     useEffect(() => {
-        if (!dataStoreDataState?.auditApi) {
-            window.location.hash = "#/settings"
-        } else {
-            initialize()
-            getSeverityRules()
-        }
+        const timer = setTimeout(() => {
+            if (!dataStoreDataState?.auditApi && !initializerLoading && !loadingRules) {
+                window.location.hash = "#/settings"
+            } else {
+                initialize()
+                getSeverityRules()
+            }
+        }, 100)
+
+        return () => clearTimeout(timer)
     }, [dataStoreDataState])
 
-    if (initializerLoading || loadingRules) {
+    if (initializerLoading || loadingRules || !dataStoreDataState?.auditApi) {
         return (
             <React.Fragment>
                 {

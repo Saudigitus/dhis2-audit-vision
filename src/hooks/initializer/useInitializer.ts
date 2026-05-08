@@ -23,10 +23,11 @@ const CREATE_OR_UPDATE_SQL_VIEW_MUTATION = {
 
 export const useInitializer = () => {
     const engine = useDataEngine()
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const { initialize: initializeEventHooks, loading: eventHookLoading } = useInitializeEventHook()
 
     const verifySqlViews = async () => {
+        setLoading(true)
         for (const view of sqlviews as SqlView[]) {
             try {
                 const response = await engine.query(GET_SQL_VIEW_QUERY(view.id)) as { sqlView: SqlView | null }

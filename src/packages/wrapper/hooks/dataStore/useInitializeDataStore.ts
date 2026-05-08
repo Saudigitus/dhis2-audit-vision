@@ -1,16 +1,13 @@
 import { useRef, useState } from 'react'
 import { useDataEngine } from '@dhis2/app-runtime'
 import { useGetDataStore } from './useGetDataStore'
-import { DataStoreType } from '../../types/DataStoreType'
-import views from "../../../../constants/sqlviews/sqlviews.json"
 import { defaultDataStoreConfig, KEY, NAMESPACE } from '../../constants/config'
 
 export const useInitializeDataStore = () => {
     const ran = useRef(false)
     const engine = useDataEngine()
     const [error, setError] = useState(false)
-    const [loading, setLoading] = useState(true)
-
+    const [loading, setLoading] = useState(false)
     const { refetch: getDataStore } = useGetDataStore()
 
     const createOrUpdate = async (config: any) => {
@@ -23,17 +20,15 @@ export const useInitializeDataStore = () => {
 
     const initializeDataStore = async () => {
         if (ran.current) {
-            setLoading(false)
             return
         }
+        setLoading(true)
         ran.current = true
 
         try {
             const baseConfig = defaultDataStoreConfig
             const existing = await getDataStore()
-            const finalConfig = buildReportsConfig(
-                existing ?? baseConfig
-            )
+            const finalConfig = existing ?? baseConfig
 
             if (!existing) {
                 await engine.mutate({
@@ -46,8 +41,7 @@ export const useInitializeDataStore = () => {
             }
 
             const isSameShape = isSameStructure(existing, baseConfig)
-            const reportsComplete = configHasReports(existing)
-            if (!isSameShape || !reportsComplete) {
+            if (!isSameShape) {
                 await createOrUpdate(finalConfig)
             }
 
@@ -96,27 +90,4 @@ function isSameStructure(a: any, b: any): boolean {
     }
 
     return typeof a === typeof b
-}
-
-function configHasReports(config: DataStoreType): boolean {
-    return Object.values(config?.reports ?? {}).every(Boolean)
-}
-
-function buildReportsConfig(config: DataStoreType): DataStoreType {
-    const getViewId = (name: string) =>
-        views.find((view) => view.name === name)?.id ?? ""
-
-    return {
-        ...config,
-
-        reports: {
-            users: getViewId("users_with_audits"),
-            riskChanges: getViewId("audit_total_risk"),
-            changesByType: getViewId("audit_by_types"),
-            changesByPeriod: getViewId("audit_totals"),
-            changesOverTime: getViewId("audit_daily"),
-            topUsersChanges: getViewId("audit_top_5_by_date"),
-            mostActiveUsers: getViewId("audit_total_per_user"),
-        },
-    }
 }

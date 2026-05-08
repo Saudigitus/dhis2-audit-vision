@@ -1,33 +1,19 @@
 export const KEY = 'values'
-export const NAMESPACE = 'audit'
+export const NAMESPACE = 'auditt'
 
 export const dataStoreKey = `dataStore/${NAMESPACE}/${KEY}`
 
 export const defaultDataStoreConfig = {
     "key": "audit",
     "auditApi": "",
-    "monitoringGroups": [
-        {
-            "createdAt": "",
-            "description": "",
-            "id": "",
-            "items": [
-                {
-                    "id": "",
-                    "type": ""
-                }
-            ],
-            "name": "",
-            "updatedAt": ""
-        }
-    ],
+    "monitoringGroups": [],
     "reports": {
-        "changesByPeriod": "",
-        "changesByType": "",
-        "changesOverTime": "",
-        "mostActiveUsers": "",
-        "riskChanges": "",
-        "topUsersChanges": "",
-        "users": ""
+        "changesByPeriod": "uOPaRDAtwFi",
+        "changesByType": "ssta0egVkH9",
+        "changesOverTime": "cWp81fDdg4s",
+        "mostActiveUsers": "B7DrTkhIYld",
+        "riskChanges": "fD1pIBbXIAo",
+        "topUsersChanges": "xZQp6Isnhkj",
+        "users": "rLkml5V4zSF"
     }
 }
