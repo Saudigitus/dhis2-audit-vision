@@ -21,7 +21,7 @@ const sqlView = (id: string, vars?: Record<string, any>) => ({
 
 const useGetDashboardData = () => {
     const engine = useDataEngine();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const { reports } = useRecoilValue(DataStoreConfigState);
     const severityrules = useRecoilValue(SeverityRulesSchema);
     const [data, setData] = useState<DashboardData>({
@@ -39,9 +39,10 @@ const useGetDashboardData = () => {
 
     const getDashboardData = async ({ startDate, endDate,
     }: { startDate: string; endDate: string; }) => {
-        if (!startDate || !endDate) return;
-
-        setLoading(true);
+        if (!startDate || !endDate) {
+            setLoading(false);
+            return
+        };
 
         try {
             const today = format(new Date(), "yyyy-MM-dd");

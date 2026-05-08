@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react"
 import { useDataEngine } from "@dhis2/app-runtime"
-import { dataStoreKey } from "../../packages/wrapper/config"
 import usePostDataStore from "../../packages/wrapper/hooks/dataStore/usePostDataStore"
 import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
+import { dataStoreKey } from "../../packages/wrapper/constants/config"
 
 const query = {
     dataStoreValues: {

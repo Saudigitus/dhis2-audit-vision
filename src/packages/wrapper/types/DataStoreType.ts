@@ -1,6 +1,3 @@
-const dataStoreKey = "dataStore/audit/values"
-export { dataStoreKey }
-
 type DataStoreType = {
     key: string
     auditApi: string
@@ -20,17 +17,8 @@ type DataStoreType = {
         updatedAt: string
         items: Array<{
             id: string,
-            // name: string,
             type: "program" | "dataSet"
         }>,
-        // programs: Array<{
-        //     id: string,
-        //     name: string
-        // }>,
-        // dataSets: Array<{
-        //     id: string,
-        //     name: string
-        // }>
         description: string
     }>
 };
