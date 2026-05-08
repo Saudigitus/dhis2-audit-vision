@@ -9,7 +9,7 @@ export const useInitializeDataStore = () => {
     const ran = useRef(false)
     const engine = useDataEngine()
     const [error, setError] = useState(false)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     const { refetch: getDataStore } = useGetDataStore()
 
@@ -22,10 +22,11 @@ export const useInitializeDataStore = () => {
     }
 
     const initializeDataStore = async () => {
-        if (ran.current) return
+        if (ran.current) {
+            setLoading(false)
+            return
+        }
         ran.current = true
-
-        setLoading(true)
 
         try {
             const baseConfig = defaultDataStoreConfig

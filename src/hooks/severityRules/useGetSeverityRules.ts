@@ -5,17 +5,17 @@ import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSche
 import { SeverityRulesSchema } from "../../schema/severityRulesSchema"
 
 export const useGetSeverityRules = () => {
-    const [loading, setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(true)
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
     const setSeverityRules = useSetRecoilState(SeverityRulesSchema)
 
     const getSeverityRules = async () => {
         if (!dataStoreDataState?.auditApi) {
             console.log('auditApi is not set in dataStoreDataState')
+            setLoading(false)
             return
         }
 
-        setLoading(true)
         try {
             const response = await axios.get(`${dataStoreDataState?.auditApi}/api/notifications`)
 
