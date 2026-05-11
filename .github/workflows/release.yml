@@ -1,18 +1,18 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to release (e.g. 1.0.2)'
-        required: true
-        default: '1.0.2'
+  pull_request:
+    types:
+      - closed
+    branches:
+      - develop
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,17 +34,21 @@ jobs:
 
       - name: Bump version and generate changelog
         run: |
-          npm run release -- --release-as ${{ github.event.inputs.version }}
+          npm run release
+
+      - name: Get version from package.json
+        id: package_version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       - name: Push changes and tags
         run: |
-          git push --follow-tags origin HEAD
+          git push --follow-tags origin HEAD:develop
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ github.event.inputs.version }}
-          name: 📦 DHIS2 AUDIT VISION – Version ${{ github.event.inputs.version }} Release Notes
+          tag_name: v${{ steps.package_version.outputs.VERSION }}
+          name: 📦 DHIS2 AUDIT VISION – Version ${{ steps.package_version.outputs.VERSION }} Release Notes
           body: |
             **Release Date:** $(date +'%Y-%m-%d')
 
