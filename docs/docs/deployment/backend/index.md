@@ -1,12 +1,12 @@
 ---
 id: index
-title: Audit API Deployment
+title: DHIS2 Audit Vision API Deployment
 sidebar_position: 1
 ---
 
-# Audit API (Backend) Deployment
+# DHIS2 Audit Vision API Deployment
 
-The Audit API is a **FastAPI** Python application that connects to your DHIS2 PostgreSQL database and exposes audit data to the frontend application.
+The DHIS2 Audit Vision API is a **FastAPI** Python application that connects to your DHIS2 PostgreSQL database and exposes audit data to the frontend application.
 
 ## Prerequisites
 

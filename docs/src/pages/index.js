@@ -4,39 +4,42 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import Heading from '@theme/Heading';
 import styles from './index.module.css';
+import { History, Activity, RotateCcw, BellRing } from 'lucide-react';
 
 const features = [
   {
     title: 'Complete Traceability',
-    emoji: '🔍',
+    Icon: History,
     description:
       'Track every change made to your DHIS2 metadata with Diff visualization, dependency tracking, and complete audit trails.',
   },
   {
     title: 'Real-Time Monitoring',
-    emoji: '⚡',
+    Icon: Activity,
     description:
       'Monitor user activity and system changes in real time as they happen across your DHIS2 instance.',
   },
   {
     title: 'Reverse Any Change',
-    emoji: '↩️',
+    Icon: RotateCcw,
     description:
       'Quickly revert accidental or unwanted changes with detailed change history and one-click rollback capabilities.',
   },
   {
     title: 'Automatic Alerts',
-    emoji: '🔔',
+    Icon: BellRing,
     description:
       'Receive intelligent notifications categorized by severity level (High, Medium, Low) when critical changes happen.',
   },
 ];
 
-function Feature({ title, emoji, description }) {
+function Feature({ title, Icon, description }) {
   return (
     <div className={clsx('col col--3')}>
       <div className="text--center padding-horiz--md padding-vert--md">
-        <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>{emoji}</div>
+        <div className={styles.featureIconContainer}>
+          <Icon size={48} className={styles.featureIcon} />
+        </div>
         <Heading as="h3">{title}</Heading>
         <p>{description}</p>
       </div>

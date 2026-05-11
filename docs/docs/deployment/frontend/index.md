@@ -1,12 +1,12 @@
 ---
 id: index
-title: Frontend App Deployment
+title: DHIS2 Audit Vision Deployment
 sidebar_position: 1
 ---
 
-# Frontend App Deployment
+# DHIS2 Audit Vision Deployment
 
-The DHIS2 Audit Vision frontend is a **DHIS2 custom application** that runs inside your DHIS2 instance. It requires no separate server — it is uploaded and managed through the DHIS2 App Management interface.
+The DHIS2 Audit Vision is a **DHIS2 custom application** that runs inside your DHIS2 instance. It requires no separate server — it is uploaded and managed through the DHIS2 App Management interface.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ Before installing, ensure you have:
 
 - A running DHIS2 instance (**minimum version 2.40**)
 - Administrator access to the DHIS2 instance
-- A deployed [Audit API](../backend/) that the frontend will connect to
+- A deployed [DHIS2 Audit Vision API](../backend/) that the frontend will connect to
 
 ## Step 1 – Installing the App in DHIS2
 

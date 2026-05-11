@@ -9,11 +9,11 @@ const sidebars = {
     {
       type: 'doc',
       id: 'deployment/frontend/index',
-      label: 'Frontend App',
+      label: 'DHIS2 Audit Vision',
     },
     {
       type: 'category',
-      label: 'Audit API (Backend)',
+      label: 'DHIS2 Audit Vision API',
       link: { type: 'doc', id: 'deployment/backend/index' },
       items: [
         'deployment/backend/install-nginx',
