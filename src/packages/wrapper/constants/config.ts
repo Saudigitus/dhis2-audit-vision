@@ -1,5 +1,5 @@
 export const KEY = 'values'
-export const NAMESPACE = 'auditt'
+export const NAMESPACE = 'audit'
 
 export const dataStoreKey = `dataStore/${NAMESPACE}/${KEY}`
 

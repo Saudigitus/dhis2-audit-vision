@@ -24,8 +24,17 @@ export default function MonitoringGroups() {
   const [editingGroup, setEditingGroup] = useState<MonitoringGroup | null>(null);
 
   useEffect(() => {
-    setGroups(values?.monitoringGroups)
-  }, [values])
+    if (values?.monitoringGroups) {
+      const sorted = [...values.monitoringGroups].sort((a, b) => {
+        const dateA = a?.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const dateB = b?.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      setGroups(sorted);
+    } else {
+      setGroups([]);
+    }
+  }, [values]);
 
   const filteredGroups = groups?.filter(g =>
     g.name?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||

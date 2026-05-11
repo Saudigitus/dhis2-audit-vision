@@ -12,7 +12,7 @@ sidebar_position: 4
 
 The main Metadata Grouping page displays all your created groups as cards.
 
-![Metadata Grouping Overview](/img/metadata-grouping/metadata-grouping.png)
+![Metadata Grouping Overview](/img/metadata-grouping/group-overview.png)
 
 Each group card shows:
 - **Group Name and Description**: e.g., HIV/SIDA, MALARIA, TB PROGRAM.
@@ -20,7 +20,23 @@ Each group card shows:
 - **Timestamps**: When the group was created and last updated.
 - **Monitor Link**: A direct shortcut to view all changes related to this group.
 
-## 2. Monitoring Group Changes
+## 2. Group Configuration
+
+A group configuration form is available to manage the objects within a group.
+The groups can be created, edited, and deleted as needed.
+
+![Group Configuration](/img/metadata-grouping/group-creation.png)
+
+The group configuration form includes:
+- **Group Name**: e.g., HIV/SIDA, MALARIA, TB PROGRAM.
+- **Group Description**: A brief description of the group, useful for context and reference.
+- **Objects**: A list of all selected programs and datasets within the group.
+
+The created group is then displayed in the main Metadata Grouping page.
+
+![Metadata Grouping Overview](/img/metadata-grouping/metadata-grouping.png)
+
+## 3. Monitoring Group Changes
 
 When you click on a group or its "Monitor" link, you are taken to a specialized view within the Change Explorer that is automatically filtered for that group.
 
@@ -31,7 +47,7 @@ In this view:
 - **Last Operations**: A summary of how many changes have occurred for each object (e.g., "Updated +5").
 - This provides a high-level view of which parts of a specific health program are being modified most frequently.
 
-## 3. Detailed Audit Trail per Object
+## 4. Detailed Audit Trail per Object
 
 By expanding an object in the group list, you can see its specific audit history without leaving the group context.
 
@@ -39,7 +55,7 @@ By expanding an object in the group list, you can see its specific audit history
 
 This lists individual operations (CREATE, UPDATE, DELETE) with details on who made the change and when.
 
-## 4. Analyzing Changes within a Group
+## 5. Analyzing Changes within a Group
 
 Just like in the main Change Explorer, you can drill down into any specific change to see exactly what was modified.
 
