@@ -29,7 +29,7 @@ const config = {
         docs: {
           sidebarPath: './sidebars.js',
           editUrl:
-            'https://github.com/Saudigitus/dhis2-audit-vision/tree/main/apps/docs/',
+            'https://github.com/Saudigitus/dhis2-audit-vision/tree/develop/docs/',
         },
         blog: false,
         theme: {

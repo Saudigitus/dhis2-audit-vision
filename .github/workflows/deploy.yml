@@ -1,9 +1,14 @@
-name: Deploy to GitHub Pages
+name: Deploy Docs to GitHub Pages
 
 on:
   push:
     branches:
       - develop
+    paths:
+      - 'docs/**'
+
+permissions:
+  contents: write        # ← isto é o que faltava
 
 jobs:
   deploy:
@@ -16,15 +21,18 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: docs/package-lock.json
 
       - name: Install dependencies
+        working-directory: docs
         run: npm ci
 
       - name: Build website
+        working-directory: docs
         run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: docs/build
