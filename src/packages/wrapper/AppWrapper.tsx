@@ -1,50 +1,42 @@
 import React from "react"
 import { AppWrapperProps } from "./types"
-import useAppConfig from "./hooks/useAppConfig"
 import { CircularLoader } from "@dhis2/ui"
-import { DataStoreConfigState } from "./types/DataStoreSchema"
-import { useRecoilValue } from "recoil"
-import RulesWrapper from "./rulesWrapper/rulesWrapper"
+import useAppConfig from "./hooks/useAppConfig"
 import { AppWrapperInitializer } from "./AppWrapperInitializer"
+import { useRecoilValue } from "recoil"
+import { DataStoreConfigState } from "./types/DataStoreSchema"
 
 const AppWrapper = (props: AppWrapperProps) => {
+    const { children } = props
     const { loading, error } = useAppConfig()
-    const { children, errorComponent, loadingComponent } = props
-    const dataStoreData = useRecoilValue(DataStoreConfigState)
+    const dataStoreDataState = useRecoilValue(DataStoreConfigState)
+    
 
     if (error) {
         return (
             <React.Fragment>
-                {
-                    errorComponent ??
-                    <div className='flex items-center justify-center'>
-                        An error occurred while loading the app.
-                    </div>
-                }
+                <div className='flex items-center justify-center'>
+                    An error occurred while loading the app.
+                </div>
             </React.Fragment>
         )
     }
 
-    if (loading || !dataStoreData) {
+    if (loading && !dataStoreDataState) {
         return (
             <React.Fragment>
-                {
-                    loadingComponent ??
-                    <div className='flex items-center justify-center'>
-                        <CircularLoader />
-                    </div>
-                }
+                <div className='flex items-center justify-center'>
+                    <CircularLoader />
+                </div>
             </React.Fragment>
         )
     }
 
     return (
         <React.Fragment>
-            <RulesWrapper>
-                <AppWrapperInitializer>
-                    {children}
-                </AppWrapperInitializer>
-            </RulesWrapper>
+            <AppWrapperInitializer>
+                {children}
+            </AppWrapperInitializer>
         </React.Fragment>
     )
 }

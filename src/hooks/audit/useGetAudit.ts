@@ -53,7 +53,6 @@ export const useGetAudit = () => {
                     enrichedItems.push(enrichedItem)
                 }
 
-                console.log(paginatedItems, dataStoreDataState)
                 setData({
                     audits: enrichedItems,
                     pager: { page, pageCount, pageSize, total }

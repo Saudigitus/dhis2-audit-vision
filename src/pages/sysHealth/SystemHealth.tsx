@@ -21,8 +21,6 @@ const auditChecks = [
 export default function SystemHealth() {
   const { loading: loadingSysInfo, sysInfo } = useGetSysInfo()
 
-  console.log(sysInfo)
-
   return (
     <div className="space-y-6">
       {/* Overview Cards */}

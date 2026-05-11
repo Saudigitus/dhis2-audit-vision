@@ -1,10 +1,7 @@
-import { useState } from "react"
 import { useDataEngine } from "@dhis2/app-runtime"
 
-
-export function useGetDataStoreConfig() {
+export default function useGetDataStoreConfig({ setLoading }: { setLoading: (args: boolean) => void }) {
     const engine = useDataEngine()
-    const [loading, setLoading] = useState(false)
 
     const getDataStore = async (key: string) => {
         try {
@@ -22,5 +19,5 @@ export function useGetDataStoreConfig() {
         }
     }
 
-    return { getDataStore, loading }
+    return { getDataStore }
 }

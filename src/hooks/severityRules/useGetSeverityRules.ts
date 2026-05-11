@@ -10,9 +10,13 @@ export const useGetSeverityRules = () => {
     const setSeverityRules = useSetRecoilState(SeverityRulesSchema)
 
     const getSeverityRules = async () => {
-        setLoading(true)
+        if (!dataStoreDataState?.auditApi) {
+            console.log('auditApi is not set in dataStoreDataState')
+            return
+        }
         try {
-            const response = await axios.get(`${dataStoreDataState.auditApi}/api/notifications`)
+            setLoading(true)
+            const response = await axios.get(`${dataStoreDataState?.auditApi}/api/notifications`)
 
             setSeverityRules(response.data)
         } catch (error) {

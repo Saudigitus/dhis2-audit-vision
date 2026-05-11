@@ -66,7 +66,6 @@ const countRiskChanges = (severityRules: SeverityRuleType[], rows: any[]) => {
         const objectType = rule.objectType?.split('.').pop();
         const action = rule.action;
         const changes = objectTypeMap.get(objectType || '')?.get(action);
-        console.log(changes, objectType, action, objectTypeMap)
         if (changes !== undefined) total += changes;
     }
 

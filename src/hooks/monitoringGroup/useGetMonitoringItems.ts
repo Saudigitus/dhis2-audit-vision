@@ -13,8 +13,6 @@ const useGetMonitoringItems = () => {
         const dataSets: any = await getDataSets()
         const programs: any = await getPrograms()
 
-        console.log(dataSets, programs)
-
         setData([
             ...dataSets?.map((data: any) => ({ id: data?.id, name: data?.displayName, type: "dataSet" })),
             ...programs?.map((data: any) => ({ id: data?.id, name: data?.displayName, type: "program" })),

@@ -32,8 +32,6 @@ export default function ChangeExplorer() {
   const { group } = useParams()
   const { users, loading: usersLoading } = useGetUsers();
 
-  console.log(users)
-
   useEffect(() => {
     getAudit({ page, pageSize, filterQuery: filterQuery! })
   }, [page, pageSize, filterQuery, group])

@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react"
 import { useDataEngine } from "@dhis2/app-runtime"
-import { dataStoreKey, DataStoreType } from "../../packages/wrapper/config"
+import { dataStoreKey } from "../../packages/wrapper/constants/config"
+import { DataStoreType } from "../../packages/wrapper/types/DataStoreType"
 import { MonitoringGroup } from "../../types/monitoringGroups/MonitoringGroupsTypes"
 import usePostDataStore from "../../packages/wrapper/hooks/dataStore/usePostDataStore"
 
