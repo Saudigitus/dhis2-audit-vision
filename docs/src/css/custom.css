@@ -1,0 +1,46 @@
+/**
+ * DHIS2 Audit Vision – custom Docusaurus theme
+ * Primary colour: DHIS2 blue (#147cd7)
+ */
+
+:root {
+  --ifm-color-primary: #147cd7;
+  --ifm-color-primary-dark: #1270c2;
+  --ifm-color-primary-darker: #1169b7;
+  --ifm-color-primary-darkest: #0e5797;
+  --ifm-color-primary-light: #2288db;
+  --ifm-color-primary-lighter: #2d8edd;
+  --ifm-color-primary-lightest: #4f9fe2;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(20, 124, 215, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #4f9fe2;
+  --ifm-color-primary-dark: #3391dd;
+  --ifm-color-primary-darker: #268bda;
+  --ifm-color-primary-darkest: #147cd7;
+  --ifm-color-primary-light: #6baee7;
+  --ifm-color-primary-lighter: #78b4e9;
+  --ifm-color-primary-lightest: #a0caef;
+  --docusaurus-highlighted-code-line-bg: rgba(79, 159, 226, 0.2);
+}
+
+/* Navbar logo area */
+.navbar__brand {
+  font-weight: 700;
+}
+
+/* Hero section on landing page */
+.hero--primary {
+  background: linear-gradient(135deg, #0d5fa8 0%, #147cd7 60%, #1a9bfc 100%);
+}
+
+.hero__title {
+  font-size: 2.8rem;
+}
+
+/* Admonitions */
+.alert--info {
+  border-left-color: var(--ifm-color-primary);
+}
