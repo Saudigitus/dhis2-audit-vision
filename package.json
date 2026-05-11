@@ -1,13 +1,14 @@
 {
   "name": "react-vite-tailwind",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.2",
   "scripts": {
     "start": "d2-app-scripts start --proxy https://training.saudigitus.org/audit",
     "test": "d2-app-scripts test",
     "deploy": "d2-app-scripts deploy",
     "build": "d2-app-scripts build --no-verify",
-    "dev": "vite"
+    "dev": "vite",
+    "release": "standard-version"
   },
   "dependencies": {
     "@dhis2/data-engine": "^3.17.0",
@@ -33,6 +34,7 @@
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "5.1.1",
+    "standard-version": "^9.5.0",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
     "vite": "7.2.4",
