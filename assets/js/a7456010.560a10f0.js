@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkdhis2_audit_vision_docs=globalThis.webpackChunkdhis2_audit_vision_docs||[]).push([[235],{8552(s){s.exports=JSON.parse('{"name":"docusaurus-plugin-content-pages","id":"default"}')}}]);
