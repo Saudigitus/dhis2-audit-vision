@@ -1,19 +1,22 @@
 name: Deploy Docs to GitHub Pages
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - develop
     paths:
       - 'docs/**'
 
 permissions:
-  contents: write        # ← isto é o que faltava
+  contents: write
 
 jobs:
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v4
 
