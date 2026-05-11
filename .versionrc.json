@@ -1,0 +1,16 @@
+{
+  "types": [
+    {"type": "feat", "section": "✨ New Features"},
+    {"type": "fix", "section": "🐛 Bug Fixes"},
+    {"type": "chore", "section": "🔧 Technical Tasks"},
+    {"type": "docs", "section": "📝 Documentation"},
+    {"type": "style", "section": "💄 Styling"},
+    {"type": "refactor", "section": "♻️ Code Refactoring"},
+    {"type": "perf", "section": "⚡ Performance Improvements"},
+    {"type": "test", "section": "✅ Testing"},
+    {"type": "ci", "section": "🚀 CI/CD"}
+  ],
+  "commitPartial": "### {{section}}\n\n{{#each commits}}\n- {{#if scope}}**{{scope}}**: {{/if}}{{subject}} ([{{shortHash}}]({{url}}))\n{{/each}}\n",
+  "header": "## [{{version}}] - {{date}}\n\n### 📦 DHIS2 AUDIT VISION – Version {{version}} Release Notes\n\n**Release Date:** {{date}}\n",
+  "footer": "\n---\n\n### 🔧 Technical Features\n\n- **Frontend**: React + TypeScript + Vite + Tailwind CSS\n- **DHIS2 UI Components**: Integration with @dhis2/ui\n- **State Management**: Recoil\n- **Routing**: React Router DOM\n- **Charts**: Recharts\n- **Icons**: Lucide React\n- **Internationalization**: i18n support\n- **Backend API**: Python-based REST API\n- **Database**: PostgreSQL with Alembic\n- **Deployment**: Docker support\n\n### 📦 Deployment Options\n\n- **Frontend**: DHIS2 custom app bundle\n- **Backend API**: \n  - Docker Compose (recommended)\n  - Manual installation\n\n### 📋 Requirements\n\n- **DHIS2 Instance**: Minimum version 2.40\n- **Frontend**: Node.js 18+\n- **Backend API**: \n  - Python 3.11+\n  - PostgreSQL\n  - Docker (optional)\n\n### 📝 Documentation\n\n- Complete README with installation\n- DHIS2 configuration guide\n- Developer guides\n\n### 🔒 Security\n\n- Integration user permissions (F_METADATA_EXPORT, F_AUDIT_READ)\n- Automatic SQL View management\n- Secure environment variables\n"
+}
