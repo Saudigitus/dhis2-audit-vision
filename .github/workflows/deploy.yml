@@ -6,8 +6,8 @@ on:
       - closed
     branches:
       - develop
-    # paths:
-    #   - 'docs/**'
+
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,7 +16,7 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v4
 
