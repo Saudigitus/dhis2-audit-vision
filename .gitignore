@@ -6,3 +6,4 @@ buid
 build
 docs/node_modules
 docs/.docusaurus
+docs/build
