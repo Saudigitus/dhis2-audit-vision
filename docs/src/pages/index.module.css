@@ -24,3 +24,18 @@
   padding: 3rem 0;
   width: 100%;
 }
+
+.featureIconContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.featureIcon {
+  color: var(--ifm-color-primary);
+  transition: transform 0.2s ease-in-out;
+}
+
+.featureIcon:hover {
+  transform: scale(1.1);
+}

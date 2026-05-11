@@ -45,6 +45,7 @@ const config = {
       image: 'img/audit-vision-social.png',
       navbar: {
         title: 'DHIS2 Audit Vision',
+
         logo: {
           alt: 'DHIS2 Audit Vision Logo',
           src: 'img/logo.png',
@@ -110,7 +111,7 @@ const config = {
               },
               {
                 label: 'Saudigitus',
-                href: 'https://saudigitus.com',
+                href: 'https://saudigitus.org',
               },
               {
                 label: 'DHIS2',

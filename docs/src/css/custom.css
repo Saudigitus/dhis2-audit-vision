@@ -31,6 +31,10 @@
   font-weight: 700;
 }
 
+.navbar__title {
+  font-weight: bold;
+}
+
 /* Hero section on landing page */
 .hero--primary {
   background: linear-gradient(135deg, #0d5fa8 0%, #147cd7 60%, #1a9bfc 100%);

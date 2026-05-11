@@ -12,14 +12,14 @@ This section provides comprehensive documentation on how to deploy the DHIS2 Aud
 
 The DHIS2 Audit Vision project consists of two main components:
 
-1. **Frontend App** – A DHIS2 custom application installed directly into your DHIS2 instance via the App Management module.
-2. **Audit API (Backend)** – A FastAPI-based backend service that connects to your DHIS2 PostgreSQL database and exposes audit data to the frontend.
+1. **DHIS2 Audit Vision** – A DHIS2 custom application installed directly into your DHIS2 instance via the App Management module.
+2. **DHIS2 Audit Vision API** – A FastAPI-based backend service that connects to your DHIS2 PostgreSQL database and exposes audit data to the frontend.
 
 Each component has its own deployment requirements, detailed in the respective sections below.
 
 ## Deployment Options
 
-### Frontend App Deployment
+### DHIS2 Audit Vision Deployment
 
 The frontend is packaged as a standard DHIS2 custom app and is installed directly into your DHIS2 instance:
 
@@ -27,7 +27,7 @@ The frontend is packaged as a standard DHIS2 custom app and is installed directl
 - Upload via DHIS2 App Management
 - Configure the API URL (see [Configuration section](../configuration/configure-api-url))
 
-### Audit API Deployment
+### DHIS2 Audit Vision API Deployment
 
 The backend API is a Python FastAPI application, deployed on a Ubuntu server with:
 
@@ -43,5 +43,5 @@ The DHIS2 instance must be running **version 2.40 or higher** for the audit syst
 
 Choose the component you want to deploy:
 
-- [Frontend App Deployment](./frontend/)
-- [Audit API (Backend) Deployment](./backend/)
+- [DHIS2 Audit Vision Deployment](./frontend/)
+- [DHIS2 Audit Vision API Deployment](./backend/)
