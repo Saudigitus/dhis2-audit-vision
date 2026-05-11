@@ -6,8 +6,8 @@ on:
       - closed
     branches:
       - develop
-    paths:
-      - 'docs/**'
+    # paths:
+    #   - 'docs/**'
 
 permissions:
   contents: write
