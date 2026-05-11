@@ -1,9 +1,7 @@
 name: Release
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - develop
 
@@ -12,7 +10,6 @@ permissions:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,13 +37,73 @@ jobs:
         run: |
           npm run release
           NEW_VERSION=$(node -p "require('./package.json').version")
+          RELEASE_DATE=$(date +'%Y-%m-%d')
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          
           # Extract only the latest version section from CHANGELOG.md
-          sed -n "/## \[$NEW_VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' > RELEASE_NOTES.md
+          # standard-version uses ## [version] or ## version
+          sed -n "/## \[$NEW_VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' > CONTENT.md || sed -n "/## $NEW_VERSION/,/## /p" CHANGELOG.md | sed '$d' > CONTENT.md
+          
+          # Create professional RELEASE_NOTES.md with dynamic header and static footer
+          echo "### 📦 DHIS2 AUDIT VISION – Version $NEW_VERSION Release Notes" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "**Release Date:** $RELEASE_DATE" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          cat CONTENT.md >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "---" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### 🔧 Technical Features" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "- **Frontend**: React + TypeScript + Vite + Tailwind CSS" >> RELEASE_NOTES.md
+          echo "- **DHIS2 UI Components**: Integration with @dhis2/ui" >> RELEASE_NOTES.md
+          echo "- **State Management**: Recoil" >> RELEASE_NOTES.md
+          echo "- **Routing**: React Router DOM" >> RELEASE_NOTES.md
+          echo "- **Charts**: Recharts" >> RELEASE_NOTES.md
+          echo "- **Icons**: Lucide React" >> RELEASE_NOTES.md
+          echo "- **Internationalization**: i18n support" >> RELEASE_NOTES.md
+          echo "- **Backend API**: Python-based REST API" >> RELEASE_NOTES.md
+          echo "- **Database**: PostgreSQL with Alembic" >> RELEASE_NOTES.md
+          echo "- **Deployment**: Docker support" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### 📦 Deployment Options" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "- **Frontend**: DHIS2 custom app bundle" >> RELEASE_NOTES.md
+          echo "- **Backend API**: " >> RELEASE_NOTES.md
+          echo "  - Docker Compose (recommended)" >> RELEASE_NOTES.md
+          echo "  - Manual installation" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### 📋 Requirements" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "- **DHIS2 Instance**: Minimum version 2.40" >> RELEASE_NOTES.md
+          echo "- **Frontend**: Node.js 18+" >> RELEASE_NOTES.md
+          echo "- **Backend API**: " >> RELEASE_NOTES.md
+          echo "  - Python 3.11+" >> RELEASE_NOTES.md
+          echo "  - PostgreSQL" >> RELEASE_NOTES.md
+          echo "  - Docker (optional)" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### 📝 Documentation" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "- Complete README with installation" >> RELEASE_NOTES.md
+          echo "- DHIS2 configuration guide" >> RELEASE_NOTES.md
+          echo "- Developer guides" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "### 🔒 Security" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "- Integration user permissions (F_METADATA_EXPORT, F_AUDIT_READ)" >> RELEASE_NOTES.md
+          echo "- Automatic SQL View management" >> RELEASE_NOTES.md
+          echo "- Secure environment variables" >> RELEASE_NOTES.md
+
+      - name: Build DHIS2 App
+        run: npm run build
+
+      - name: Prepare Release Asset
+        run: |
+          find build/bundle/ -name "*.zip" -exec mv {} ./dhis2-audit-vision-v${{ env.NEW_VERSION }}.zip \;
 
       - name: Push changes and tags
         run: |
-          git push --follow-tags origin HEAD:develop
+          git push --follow-tags origin HEAD:main
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -54,5 +111,6 @@ jobs:
           tag_name: v${{ env.NEW_VERSION }}
           name: 📦 DHIS2 AUDIT VISION – Version ${{ env.NEW_VERSION }}
           body_path: RELEASE_NOTES.md
+          files: dhis2-audit-vision-v${{ env.NEW_VERSION }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

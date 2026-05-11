@@ -10,6 +10,47 @@
     "dev": "vite",
     "release": "standard-version"
   },
+  "standard-version": {
+    "types": [
+      {
+        "type": "feat",
+        "section": "✨ New Features"
+      },
+      {
+        "type": "fix",
+        "section": "🐛 Bug Fixes"
+      },
+      {
+        "type": "chore",
+        "section": "🔧 Technical Tasks"
+      },
+      {
+        "type": "docs",
+        "section": "📝 Documentation"
+      },
+      {
+        "type": "style",
+        "section": "💄 Styling"
+      },
+      {
+        "type": "refactor",
+        "section": "♻️ Code Refactoring"
+      },
+      {
+        "type": "perf",
+        "section": "⚡ Performance Improvements"
+      },
+      {
+        "type": "test",
+        "section": "✅ Testing"
+      },
+      {
+        "type": "ci",
+        "section": "🚀 CI/CD"
+      }
+    ],
+    "header": "# Changelog\n\nAll notable changes to DHIS2 Audit Vision will be documented in this file.\n"
+  },
   "dependencies": {
     "@dhis2/data-engine": "^3.17.0",
     "@tailwindcss/postcss": "^4.1.18",
