@@ -4,3 +4,5 @@ buid
 .env
 .d2
 build
+docs/node_modules
+docs/.docusaurus
