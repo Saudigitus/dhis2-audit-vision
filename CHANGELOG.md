@@ -1,6 +1,15 @@
-# Changelog
+## [{{version}}] - {{date}}
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+### 📦 DHIS2 AUDIT VISION – Version {{version}} Release Notes
+
+**Release Date:** {{date}}
+
+### [1.1.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.0...v1.1.1) (2026-05-11)
+
+
+### 🚀 CI/CD
+
+* **release:** update workflow for dynamic release notes ([f49d7cf](https://github.com/Saudigitus/dhis2-audit-vision/commit/f49d7cffd043bcb7ad05e31a9d918a7e384773eb))
 
 ## 1.1.0 (2026-05-11)
 
