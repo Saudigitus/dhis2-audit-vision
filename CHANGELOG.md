@@ -1,8 +1,14 @@
-## [{{version}}] - {{date}}
+# Changelog
 
-### 📦 DHIS2 AUDIT VISION – Version {{version}} Release Notes
+All notable changes to DHIS2 Audit Vision will be documented in this file.
 
-**Release Date:** {{date}}
+### [1.1.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.1...v1.1.2) (2026-05-11)
+
+
+### 🚀 CI/CD
+
+* **release:** update push target branch from main to develop ([0a0f254](https://github.com/Saudigitus/dhis2-audit-vision/commit/0a0f254e39a449ea6969674173a2a43b7781f39a))
+* update CI/CD workflows and release tooling ([339c30d](https://github.com/Saudigitus/dhis2-audit-vision/commit/339c30d6605f2c41d2f0b72e5312264ed56f60ed))
 
 ### [1.1.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.0...v1.1.1) (2026-05-11)
 
