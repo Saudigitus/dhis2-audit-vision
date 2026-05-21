@@ -21,7 +21,7 @@ interface TableDataProps {
 }
 
 const TableData = (props: TableDataProps) => {
-    const { data, header, onRowClick, setSelectedChange, loading, dependenceHeaders, onDelete, hasDelete } = props;
+    const { data, header =[], onRowClick, setSelectedChange, loading, dependenceHeaders, onDelete, hasDelete } = props;
     const [expandedRows, setExpandedRows] = useState<Set<any>>(new Set());
     const [expandedData, setExpandedData] = useState<any>({});
     const [isLoading, setIsLoading] = useState<any>({});
