@@ -21,7 +21,7 @@ interface TableDataProps {
 }
 
 const TableData = (props: TableDataProps) => {
-    const { data, header =[], onRowClick, setSelectedChange, loading, dependenceHeaders, onDelete, hasDelete } = props;
+    const { data = [], header = [], onRowClick, setSelectedChange, loading, dependenceHeaders, onDelete, hasDelete } = props;
     const [expandedRows, setExpandedRows] = useState<Set<any>>(new Set());
     const [expandedData, setExpandedData] = useState<any>({});
     const [isLoading, setIsLoading] = useState<any>({});
@@ -62,7 +62,7 @@ const TableData = (props: TableDataProps) => {
         <tbody>
             {loading ? (
                 <tr>
-                    <td className="pt-4" colSpan={header.length + (dependenceHeaders ? 1 : 0)}>
+                    <td className="pt-4" colSpan={header?.length + (dependenceHeaders ? 1 : 0)}>
                         <div className="flex justify-center m-5">
                             <Center>
                                 <CircularLoader />
@@ -70,9 +70,9 @@ const TableData = (props: TableDataProps) => {
                         </div>
                     </td>
                 </tr>
-            ) : data.length === 0 ? (
+            ) : data?.length === 0 ? (
                 <tr>
-                    <td className="pt-4 text-center" colSpan={header.length + (dependenceHeaders ? 1 : 0)}>
+                    <td className="pt-4 text-center" colSpan={header?.length + (dependenceHeaders ? 1 : 0)}>
                         <span className="text-[#94a3b8] text-sm">No data found</span>
                     </td>
                 </tr>
