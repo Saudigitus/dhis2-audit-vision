@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.1.3](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.2...v1.1.3) (2026-05-21)
+
+
+### 🐛 Bug Fixes
+
+* **tableData:** solved issue when open metadata-grouping ([f4de5ff](https://github.com/Saudigitus/dhis2-audit-vision/commit/f4de5ffdc8c547e41c1ca637e7a2d2ea2ea86e33))
+
 ### [1.1.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.1...v1.1.2) (2026-05-11)
 
 
