@@ -2,6 +2,20 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.2.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.4...v1.2.0) (2026-05-27)
+
+
+### ♻️ Code Refactoring
+
+* **audit:** use centralized resource mappings ([1daa835](https://github.com/Saudigitus/dhis2-audit-vision/commit/1daa83597264a5b7f837ed41bdc6b08f07a6dfc9))
+
+
+### ✨ New Features
+
+* **audit-drawer:** add display name field ([60bec10](https://github.com/Saudigitus/dhis2-audit-vision/commit/60bec109bf1cbb69dd41f88e8e20d81bd3374b6e))
+* **audit:** add audit item metadata enrichment ([e82f025](https://github.com/Saudigitus/dhis2-audit-vision/commit/e82f02599694bb99f276ce2f8f958ba798d45708))
+* **audit:** add display name enrichment for audit table entries ([9f1f4a6](https://github.com/Saudigitus/dhis2-audit-vision/commit/9f1f4a669544898c62947709a79e5ba6324300f3))
+
 ### [1.1.4](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.3...v1.1.4) (2026-05-21)
 
 ### [1.1.3](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.2...v1.1.3) (2026-05-21)
