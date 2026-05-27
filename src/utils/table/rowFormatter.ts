@@ -5,6 +5,7 @@ function rowsFormatter(data: DataProps[]) {
     if (!data) return []
 
     const formattedData = data?.map((item) => ({
+        ...item,
         id: item.uid,
         action: item.auditType,
         user: item.createdBy,

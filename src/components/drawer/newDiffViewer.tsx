@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { displayValue, formatDate, isArrayOfObjects, isPlainObject, pairArrayItems, sortKeysWithIdentityFirst, valuesEqual } from "./utils/diffViewUtils";
 import { ArrayPair, DiffArrayItem, DiffNode, DiffNodeType } from "../../types/diffTypes/diffTypes";
-import { ActionIcon, BoxIcon, CalendarIcon, CollapseIcon, DocIcon, ExpandIcon, EyeIcon, EyeOffIcon, HashIcon, ResetExpandIcon, UserIcon } from "./components/icons";
+import { ActionIcon, BoxIcon, CalendarIcon, CollapseIcon, DocIcon, ExpandIcon, EyeIcon, EyeOffIcon, HashIcon, ResetExpandIcon, TagIcon, UserIcon } from "./components/icons";
 import UpdateHistory from "./components/updateHistory";
 import { format } from "date-fns";
 import { RotateCcw } from "lucide-react";
@@ -216,10 +216,11 @@ export default function AuditDiffViewer({ auditDetails, selectedChange, onClose,
                     <MetaRow icon={<UserIcon />} label="User:" value={<span className="font-bold text-slate-800">{selectedChange?.user ?? "system"}</span>} />
                     <MetaRow icon={<CalendarIcon />} label="Date:" value={<span className="font-bold text-slate-800">{formatDate(selectedChange?.date)}</span>} />
                     <MetaRow icon={<DocIcon />} label="Type:" value={<span className="inline-flex px-3 py-0.5 bg-slate-100 text-slate-600 text-sm rounded font-medium">{selectedChange?.type}</span>} />
+                    <MetaRow icon={<ActionIcon />} label="Action:" value={<span className={`inline-flex px-3 py-0.5 text-sm rounded font-bold border ${createMode ? "bg-green-100 text-green-700 border-green-200" : "bg-amber-100 text-amber-700 border-amber-200"}`}>{selectedChange?.action}</span>} />
                 </div>
                 <div className="space-y-3">
-                    <MetaRow icon={<ActionIcon />} label="Action:" value={<span className={`inline-flex px-3 py-0.5 text-sm rounded font-bold border ${createMode ? "bg-green-100 text-green-700 border-green-200" : "bg-amber-100 text-amber-700 border-amber-200"}`}>{selectedChange?.action}</span>} />
                     <MetaRow icon={<BoxIcon />} label="Object name:" value={<span className="font-bold text-slate-800">{selectedChange?.object}</span>} />
+                    <MetaRow icon={<TagIcon />} label="Display Name:" value={<span className="inline-flex px-3 py-0.5 bg-slate-100 text-slate-600 text-sm rounded font-medium">{selectedChange?.displayName}</span>} />
                     <MetaRow icon={<HashIcon />} label="ID:" value={<span className="font-mono text-slate-700 font-semibold">{selectedChange?.id}</span>} />
                 </div>
             </div>
