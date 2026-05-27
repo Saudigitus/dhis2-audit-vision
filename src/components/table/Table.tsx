@@ -32,6 +32,7 @@ interface TableProps {
 const Table: FC<TableProps> = (props) => {
     const { onDelete, hasDelete = false, onRowClick, header, tabledata, setSelectedChange, pagination, title, description, loading, dependenceHeaders } = props
     const { groupName } = useParams()
+    console.log(tabledata)
 
     return (
         <div className="flex-1 bg-white rounded-xl border border-[#e2e8f0]">
