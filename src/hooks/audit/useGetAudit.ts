@@ -4,6 +4,7 @@ import { useParams } from "../common/useQueryParams"
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 import { useRecoilValue } from "recoil"
 import { useDataEngine } from "@dhis2/app-runtime"
+import { getMappingKey, RESOURCE_MAPPING } from "../../constants/common/dhis2Resources"
 
 export interface DataProps {
     uid: number
@@ -21,26 +22,6 @@ interface GetAuditProps {
         page: number
         pageSize: number
         pageCount: number
-    }
-}
-
-const GET_PROGRAM = {
-    program: {
-        resource: 'programs',
-        id: ({ programId }: any) => programId,
-        params: {
-            fields: ['id', 'displayName', 'programType', 'programStages']
-        }
-    }
-}
-
-const GET_DATASET = {
-    dataSet: {
-        resource: 'dataSets',
-        id: ({ dataSetId }: any) => dataSetId,
-        params: {
-            fields: ['id', 'displayName', 'periodType', 'dataSetElements']
-        }
     }
 }
 
@@ -66,18 +47,28 @@ export const useGetAudit = () => {
                         const enrichedItem: any = { ...item }
 
                         try {
+                            const mappingKey = getMappingKey(item.type);
+                            const mapping = RESOURCE_MAPPING[mappingKey];
+                            
+                            const metadataQuery = mapping ? {
+                                metadata: {
+                                    resource: mapping.resource,
+                                    id: item.id,
+                                    params: {
+                                        fields: mapping.fields
+                                    }
+                                }
+                            } : null;
+
                             const [auditResponse, metadataResponse] = await Promise.all([
                                 axios.get(`${dataStoreDataState.auditApi}/api/audits/metadata/${item.id}?type=${item.type.toUpperCase()}&page=1&pageSize=5`),
-                                item.type === 'dataSet'
-                                    ? engine.query(GET_DATASET, { variables: { dataSetId: item.id } })
-                                    : item.type === 'program'
-                                        ? engine.query(GET_PROGRAM, { variables: { programId: item.id } })
-                                        : Promise.resolve(null)
+                                metadataQuery ? engine.query(metadataQuery) : Promise.resolve(null)
                             ])
 
                             if (metadataResponse) {
                                 const res = metadataResponse as any
-                                enrichedItem.name = res?.dataSet?.displayName || res?.program?.displayName
+                                // Prefer displayName, fallback to name
+                                enrichedItem.name = res?.metadata?.displayName || res?.metadata?.name || item.id
                             }
 
                             if (auditResponse?.data?.audits?.length > 0) {

@@ -17,7 +17,7 @@ type DataStoreType = {
         updatedAt: string
         items: Array<{
             id: string,
-            type: "program" | "dataSet"
+            type: string
         }>,
         description: string
     }>
