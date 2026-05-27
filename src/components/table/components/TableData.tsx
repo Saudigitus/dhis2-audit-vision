@@ -107,7 +107,8 @@ const TableData = (props: TableDataProps) => {
                                         onClick={() => {
                                             onRowClick?.(row)
                                             setSelectedChange?.({
-                                                date: row?.time, type: row?.type, user: row?.user, id: row?.id, action: row?.action, object: row?.object,
+                                                date: row?.time,
+                                                ...row
                                             })
                                         }}
                                         className=" inline-flex items-center justify-center w-6 h-6 rounded text-[#98a8bb] hover:text-[#475569] hover:bg-[#f1f5f9] transition-colors duration-150 cursor-pointer"
