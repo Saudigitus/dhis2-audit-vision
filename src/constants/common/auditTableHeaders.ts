@@ -16,6 +16,10 @@ export const changeExplorerHeader = [
         displayName: "Object Name",
     },
     {
+        id: "displayName",
+        displayName: "Display Name",
+    },
+    {
         id: "action",
         displayName: "Action",
     },

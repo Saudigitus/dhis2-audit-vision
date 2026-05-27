@@ -89,8 +89,43 @@ export const useGetAudit = () => {
                 })
             } else {
                 const response = await axios.get(`${dataStoreDataState.auditApi}/api/audits?page=${page}&pageSize=${pageSize}${filterQuery ? `&${filterQuery}` : ''}`)
+                const auditItems = response?.data?.audits || []
 
-                setData(response?.data)
+                const enrichedAudits = await Promise.all(
+                    auditItems.map(async (item: any) => {
+                        const enrichedItem = { ...item }
+                        // Extract type from klass (e.g. org.hisp.dhis.program.Program -> Program)
+                        const klassParts = item.klass?.split('.') || []
+                        const rawType = klassParts[klassParts.length - 1]
+
+                        if (rawType && item.uid) {
+                            const mappingKey = getMappingKey(rawType)
+                            const mapping = RESOURCE_MAPPING[mappingKey]
+
+                            if (mapping) {
+                                try {
+                                    const metadataResponse = await engine.query({
+                                        metadata: {
+                                            resource: mapping.resource,
+                                            id: item.uid,
+                                            params: { fields: mapping.fields }
+                                        }
+                                    }) as any
+                                    enrichedItem.displayName = metadataResponse?.metadata?.displayName || metadataResponse?.metadata?.name || item.uid
+                                } catch (error) {
+                                    // Item might have been deleted or not found
+                                    enrichedItem.displayName = item.uid
+                                }
+                            }
+                        }
+                        return enrichedItem
+                    })
+                )
+
+                setData({
+                    ...response?.data,
+                    audits: enrichedAudits
+                })
                 return response
             }
         } catch (error) {

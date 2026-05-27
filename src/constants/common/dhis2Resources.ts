@@ -10,10 +10,12 @@ export const RESOURCE_MAPPING: Record<string, { resource: string, fields: string
     indicatorGroup: { resource: 'indicatorGroups', fields: ['id', 'displayName'] },
     indicatorType: { resource: 'indicatorTypes', fields: ['id', 'displayName'] },
     programIndicator: { resource: 'programIndicators', fields: ['id', 'displayName'] },
+    programIndicatorGroup: { resource: 'programIndicatorGroups', fields: ['id', 'displayName'] },
     
     // Tracker
     trackedEntityType: { resource: 'trackedEntityTypes', fields: ['id', 'displayName'] },
     trackedEntityAttribute: { resource: 'trackedEntityAttributes', fields: ['id', 'displayName'] },
+    trackedEntityInstanceFilter: { resource: 'trackedEntityInstanceFilters', fields: ['id', 'displayName'] },
     programStage: { resource: 'programStages', fields: ['id', 'displayName'] },
     relationshipType: { resource: 'relationshipTypes', fields: ['id', 'displayName'] },
     
@@ -49,11 +51,22 @@ export const RESOURCE_MAPPING: Record<string, { resource: string, fields: string
     programRuleAction: { resource: 'programRuleActions', fields: ['id', 'displayName'] },
     validationRule: { resource: 'validationRules', fields: ['id', 'displayName'] },
     validationRuleGroup: { resource: 'validationRuleGroups', fields: ['id', 'displayName'] },
+    predictor: { resource: 'predictors', fields: ['id', 'displayName'] },
+    
+    // System & Integration
+    eventHook: { resource: 'eventHooks', fields: ['id', 'displayName', 'name'] },
+    jobConfiguration: { resource: 'jobConfigurations', fields: ['id', 'displayName', 'name', 'jobType'] },
+    pushAnalysis: { resource: 'pushAnalysis', fields: ['id', 'displayName'] },
+    metadataVersion: { resource: 'metadataVersions', fields: ['id', 'name'] },
     
     // Other
     attribute: { resource: 'attributes', fields: ['id', 'displayName'] },
     constant: { resource: 'constants', fields: ['id', 'displayName'] },
     document: { resource: 'documents', fields: ['id', 'displayName'] },
+    interpretation: { resource: 'interpretations', fields: ['id', 'name'] },
+    externalMapLayer: { resource: 'externalMapLayers', fields: ['id', 'displayName'] },
+    dataApprovalLevel: { resource: 'dataApprovalLevels', fields: ['id', 'displayName'] },
+    dataApprovalWorkflow: { resource: 'dataApprovalWorkflows', fields: ['id', 'displayName'] },
 };
 
 /**
