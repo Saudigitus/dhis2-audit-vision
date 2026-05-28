@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.3.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.2.1...v1.3.0) (2026-05-28)
+
+
+### ✨ New Features
+
+* **audit hooks:** add display names to aggrouped audit items ([aba956a](https://github.com/Saudigitus/dhis2-audit-vision/commit/aba956ac61d853d623041e29caa47b360520a235))
+
 ### [1.2.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.2.0...v1.2.1) (2026-05-28)
 
 ## [1.2.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.1.4...v1.2.0) (2026-05-27)
