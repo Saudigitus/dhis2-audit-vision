@@ -4,12 +4,13 @@ import { useRecoilValue } from "recoil"
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 
 export interface DataProps {
-    id: number
+    id: number | string
     auditType: string
     createdBy: string
     updated_at: string
     auditScope: string
     klass: string
+    displayName?: string
 }
 
 export const useGetAuditDetails = () => {

@@ -7,12 +7,13 @@ import { useDataEngine } from "@dhis2/app-runtime"
 import { getMappingKey, RESOURCE_MAPPING } from "../../constants/common/dhis2Resources"
 
 export interface DataProps {
-    uid: number
+    uid: number | string
     auditType: string
     createdBy: string
     updated_at: string
     auditScope: string
     klass: string
+    displayName?: string
 }
 
 interface GetAuditProps {
