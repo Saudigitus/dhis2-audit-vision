@@ -25,7 +25,7 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
         return () => clearTimeout(timer)
     }, [dataStoreDataState])
 
-    if (initializerLoading || loadingRules || !dataStoreDataState?.auditApi) {
+    if (initializerLoading || loadingRules) {
         return (
             <React.Fragment>
                 {
