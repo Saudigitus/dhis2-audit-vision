@@ -3,6 +3,8 @@ import { useDataEngine } from '@dhis2/app-runtime'
 import sqlviews from '../../constants/sqlviews/sqlviews.json'
 import { SqlView } from '../../types/sqlView/sqlView'
 import { useInitializeEventHook } from './useInitializeEventHook'
+import { ErrorsSchema } from '../../schema/errorsSchema'
+import { useSetRecoilState } from 'recoil'
 
 const GET_SQL_VIEW_QUERY = (id: string) => ({
     sqlView: {
@@ -25,6 +27,7 @@ export const useInitializer = () => {
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
     const { initialize: initializeEventHooks, loading: eventHookLoading } = useInitializeEventHook()
+    const setErros = useSetRecoilState(ErrorsSchema)
 
     const verifySqlViews = async () => {
         setLoading(true)
@@ -38,11 +41,12 @@ export const useInitializer = () => {
                 } else {
                     createSqlViews([view])
                 }
-            } catch (error: unknown) {
+            } catch (error: any) {
                 const err = error as { details?: { httpStatusCode?: number } }
                 if (err.details?.httpStatusCode === 404) {
                     createSqlViews([view])
                 } else {
+                    setErros((prev: any) => ({ ...prev, sqlViews: [...(prev?.sqlViews || []), { error: `Error checking SQL View ${view.id}: ${error.message}`, object: view }] }))
                     console.error(`Error checking SQL View ${view.id}:`, error)
                 }
             }
@@ -64,8 +68,13 @@ export const useInitializer = () => {
                 },
             })
             console.log(`SQL Views created/updated successfully:`, views.map(v => v.name))
-        } catch (error) {
-            console.error('Error creating SQL Views:', error)
+        } catch (error: any) {
+            setErros((prev: any) => ({
+                ...prev,
+                sqlViews: [...(prev?.sqlViews || []),
+                { error: 'Error creating SQL View:  ' + error?.details?.response?.response?.typeReports?.[0]?.objectReports?.[0]?.errorReports?.[0]?.message || '', object: views[0] }]
+            }))
+            console.error('Error creating SQL Views:', views, error, error?.details)
         }
     }
 

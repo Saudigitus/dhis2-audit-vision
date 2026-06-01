@@ -4,6 +4,7 @@ import { useAuditApi } from '../hooks/auditApi/useSaveAuditApi';
 import { DataStoreConfigState } from '../packages/wrapper/types/DataStoreSchema';
 import { useRecoilValue } from 'recoil';
 import useShowAlerts from '../packages/wrapper/hooks/alert/useShowAlert';
+import { ErrorsSchema } from '../schema/errorsSchema';
 
 // function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
 //   return (
@@ -27,7 +28,9 @@ export default function SettingsPage() {
   const dataStoreDataState = useRecoilValue(DataStoreConfigState)
   const [retention, setRetention] = useState(dataStoreDataState?.auditApi ?? '');
   const { hide, show } = useShowAlerts()
+    const setErros = useRecoilValue(ErrorsSchema)
 
+    console.log(setErros)
   const { loading, updateApi } = useAuditApi()
   // const [autoBackup, setAutoBackup] = useState(true);
 
