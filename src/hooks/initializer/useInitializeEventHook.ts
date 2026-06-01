@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useDataEngine } from '@dhis2/app-runtime'
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import eventHooks from '../../constants/eventHooks/eventHooks.json'
 import { EventHook } from '../../types/eventHook/eventHook'
 import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSchema'
+import { ErrorsSchema } from '../../schema/errorsSchema'
 
 const GET_EVENT_HOOK_QUERY = (id: string) => ({
     eventHook: {
@@ -26,6 +27,7 @@ export const useInitializeEventHook = () => {
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
     const dataStoreConfig = useRecoilValue(DataStoreConfigState)
+    const setErros = useSetRecoilState(ErrorsSchema)
 
     const buildEventHookWithUrl = (): EventHook => {
         const hook = { ...eventHooks } as EventHook
@@ -44,7 +46,7 @@ export const useInitializeEventHook = () => {
 
         setLoading(true)
         const hook = buildEventHookWithUrl()
-        
+
         try {
             const response = await engine.query(GET_EVENT_HOOK_QUERY(hook.id)) as { eventHook: EventHook | null }
             const existingHook = response.eventHook
@@ -54,12 +56,13 @@ export const useInitializeEventHook = () => {
             } else {
                 createEventHooks([hook])
             }
-        } catch (error: unknown) {
+        } catch (error: any) {
             const err = error as { details?: { httpStatusCode?: number } }
             if (err.details?.httpStatusCode === 404) {
                 createEventHooks([hook])
             } else {
-                console.error(`Error checking Event Hook ${hook.id}:`, error)
+                setErros((prev: any) => ({ ...prev, webHooks: [...prev?.webHooks || [], { error: `Error checking Event Hook ${hook.id}: ${error.message}`, object: hook }] }))
+                // console.error(`Error checking Event Hook ${hook.id}:`, error)
             }
         }
         setLoading(false)
@@ -68,7 +71,7 @@ export const useInitializeEventHook = () => {
     const compareEventHooks = (existingHook: EventHook, newHook: EventHook) => {
         const isSourceEqual = JSON.stringify(existingHook.source) === JSON.stringify(newHook.source)
         const isTargetsEqual = JSON.stringify(existingHook.targets) === JSON.stringify(newHook.targets)
-        
+
         if (!isSourceEqual || !isTargetsEqual) {
             createEventHooks([newHook])
         }
@@ -82,8 +85,13 @@ export const useInitializeEventHook = () => {
                 },
             })
             console.log(`Event Hooks created/updated successfully:`, hooks.map(h => h.name))
-        } catch (error) {
-            console.error('Error creating Event Hooks:', error)
+        } catch (error: any) {
+            setErros((prev: any) => ({
+                ...prev,
+                webHooks: [...(prev?.webHooks || []),
+                { error: 'Error creating Event Hook:  ' + error?.details?.response?.typeReports?.[0]?.objectReports?.[0]?.errorReports?.[0]?.message || '', object: hooks[0] }]
+            }))
+            console.log('Error creating Event Hooks:', hooks, error, error?.details)
         }
     }
 
