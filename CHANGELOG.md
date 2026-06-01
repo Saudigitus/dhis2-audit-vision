@@ -2,6 +2,15 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.4.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.3.0...v1.4.0) (2026-06-01)
+
+
+### ✨ New Features
+
+* add centralized error tracking and update dev proxy ([a329a4e](https://github.com/Saudigitus/dhis2-audit-vision/commit/a329a4ebe38c662500074c261fd62de8f9d2a7bf))
+* add error reporting modal and summary banner to Settings page to display system configuration issues ([d14834b](https://github.com/Saudigitus/dhis2-audit-vision/commit/d14834ba2cdbe902ba0722761bca2a2d75d37e63))
+* **initializer:** add progress tracking for app initialization ([3785a04](https://github.com/Saudigitus/dhis2-audit-vision/commit/3785a042b1724bfe848e76d29a860e5c264b4e65))
+
 ## [1.3.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.2.1...v1.3.0) (2026-05-28)
 
 
