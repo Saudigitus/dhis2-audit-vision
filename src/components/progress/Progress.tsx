@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react"
+import { Center, CircularLoader } from "@dhis2/ui"
 
 type StepStatus = "PENDING" | "SUCCESS" | "ERROR"
 
@@ -10,8 +11,8 @@ type ProgressStep = {
 
 type PropsContainer = {
     progress: Record<string, ProgressStep>
-    open: boolean
     onClose?: () => void
+    loading?: boolean
 }
 
 const statusConfig: Record<
@@ -66,26 +67,21 @@ const ProgressItem = ({ step }: { step: ProgressStep }) => {
     )
 }
 
-export const ProgressContainer = ({
-    progress,
-    open,
-    onClose,
-}: PropsContainer) => {
-    const scrollRef = useRef<HTMLDivElement | null>(null)
-
+export const ProgressContainer = ({ progress, onClose, loading }: PropsContainer) => {
     const steps = Object.entries(progress)
 
-    // 👇 AUTO SCROLL TO LAST ITEM
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTo({
-                top: scrollRef.current.scrollHeight,
-                behavior: "smooth",
-            })
-        }
-    }, [progress])
 
-    if (!open) return null
+    console.log(progress)
+
+    if (loading && !Object.keys(progress).length) {
+        return (
+            <React.Fragment>
+                <Center className='flex items-center justify-center'>
+                    <CircularLoader />
+                </Center>
+            </React.Fragment>
+        )
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -120,12 +116,14 @@ export const ProgressContainer = ({
                 </div>
 
                 <div
-                    ref={scrollRef}
                     className="flex-1 overflow-y-auto p-6 space-y-3"
                 >
-                    {steps.map(([key, step]) => (
+                    {steps?.map(([key, step]) => (
                         <ProgressItem key={key} step={step} />
                     ))}
+                    <div className='flex items-center justify-center'>
+                        <CircularLoader small />
+                    </div>
                     <div className="h-2" />
                 </div>
             </div>

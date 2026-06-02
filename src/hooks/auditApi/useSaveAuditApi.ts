@@ -1,8 +1,10 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState, useCallback } from "react"
 import { useDataEngine } from "@dhis2/app-runtime"
 import usePostDataStore from "../../packages/wrapper/hooks/dataStore/usePostDataStore"
 import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
 import { dataStoreKey } from "../../packages/wrapper/constants/config"
+import { useInitializeRoutes } from "./useInitializeRoutes"
 
 const query = {
     dataStoreValues: {
@@ -11,19 +13,23 @@ const query = {
 }
 
 const useAuditApi = () => {
+    const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
     const { createDataStore } = usePostDataStore()
     const [error, setError] = useState<Error | null>(null)
     const { hide, show } = useShowAlerts()
+    const { initializeRoutes } = useInitializeRoutes()
 
-    const updateApi = useCallback(async (auditApi: string) => {
+    const updateApi = useCallback(async (auditApi: string, auditApiToken: string) => {
         setLoading(true)
         setError(null)
 
         try {
             const result: any = await engine.query(query)
-            await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi } })
+            await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi, auditApiToken } })
+
+            await initializeRoutes(auditApi, auditApiToken)
 
             show({
                 message: `Configuration saved successfuly!`,
@@ -32,6 +38,7 @@ const useAuditApi = () => {
             setTimeout(hide, 5000);
             window.location.reload()
         } catch (err) {
+      showError(err);
             const caught = err instanceof Error ? err : new Error(String(err))
             show({
                 message: `Unknown error: ${caught}`,
@@ -42,7 +49,7 @@ const useAuditApi = () => {
         } finally {
             setLoading(false)
         }
-    }, [engine, createDataStore])
+    }, [engine, createDataStore, initializeRoutes])
 
     return { updateApi, loading, error }
 }

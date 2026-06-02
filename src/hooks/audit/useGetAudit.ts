@@ -1,4 +1,4 @@
-import axios from "axios"
+import { useGlobalError } from '../error/useGlobalError';
 import { useState } from "react"
 import { useParams } from "../common/useQueryParams"
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
@@ -27,6 +27,7 @@ interface GetAuditProps {
 }
 
 export const useGetAudit = () => {
+  const { showError } = useGlobalError();
     const [data, setData] = useState<GetAuditProps | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const { group } = useParams()
@@ -61,8 +62,19 @@ export const useGetAudit = () => {
                                 }
                             } : null;
 
+                            const auditQuery = {
+                                audit: {
+                                    resource: `routes/audit-metadata/run/${item.id}`,
+                                    params: {
+                                        type: item.type.toUpperCase(),
+                                        page: 1,
+                                        pageSize: 5
+                                    }
+                                }
+                            };
+
                             const [auditResponse, metadataResponse] = await Promise.all([
-                                axios.get(`${dataStoreDataState.auditApi}/api/audits/metadata/${item.id}?type=${item.type.toUpperCase()}&page=1&pageSize=5`),
+                                engine.query(auditQuery),
                                 metadataQuery ? engine.query(metadataQuery) : Promise.resolve(null)
                             ])
 
@@ -72,11 +84,13 @@ export const useGetAudit = () => {
                                 enrichedItem.name = res?.metadata?.displayName || res?.metadata?.name || item.id
                             }
 
-                            if (auditResponse?.data?.audits?.length > 0) {
+                            const auditData = auditResponse as any
+                            if (auditData?.audit?.audits?.length > 0) {
                                 enrichedItem.hasDependencies = true
-                                enrichedItem.last5 = auditResponse.data.audits.map((x: any) => x.auditType)
+                                enrichedItem.last5 = auditData.audit.audits.map((x: any) => x.auditType)
                             }
                         } catch (error) {
+      showError(error);
                             console.error(`Failed to enrich audit item ${item.id}:`, error)
                         }
 
@@ -89,8 +103,25 @@ export const useGetAudit = () => {
                     pager: { page, pageCount, pageSize, total }
                 })
             } else {
-                const response = await axios.get(`${dataStoreDataState.auditApi}/api/audits?page=${page}&pageSize=${pageSize}${filterQuery ? `&${filterQuery}` : ''}`)
-                const auditItems = response?.data?.audits || []
+                // Parse filterQuery into params object
+                const params: any = { page, pageSize };
+                if (filterQuery) {
+                    filterQuery.split('&').forEach(pair => {
+                        const [key, value] = pair.split('=');
+                        params[key] = value;
+                    });
+                }
+
+                const query = {
+                    audits: {
+                        resource: 'routes/audits/run',
+                        params
+                    }
+                };
+
+                const response = await engine.query(query);
+                const auditData = response as any;
+                const auditItems = auditData?.audits?.audits || [];
 
                 const enrichedAudits = await Promise.all(
                     auditItems.map(async (item: any) => {
@@ -114,6 +145,7 @@ export const useGetAudit = () => {
                                     }) as any
                                     enrichedItem.displayName = metadataResponse?.metadata?.displayName || metadataResponse?.metadata?.name || item.uid
                                 } catch (error) {
+      showError(error);
                                     // Item might have been deleted or not found
                                     enrichedItem.displayName = item.uid
                                 }
@@ -124,12 +156,13 @@ export const useGetAudit = () => {
                 )
 
                 setData({
-                    ...response?.data,
+                    ...auditData?.audits,
                     audits: enrichedAudits
                 })
-                return response
+                return { data: auditData?.audits }
             }
         } catch (error) {
+      showError(error);
             throw error
         } finally {
             setLoading(false)

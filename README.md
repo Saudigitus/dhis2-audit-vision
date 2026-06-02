@@ -50,6 +50,24 @@ The DHIS2 Audit Vision frontend is a DHIS2 custom application.
 
 The Audit API provides the backend functionality for DHIS2 Audit Vision.
 
+### Quick Start with Docker (Recommended)
+
+For a quick and easy setup, use Docker:
+
+1. Clone the repository
+2. Copy `.env.example` to `.env` and configure
+3. Build and start services: `docker compose up --build -d`
+4. Run migrations: `docker compose exec api alembic upgrade head`
+5. Create superuser and get access token: `docker compose exec api python commands.py seed-superuser`
+
+The API will be available at http://localhost:8000. **Save the generated access token** - you'll need it to configure DHIS2 Audit Vision's Settings page.
+
+For detailed instructions, see the [Deployment Documentation](https://saudigitus.github.io/dhis2-audit-vision/docs/deployment/intro) and [Development Documentation](https://saudigitus.github.io/dhis2-audit-vision/docs/development/intro).
+
+#### Manual Installation (Ubuntu 22.04 LTS)
+
+For manual installation, follow these steps:
+
 #### Prerequisites
 
 - Ubuntu 22.04 LTS server (fresh install recommended)
@@ -120,12 +138,14 @@ The Audit API provides the backend functionality for DHIS2 Audit Vision.
    ADMIN_PASSWORD=your_admin_password
    ```
    
-7. **Run database migrations and seeders**:
+7. **Run database migrations and create superuser**:
    ```bash
    alembic revision --autogenerate -m "Create all tables"
    alembic upgrade head
-   python3 commands.py start-audit
+   python3 commands.py seed-superuser
    ```
+   
+   **Save the generated access token** - you'll need it to configure DHIS2 Audit Vision's Settings page.
    
 8. **Configure the systemd service**:
    ```bash
@@ -230,9 +250,13 @@ Create a specific user for integration with the following minimum permissions:
 - F\_METADATA\_EXPORT
 - F\_AUDIT\_READ
 
-### 3. Automatic SQL View Management
+### 3. Automatic SQL View & API Routes Management
 
-The DHIS2 Audit Vision automatically creates and maintains the required SQL Views in your DHIS2 instance. It also checks if existing views are compatible and updates them automatically if needed. No manual SQL View creation is required.
+The DHIS2 Audit Vision automatically creates and maintains:
+- The required SQL Views in your DHIS2 instance
+- The required API Routes in your DHIS2 instance
+
+It checks if existing views/routes are compatible and updates them automatically if needed. No manual SQL View or API Routes creation is required.
 
 ### Understanding DHIS2 Auditing
 
@@ -243,13 +267,47 @@ DHIS2 records these audit logs directly into your PostgreSQL database in the res
 
 ## Backend API Development Guide (For Contributors)
 
-### Prerequisites
+### Quick Start with Docker (Recommended)
+
+For development, Docker provides an easy setup:
+
+1. **Clone the API repository**:
+   ```bash
+   git clone https://github.com/Saudigitus/dhis-audit-vision-api.git
+   cd dhis-audit-vision-api
+   ```
+
+2. **Configure environment variables**:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Build and start services**:
+   ```bash
+   docker compose up --build -d
+   ```
+
+4. **Run database migrations**:
+   ```bash
+   docker compose exec api alembic upgrade head
+   ```
+
+5. **Create a superuser and get access token**:
+   ```bash
+   docker compose exec api python commands.py seed-superuser
+   ```
+
+The API will be available at `http://localhost:8000`. **Save the generated access token** - you'll need it to configure DHIS2 Audit Vision's Settings page.
+
+### Manual Setup (Python Virtual Environment)
+
+#### Prerequisites
 - Python 3.11+
 - pip (Python package installer)
 - PostgreSQL installed and configured
 - Git
 
-### Setup Instructions
+#### Setup Instructions
 1. **Clone the API repository**:
    ```bash
    git clone https://github.com/Saudigitus/dhis-audit-vision-api.git
@@ -285,10 +343,12 @@ DHIS2 records these audit logs directly into your PostgreSQL database in the res
    alembic upgrade head
    ```
 
-7. **Run seeders**:
+7. **Create a superuser and get access token**:
    ```bash
-   python commands.py
+   python commands.py seed-superuser
    ```
+   
+   **Save the generated access token** - you'll need it to configure DHIS2 Audit Vision's Settings page.
 
 8. **Start the development server**:
    ```bash

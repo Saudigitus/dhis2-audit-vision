@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useRecoilValue } from 'recoil';
 import { useState, useEffect } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
@@ -11,6 +12,7 @@ const USERS_QUERY = (id: string) => ({
 })
 
 export const useGetUsers = () => {
+  const { showError } = useGlobalError();
   const engine = useDataEngine();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
@@ -24,6 +26,7 @@ export const useGetUsers = () => {
       setUsers(rows?.map((item: any) => item[0]));
 
     } catch (err) {
+      showError(err);
       setError(err);
     } finally {
       setLoading(false);

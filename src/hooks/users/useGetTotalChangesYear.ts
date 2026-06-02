@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState, useEffect } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { buildParams } from '../../utils/formater/dashboardDataFormater';
@@ -17,6 +18,7 @@ const TOTAL_CHANGES_QUERY = ({ id, ...rest }: any) => ({
 
 
 export const useGetTotalChangesYear = () => {
+  const { showError } = useGlobalError();
   const engine = useDataEngine();
   const [totalChanges, setTotalChanges] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -47,6 +49,7 @@ export const useGetTotalChangesYear = () => {
           setTotalChanges(0);
         }
       } catch (err) {
+      showError(err);
         setError(err);
       } finally {
         setLoading(false);
