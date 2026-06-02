@@ -1,8 +1,6 @@
-import axios from "axios"
 import { useState } from "react"
-import { useRecoilValue } from "recoil"
-import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
+import { useDataEngine } from "@dhis2/app-runtime"
 
 export interface DataProps {
     id: number
@@ -15,13 +13,17 @@ export interface DataProps {
 
 export const usePostSeverityRules = () => {
     const [loading, setLoading] = useState<boolean>(false)
-    const dataStoreDataState = useRecoilValue(DataStoreConfigState)
     const { hide, show } = useShowAlerts()
+    const engine = useDataEngine()
 
     const postAuditRules = async (form: any) => {
         setLoading(true)
         try {
-            await axios.post(`${dataStoreDataState.auditApi}/api/notifications/create`, form)
+            await engine.mutate({
+                type: 'create',
+                resource: 'routes/create-notification/run',
+                data: form
+            })
             show({
                 message: `Rule created successfully`,
                 type: { success: true }
@@ -30,7 +32,7 @@ export const usePostSeverityRules = () => {
             
             return { error: false }
         } catch (error: any) {
-            const detail = error?.response?.data?.detail?.[0]?.msg || 'Rule creation failed';
+            const detail = error?.details?.response?.data?.detail?.[0]?.msg || 'Rule creation failed';
             show({
                 message: detail,
                 type: { critical: true }

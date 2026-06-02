@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const { loading, updateApi } = useAuditApi()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const totalErrors = (setErros?.sqlViews?.length || 0) + (setErros?.webHooks?.length || 0);
+  const totalErrors = (setErros?.sqlViews?.length || 0) + (setErros?.webHooks?.length || 0) + (setErros?.routes?.length || 0);
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -163,6 +163,34 @@ export default function SettingsPage() {
                             </span>
                           </div>
                           <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-purple-50/50 p-3 rounded-lg border border-purple-50 overflow-x-auto">
+                            {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {setErros?.routes && setErros.routes.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 uppercase tracking-wider">
+                    <Link size={16} className="text-blue-500" />
+                    Routes Errors ({setErros.routes.length})
+                  </h3>
+                  <div className="grid gap-3">
+                    {setErros.routes.map((err, idx) => (
+                      <div key={idx} className="flex items-start gap-3 p-4 bg-white border border-blue-100 shadow-sm rounded-xl hover:border-blue-200 transition-colors">
+                        <div className="p-1.5 bg-blue-50 rounded-lg shrink-0 mt-0.5">
+                          <AlertCircle size={16} className="text-blue-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="mb-2">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                              {typeof err.object === 'object' ? (err.object?.name || 'Routes') : String(err.object)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-blue-50/50 p-3 rounded-lg border border-blue-50 overflow-x-auto">
                             {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
                           </p>
                         </div>

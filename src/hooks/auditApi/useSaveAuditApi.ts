@@ -3,6 +3,7 @@ import { useDataEngine } from "@dhis2/app-runtime"
 import usePostDataStore from "../../packages/wrapper/hooks/dataStore/usePostDataStore"
 import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
 import { dataStoreKey } from "../../packages/wrapper/constants/config"
+import { useInitializeRoutes } from "./useInitializeRoutes"
 
 const query = {
     dataStoreValues: {
@@ -16,6 +17,7 @@ const useAuditApi = () => {
     const { createDataStore } = usePostDataStore()
     const [error, setError] = useState<Error | null>(null)
     const { hide, show } = useShowAlerts()
+    const { initializeRoutes } = useInitializeRoutes()
 
     const updateApi = useCallback(async (auditApi: string) => {
         setLoading(true)
@@ -24,6 +26,8 @@ const useAuditApi = () => {
         try {
             const result: any = await engine.query(query)
             await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi } })
+
+            await initializeRoutes(auditApi)
 
             show({
                 message: `Configuration saved successfuly!`,
@@ -42,7 +46,7 @@ const useAuditApi = () => {
         } finally {
             setLoading(false)
         }
-    }, [engine, createDataStore])
+    }, [engine, createDataStore, initializeRoutes])
 
     return { updateApi, loading, error }
 }

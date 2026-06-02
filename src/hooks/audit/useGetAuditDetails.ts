@@ -1,7 +1,5 @@
-import axios from "axios"
 import { useState } from "react"
-import { useRecoilValue } from "recoil"
-import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
+import { useDataEngine } from "@dhis2/app-runtime"
 
 export interface DataProps {
     id: number | string
@@ -16,14 +14,24 @@ export interface DataProps {
 export const useGetAuditDetails = () => {
     const [data, setData] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(false)
-    const dataStoreDataState = useRecoilValue(DataStoreConfigState)
+    const engine = useDataEngine()
 
     const getAuditDetails = async (objectId: string) => {
         setLoading(true)
         try {
-            const response = await axios.get(`${dataStoreDataState.auditApi}/api/auditObjects?objectId=${objectId}`)
-            setData(response?.data?.auditObjects)
-            return response
+            const query = {
+                auditObjects: {
+                    resource: 'routes/audit-objects/run',
+                    params: {
+                        objectId
+                    }
+                }
+            }
+            
+            const response = await engine.query(query)
+            const auditData = response as any
+            setData(auditData?.auditObjects?.auditObjects)
+            return { data: auditData?.auditObjects }
         } catch (error) {
             throw error
         } finally {
