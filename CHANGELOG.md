@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.5.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.5.0...v1.5.1) (2026-06-02)
+
+
+### 🐛 Bug Fixes
+
+* **hooks:** add rollback alerts and error handling ([681bf11](https://github.com/Saudigitus/dhis2-audit-vision/commit/681bf11dd5a28f630e7e8c26f1e5e5eab79be45e))
+
 ## [1.5.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.4.0...v1.5.0) (2026-06-02)
 
 
