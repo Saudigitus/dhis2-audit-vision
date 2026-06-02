@@ -4,6 +4,7 @@ import { useSetRecoilState } from 'recoil'
 import { ErrorsSchema } from '../../schema/errorsSchema'
 
 interface Route {
+  id: string
   name: string
   code: string
   disabled: boolean
@@ -42,27 +43,31 @@ export const useInitializeRoutes = () => {
 
     return [
       {
+        id: 'A3htsq6bF6G',
         name: 'Audit Metadata',
         code: 'audit-metadata',
         disabled: false,
-        url: `${baseUrl}/api/audits/metadata/**`,
+        url: `${baseUrl}/api/audits/metadata`,
         auth,
       },
       {
+        id: 'HeJMXGf1K9J',
         name: 'Audits',
         code: 'audits',
         disabled: false,
-        url: `${baseUrl}/api/audits/**`,
+        url: `${baseUrl}/api/audits`,
         auth,
       },
       {
+        id: 'rWbZpQenrTD',
         name: 'Audit Objects',
         code: 'audit-objects',
         disabled: false,
-        url: `${baseUrl}/api/auditObjects/**`,
+        url: `${baseUrl}/api/auditObjects`,
         auth,
       },
       {
+        id: 'd0sbsyw0xS8',
         name: 'Create Notification',
         code: 'create-notification',
         disabled: false,
@@ -70,10 +75,19 @@ export const useInitializeRoutes = () => {
         auth,
       },
       {
+        id: 'aayonvVCCBZ',
         name: 'Delete Notification',
-        code: 'delete-notification',
+        code: 'delete-notification',  
         disabled: false,
-        url: `${baseUrl}/api/notifications/*`,
+        url: `${baseUrl}/api/notifications`,
+        auth,
+      },
+      {
+        id: 'DTD2iDhH3mk',
+        name: 'Notifications',
+        code: 'notifications',
+        disabled: false,
+        url: `${baseUrl}/api/notifications`,
         auth,
       },
     ]

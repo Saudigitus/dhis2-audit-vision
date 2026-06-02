@@ -1,10 +1,11 @@
-import axios from "axios"
 import { useState } from "react"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 import { SeverityRulesSchema } from "../../schema/severityRulesSchema"
+import { useDataEngine } from "@dhis2/app-runtime"
 
 export const useGetSeverityRules = () => {
+    const engine = useDataEngine()
     const [loading, setLoading] = useState<boolean>(false)
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
     const setSeverityRules = useSetRecoilState(SeverityRulesSchema)
@@ -14,11 +15,16 @@ export const useGetSeverityRules = () => {
             console.log('auditApi is not set in dataStoreDataState')
             return
         }
+        
         try {
             setLoading(true)
-            const response = await axios.get(`${dataStoreDataState?.auditApi}/api/notifications`)
+            const response: any = await engine.query({
+                notifications: {
+                    resource: 'routes/notifications/run'
+                }
+            })
 
-            setSeverityRules(response.data)
+            setSeverityRules(response.notifications)
         } catch (error) {
             throw error
         } finally {

@@ -89,6 +89,7 @@ export const RESOURCE_MAPPING: Record<string, { resource: string, fields: string
     
     // Other
     attribute: { resource: 'attributes', fields: ['id', 'displayName'] },
+    route: { resource: 'routes', fields: ['id', 'displayName'] },
     constant: { resource: 'constants', fields: ['id', 'displayName'] },
     document: { resource: 'documents', fields: ['id', 'displayName'] },
     interpretation: { resource: 'interpretations', fields: ['id', 'name'] },
