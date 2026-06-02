@@ -95,6 +95,13 @@ export const useInitializer = () => {
             updateProgress(key, `Creating SQL View ${view.name}`, 'SUCCESS', undefined, view)
 
         } catch (error: any) {
+            const details =
+                error?.details?.response?.typeReports?.[0]?.objectReports?.[0]?.errorReports?.[0]?.message ||
+                error?.message ||
+                'Unknown error'
+
+            updateProgress(key, `Creating SQL View ${view.name}`, 'ERROR', details, view)
+
             setErros((prev: any) => ({
                 ...prev,
                 sqlViews: [...(prev?.sqlViews || []),
