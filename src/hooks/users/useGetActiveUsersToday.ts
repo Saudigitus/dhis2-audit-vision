@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { useState, useEffect } from 'react';
 
@@ -8,6 +9,7 @@ const DATA_SUMMARY_QUERY = {
 };
 
 export const useGetActiveUsersToday = () => {
+  const { showError } = useGlobalError();
   const engine = useDataEngine();
   const [activeUsersCount, setActiveUsersCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -26,6 +28,7 @@ export const useGetActiveUsersToday = () => {
           setActiveUsersCount(activeUsers);
         }
       } catch (err) {
+      showError(err);
         setError(err);
       } finally {
         setLoading(false);

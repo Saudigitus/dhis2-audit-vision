@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useDataEngine } from "@dhis2/app-runtime"
 import { getMappingKey, RESOURCE_MAPPING } from "../../constants/common/dhis2Resources"
 
@@ -12,6 +13,7 @@ export interface DataProps {
 }
 
 export const useGetchildAudit = () => {
+  const { showError } = useGlobalError();
     const engine = useDataEngine()
 
     const getAudit = async ({ page, pageSize, id, type }: { page: number, pageSize: number, id: string, type: string }) => {
@@ -53,6 +55,7 @@ export const useGetchildAudit = () => {
                                 }) as any
                                 enrichedItem.displayName = metadataResponse?.metadata?.displayName || metadataResponse?.metadata?.name || item.uid
                             } catch (error) {
+      showError(error);
                                 // Item might have been deleted or not found
                                 enrichedItem.displayName = item.uid
                             }
@@ -69,6 +72,7 @@ export const useGetchildAudit = () => {
                 }
             }
         } catch (error) {
+      showError(error);
             throw error
         }
     }

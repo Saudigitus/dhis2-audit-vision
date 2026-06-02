@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState } from 'react'
 import { useDataEngine } from '@dhis2/app-runtime'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
@@ -24,6 +25,7 @@ const CREATE_OR_UPDATE_EVENT_HOOK_MUTATION = {
 }
 
 export const useInitializeEventHook = (updateProgress: (key: string, action: string, status: any, details?: string) => void) => {
+    const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
     const dataStoreConfig = useRecoilValue(DataStoreConfigState)
@@ -57,6 +59,7 @@ export const useInitializeEventHook = (updateProgress: (key: string, action: str
                 await createEventHooks([hook])
             }
         } catch (error: any) {
+            showError(error);
             const err = error as { details?: { httpStatusCode?: number } }
             if (err.details?.httpStatusCode === 404) {
                 await createEventHooks([hook])
@@ -88,6 +91,7 @@ export const useInitializeEventHook = (updateProgress: (key: string, action: str
             updateProgress('event-hooks', 'Initializing Event Hooks', 'SUCCESS')
             console.log(`Event Hooks created/updated successfully:`, hooks.map(h => h.name))
         } catch (error: any) {
+            showError(error);
             updateProgress('event-hooks', 'Initializing Event Hooks', 'ERROR', error?.message || 'Unknown error')
             setErros((prev: any) => ({
                 ...prev,

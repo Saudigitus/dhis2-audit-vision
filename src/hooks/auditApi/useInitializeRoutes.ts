@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState } from 'react'
 import { useDataEngine } from '@dhis2/app-runtime'
 import { useSetRecoilState } from 'recoil'
@@ -27,6 +28,7 @@ const CREATE_OR_UPDATE_ROUTES_MUTATION = {
 }
 
 export const useInitializeRoutes = () => {
+  const { showError } = useGlobalError();
   const engine = useDataEngine()
   const [loading, setLoading] = useState(false)
   const setErrors = useSetRecoilState(ErrorsSchema)
@@ -77,7 +79,7 @@ export const useInitializeRoutes = () => {
       {
         id: 'aayonvVCCBZ',
         name: 'Delete Notification',
-        code: 'delete-notification',  
+        code: 'delete-notification',
         disabled: false,
         url: `${baseUrl}/api/notifications`,
         auth,
@@ -108,6 +110,7 @@ export const useInitializeRoutes = () => {
       })
       console.log(`Routes created/updated successfully:`, routes.map(r => r.name))
     } catch (error: any) {
+      showError(error);
       console.error('Error creating routes:', error)
       setErrors((prev: any) => ({
         ...prev,
