@@ -99,6 +99,7 @@ export const useInitializer = () => {
             updateProgress(key, `Creating SQL View ${view.name}`, 'SUCCESS', undefined, view)
 
         } catch (error: any) {
+
       showError(error);
             setErros((prev: any) => ({
                 ...prev,

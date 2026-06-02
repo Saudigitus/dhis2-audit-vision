@@ -32,6 +32,7 @@ export const useGetAuditDetails = () => {
             
             const response = await engine.query(query)
             const auditData = response as any
+
             setData(auditData?.auditObjects?.auditObjects)
             return { data: auditData?.auditObjects }
         } catch (error) {
