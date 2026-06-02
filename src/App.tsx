@@ -2,6 +2,7 @@ import './index.css';
 import { RecoilRoot } from 'recoil';
 import { AppWrapper } from './packages';
 import { Router } from './components/routes';
+import { GlobalErrorModal } from './components/modal/GlobalErrorModal';
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
       <AppWrapper>
         <Router />
       </AppWrapper>
+      <GlobalErrorModal />
     </RecoilRoot>
   );
 }

@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState, useEffect } from 'react';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { useParams } from '../common/useQueryParams';
@@ -16,6 +17,7 @@ const USERS_AUDIT_SUMMARY_QUERY = ({ id, ...rest }: any) => ({
 });
 
 export const useGetUsersAuditSummary = (pageSize: number = 10) => {
+  const { showError } = useGlobalError();
   const engine = useDataEngine();
   const [auditSummary, setAuditSummary] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
@@ -54,6 +56,7 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
         setHasMore(false);
       }
     } catch (err) {
+      showError(err);
       setError(err);
     } finally {
       setLoading(false);

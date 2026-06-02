@@ -1,3 +1,4 @@
+import { useGlobalError } from '../../../../hooks/error/useGlobalError';
 import { useState } from "react"
 import { useRecoilState } from "recoil"
 import useShowAlerts from "../alert/useShowAlert"
@@ -12,6 +13,7 @@ const query = {
 }
 
 export function useGetDataStore() {
+    const { showError } = useGlobalError();
     const engine = useDataEngine()
     const { show, hide } = useShowAlerts()
     const [error, setError] = useState<boolean>(false)
@@ -25,6 +27,7 @@ export function useGetDataStore() {
             setDataStoreDataState(response?.dataStoreValues)
             return response?.dataStoreValues;
         } catch (error: any) {
+      showError(error);
             const status = error?.details?.httpStatusCode
             if (status === 404) return null
             setError(error)

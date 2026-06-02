@@ -1,8 +1,10 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState } from "react"
 import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
 import { useDataEngine } from "@dhis2/app-runtime"
 
 export const useDeleteSeverityRule = () => {
+  const { showError } = useGlobalError();
     const [loading, setLoading] = useState<boolean>(false)
     const { hide, show } = useShowAlerts()
     const engine = useDataEngine()
@@ -21,6 +23,7 @@ export const useDeleteSeverityRule = () => {
             });
             setTimeout(hide, 5000);
         } catch (error: any) {
+      showError(error);
             const detail = error?.details?.response?.data?.detail?.[0]?.msg || 'Rule deletion failed';
             show({
                 message: detail,

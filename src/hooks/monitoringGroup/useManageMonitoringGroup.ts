@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState, useCallback } from "react"
 import { useDataEngine } from "@dhis2/app-runtime"
 import { dataStoreKey } from "../../packages/wrapper/constants/config"
@@ -37,6 +38,7 @@ const formatGroupToDelete = ({ dataStore, groupToDelete }: { dataStore: DataStor
 };
 
 const useManageMonitoringGroup = () => {
+    const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
     const { createDataStore } = usePostDataStore()
@@ -56,6 +58,7 @@ const useManageMonitoringGroup = () => {
 
             return { success: true }
         } catch (err) {
+      showError(err);
             const caught = err instanceof Error ? err : new Error(String(err))
             setError(caught)
             return { success: false, error: caught }
