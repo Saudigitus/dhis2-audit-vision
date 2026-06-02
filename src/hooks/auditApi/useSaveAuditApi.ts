@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState, useCallback } from "react"
 import { useDataEngine } from "@dhis2/app-runtime"
 import usePostDataStore from "../../packages/wrapper/hooks/dataStore/usePostDataStore"
@@ -12,6 +13,7 @@ const query = {
 }
 
 const useAuditApi = () => {
+    const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
     const { createDataStore } = usePostDataStore()
@@ -36,6 +38,7 @@ const useAuditApi = () => {
             setTimeout(hide, 5000);
             window.location.reload()
         } catch (err) {
+      showError(err);
             const caught = err instanceof Error ? err : new Error(String(err))
             show({
                 message: `Unknown error: ${caught}`,

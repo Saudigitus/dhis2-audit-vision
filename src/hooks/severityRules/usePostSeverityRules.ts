@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useState } from "react"
 import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
 import { useDataEngine } from "@dhis2/app-runtime"
@@ -12,6 +13,7 @@ export interface DataProps {
 }
 
 export const usePostSeverityRules = () => {
+  const { showError } = useGlobalError();
     const [loading, setLoading] = useState<boolean>(false)
     const { hide, show } = useShowAlerts()
     const engine = useDataEngine()
@@ -32,6 +34,7 @@ export const usePostSeverityRules = () => {
             
             return { error: false }
         } catch (error: any) {
+      showError(error);
             const detail = error?.details?.response?.data?.detail?.[0]?.msg || 'Rule creation failed';
             show({
                 message: detail,

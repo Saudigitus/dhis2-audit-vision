@@ -1,3 +1,4 @@
+import { useGlobalError } from '../error/useGlobalError';
 import { useDataEngine } from '@dhis2/app-runtime';
 import { useState, useEffect } from 'react';
 import { ChartData } from '../../types/users/users';
@@ -16,6 +17,7 @@ const TOP_USERS_QUERY = ({ id, startDate, endDate }: any) => ({
 });
 
 export const useGetTop5UsersChanges = () => {
+  const { showError } = useGlobalError();
   const engine = useDataEngine();
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [usernames, setUsernames] = useState<string[]>([]);
@@ -77,6 +79,7 @@ export const useGetTop5UsersChanges = () => {
         setUsernames(usernamesArray);
         setChartData(completeData);
       } catch (err) {
+      showError(err);
         setError(err);
       } finally {
         setLoading(false);

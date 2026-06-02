@@ -1,9 +1,11 @@
+import { useGlobalError } from '../../../../hooks/error/useGlobalError';
 import { useRef, useState } from 'react'
 import { useDataEngine } from '@dhis2/app-runtime'
 import { useGetDataStore } from './useGetDataStore'
 import { defaultDataStoreConfig, KEY, NAMESPACE } from '../../constants/config'
 
 export const useInitializeDataStore = () => {
+  const { showError } = useGlobalError();
     const ran = useRef(false)
     const engine = useDataEngine()
     const [error, setError] = useState(false)
@@ -46,6 +48,7 @@ export const useInitializeDataStore = () => {
             }
 
         } catch (error) {
+      showError(error);
             console.error('Datastore initialization error:', error)
 
             try {
@@ -55,6 +58,7 @@ export const useInitializeDataStore = () => {
                     data: defaultDataStoreConfig,
                 } as any)
             } catch (fallbackError) {
+      showError(fallbackError);
                 setError(true)
                 console.error('Recovery failed:', fallbackError)
             }
