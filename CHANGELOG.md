@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.5.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.5.1...v1.5.2) (2026-06-02)
+
+
+### 🐛 Bug Fixes
+
+* improve app initialization and clean up code ([9b17514](https://github.com/Saudigitus/dhis2-audit-vision/commit/9b1751494e9e8164027ea70c08fe0a13aa120f73))
+
 ### [1.5.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.5.0...v1.5.1) (2026-06-02)
 
 
