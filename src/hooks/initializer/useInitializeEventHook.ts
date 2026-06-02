@@ -61,7 +61,7 @@ export const useInitializeEventHook = () => {
             if (err.details?.httpStatusCode === 404) {
                 await createEventHooks([hook])
             } else {
-                setErros((prev: any) => ({ ...prev, webHooks: [...prev.webHooks, { error: `Error checking Event Hook ${hook.id}: ${error.message}`, object: hook }] }))
+                setErros((prev: any) => ({ ...prev, webHooks: [...prev?.webHooks || [], { error: `Error checking Event Hook ${hook.id}: ${error.message}`, object: hook }] }))
                 // console.error(`Error checking Event Hook ${hook.id}:`, error)
             }
         }
