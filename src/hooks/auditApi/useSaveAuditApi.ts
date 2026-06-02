@@ -19,15 +19,15 @@ const useAuditApi = () => {
     const { hide, show } = useShowAlerts()
     const { initializeRoutes } = useInitializeRoutes()
 
-    const updateApi = useCallback(async (auditApi: string) => {
+    const updateApi = useCallback(async (auditApi: string, auditApiToken: string) => {
         setLoading(true)
         setError(null)
 
         try {
             const result: any = await engine.query(query)
-            await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi } })
+            await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi, auditApiToken } })
 
-            await initializeRoutes(auditApi)
+            await initializeRoutes(auditApi, auditApiToken)
 
             show({
                 message: `Configuration saved successfuly!`,
