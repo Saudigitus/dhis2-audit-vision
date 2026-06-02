@@ -1,10 +1,30 @@
 import { useState } from 'react';
-import { Link, AlertCircle, X, Database, ServerCrash, CheckCircle2, ShieldAlert, Lock } from 'lucide-react';
+import { Link, AlertCircle, X, Database, ServerCrash, CheckCircle2, ShieldAlert, Lock, Copy, Check } from 'lucide-react';
 import { useAuditApi } from '../hooks/auditApi/useSaveAuditApi';
 import { DataStoreConfigState } from '../packages/wrapper/types/DataStoreSchema';
 import { useRecoilValue } from 'recoil';
 import useShowAlerts from '../packages/wrapper/hooks/alert/useShowAlert';
 import { ErrorsSchema } from '../schema/errorsSchema';
+
+const CopyJsonButton = ({ data }: { data: any }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-700 text-gray-200 text-xs font-medium rounded-md hover:bg-gray-600 transition-colors shadow-sm absolute top-2 right-2"
+    >
+      {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+      {copied ? 'Copied!' : 'Copy'}
+    </button>
+  );
+};
 
 export default function SettingsPage() {
   const dataStoreDataState = useRecoilValue(DataStoreConfigState)
@@ -163,9 +183,9 @@ export default function SettingsPage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/80">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 text-red-600 rounded-xl shadow-sm">
+                {/* <div className="p-2 bg-red-100 text-red-600 rounded-xl shadow-sm">
                   <ShieldAlert size={22} />
-                </div>
+                </div> */}
                 <div>
                   <h2 className="text-lg font-bold text-gray-900">System Errors</h2>
                   <p className="text-sm text-gray-500 font-medium">Found {totalErrors} issues in configuration</p>
@@ -199,9 +219,26 @@ export default function SettingsPage() {
                               {typeof err.object === 'object' ? (err.object?.name || 'Unknown Object') : String(err.object)}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-red-50/50 p-3 rounded-lg border border-red-50">
-                            {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
-                          </p>
+                          <div className="mb-3">
+                            <p className="text-[13px] font-semibold text-gray-700 mb-1">Error Message:</p>
+                            <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-red-50/50 p-3 rounded-lg border border-red-50">
+                              {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
+                            </p>
+                          </div>
+                          {idx === 0 && typeof err.object === 'object' && (
+                            <div className="relative mt-2">
+                              <p className="text-[13px] font-medium text-blue-600 mb-2 flex items-center gap-1.5">
+                                <AlertCircle size={14} />
+                                Please copy this JSON payload and configure it manually:
+                              </p>
+                              <div className="relative">
+                                <pre className="text-sm text-gray-600 font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap bg-gray-800 text-gray-200 p-4 pt-12 rounded-lg border border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
+                                  {JSON.stringify(err.object, null, 2)}
+                                </pre>
+                                <CopyJsonButton data={err.object} />
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -227,9 +264,26 @@ export default function SettingsPage() {
                               {typeof err.object === 'object' ? (err.object?.name || 'Unknown Object') : String(err.object)}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-purple-50/50 p-3 rounded-lg border border-purple-50 overflow-x-auto">
-                            {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
-                          </p>
+                          <div className="mb-3">
+                            <p className="text-[13px] font-semibold text-gray-700 mb-1">Error Message:</p>
+                            <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-purple-50/50 p-3 rounded-lg border border-purple-50 overflow-x-auto">
+                              {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
+                            </p>
+                          </div>
+                          {idx === 0 && typeof err.object === 'object' && (
+                            <div className="relative mt-2">
+                              <p className="text-[13px] font-medium text-blue-600 mb-2 flex items-center gap-1.5">
+                                <AlertCircle size={14} />
+                                Please copy this JSON payload and configure it manually:
+                              </p>
+                              <div className="relative">
+                                <pre className="text-sm text-gray-600 font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap bg-gray-800 text-gray-200 p-4 pt-12 rounded-lg border border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
+                                  {JSON.stringify(err.object, null, 2)}
+                                </pre>
+                                <CopyJsonButton data={err.object} />
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -255,9 +309,26 @@ export default function SettingsPage() {
                               {typeof err.object === 'object' ? (err.object?.name || 'Routes') : String(err.object)}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-blue-50/50 p-3 rounded-lg border border-blue-50 overflow-x-auto">
-                            {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
-                          </p>
+                          <div className="mb-3">
+                            <p className="text-[13px] font-semibold text-gray-700 mb-1">Error Message:</p>
+                            <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-blue-50/50 p-3 rounded-lg border border-blue-50 overflow-x-auto">
+                              {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
+                            </p>
+                          </div>
+                          {idx === 0 && typeof err.object === 'object' && (
+                            <div className="relative mt-2">
+                              <p className="text-[13px] font-medium text-blue-600 mb-2 flex items-center gap-1.5">
+                                <AlertCircle size={14} />
+                                Please copy this JSON payload and configure it manually:
+                              </p>
+                              <div className="relative">
+                                <pre className="text-sm text-white font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap bg-gray-800 p-4 pt-12 rounded-lg border border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
+                                  {JSON.stringify(err.object, null, 2)}
+                                </pre>
+                                <CopyJsonButton data={err.object} />
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
