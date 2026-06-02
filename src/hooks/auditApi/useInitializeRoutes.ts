@@ -45,21 +45,21 @@ export const useInitializeRoutes = () => {
         name: 'Audit Metadata',
         code: 'audit-metadata',
         disabled: false,
-        url: `${baseUrl}/api/audits/metadata/**`,
+        url: `${baseUrl}/api/audits/metadata`,
         auth,
       },
       {
         name: 'Audits',
         code: 'audits',
         disabled: false,
-        url: `${baseUrl}/api/audits/**`,
+        url: `${baseUrl}/api/audits`,
         auth,
       },
       {
         name: 'Audit Objects',
         code: 'audit-objects',
         disabled: false,
-        url: `${baseUrl}/api/auditObjects/**`,
+        url: `${baseUrl}/api/auditObjects`,
         auth,
       },
       {
@@ -73,7 +73,7 @@ export const useInitializeRoutes = () => {
         name: 'Delete Notification',
         code: 'delete-notification',
         disabled: false,
-        url: `${baseUrl}/api/notifications/*`,
+        url: `${baseUrl}/api/notifications`,
         auth,
       },
     ]
