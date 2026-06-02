@@ -62,7 +62,7 @@ export default function SettingsPage() {
   const handleSave = async () => {
     if (validate()) {
       try {
-        await updateApi(auditApi);
+        await updateApi(auditApi, auditApiToken);
       } catch (err) {
         show({
           message: `Failed to save settings`,
