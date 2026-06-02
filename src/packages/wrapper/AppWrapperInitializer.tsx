@@ -1,14 +1,14 @@
+import { Center, CircularLoader } from "@dhis2/ui"
 import { useRecoilValue } from "recoil"
 import React, { useEffect } from "react"
 import { AppWrapperProps } from "./types"
-import { Center, CircularLoader } from "@dhis2/ui"
 import { DataStoreConfigState } from "./types/DataStoreSchema"
 import { useInitializer } from "../../hooks/initializer/useInitializer"
 import { useGetSeverityRules } from "../../hooks/severityRules/useGetSeverityRules"
 import { ProgressContainer } from "../../components/progress/Progress"
 
 const AppWrapperInitializer = (props: AppWrapperProps) => {
-    const { children, loadingComponent } = props
+    const { children } = props
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
     const { initialize, loading: initializerLoading, progress } = useInitializer()
     const { getSeverityRules, loading: loadingRules } = useGetSeverityRules()
@@ -32,9 +32,7 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
     if (initializerLoading || loadingRules) {
         return (
             <React.Fragment>
-                <Center className='flex items-center justify-center'>
-                    <ProgressContainer open={true} progress={progress} />
-                </Center>
+                <ProgressContainer  progress={progress}  loading={initializerLoading || loadingRules} />
             </React.Fragment>
         )
     }
