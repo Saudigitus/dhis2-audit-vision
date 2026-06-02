@@ -2,6 +2,31 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.5.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.4.0...v1.5.0) (2026-06-02)
+
+
+### ♻️ Code Refactoring
+
+* **initializer, progress:** fix async issues and clean up code in hooks and components ([63c7eb8](https://github.com/Saudigitus/dhis2-audit-vision/commit/63c7eb8aff2b390875f5954ddf80fef577511315))
+* migrate API calls to dhis2 app-runtime ([bf26d04](https://github.com/Saudigitus/dhis2-audit-vision/commit/bf26d040f7bc65109719389ae804ff58344f5fed))
+* update progress tracking and add spinner ([c3dba4e](https://github.com/Saudigitus/dhis2-audit-vision/commit/c3dba4ee7c7c18c707725e5ef70880e157014202))
+* update severity rules fetch, add notifications route ([22bc47b](https://github.com/Saudigitus/dhis2-audit-vision/commit/22bc47b260978b3bf30a223134662e7dd3cc1a05))
+
+
+### ✨ New Features
+
+* add CopyJsonButton to error display for manual configuration in Settings page ([38e4521](https://github.com/Saudigitus/dhis2-audit-vision/commit/38e45215a1c3029855bf61963744bd2b0776724d))
+* add id field to routes and assign unique ids ([5158c2f](https://github.com/Saudigitus/dhis2-audit-vision/commit/5158c2f39f73fe5f515957af4fb26f311677f07a))
+* add route resource and update dev proxy ([c6528ee](https://github.com/Saudigitus/dhis2-audit-vision/commit/c6528ee85182f276ab22f5b957f65ef9a354f501))
+* **audit-api:** add bearer token auth support ([6d9bca0](https://github.com/Saudigitus/dhis2-audit-vision/commit/6d9bca080f99a44f89b9548c1904223708629eb0))
+* implement global error handling system with dedicated modal and error reporting hooks ([fbefa01](https://github.com/Saudigitus/dhis2-audit-vision/commit/fbefa01ddcdbc16a4fe3ff993233301752a3bfc8))
+* **settings:** add audit API token config and validation ([d5a2ca5](https://github.com/Saudigitus/dhis2-audit-vision/commit/d5a2ca5a23bee07c9f0f82c93a4c3154e4eb102a))
+
+
+### 📝 Documentation
+
+* add API routes management docs and update related config guides ([1536e43](https://github.com/Saudigitus/dhis2-audit-vision/commit/1536e43cbfb9983be6fd9eaa65a503a70c31b7c5))
+
 ## [1.4.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.3.0...v1.4.0) (2026-06-01)
 
 
