@@ -1,4 +1,3 @@
-import { Center, CircularLoader } from "@dhis2/ui"
 import { useRecoilValue } from "recoil"
 import React, { useEffect } from "react"
 import { AppWrapperProps } from "./types"
@@ -14,25 +13,30 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
     const { getSeverityRules, loading: loadingRules } = useGetSeverityRules()
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (!Object.entries(progress).every(([key, step]) => step.status === 'SUCCESS')) {
-                return
-            }
-            if (!dataStoreDataState?.auditApi && !initializerLoading && !loadingRules) {
-                window.location.hash = "#/settings"
-            } else {
-                initialize()
-                getSeverityRules()
-            }
-        }, 100)
+        if (!dataStoreDataState) return
 
-        return () => clearTimeout(timer)
+        const hasAuditApi = !!dataStoreDataState?.auditApi;
+        const progressEntries = Object.values(progress);
+        const isFullyInitialized = progressEntries.length > 0 && progressEntries.every((step) => step.status === 'SUCCESS');
+        const isInProgress = progressEntries.some((step) => step.status === 'PENDING');
+
+        if (isFullyInitialized || isInProgress) {
+            return
+        }
+
+        if (!hasAuditApi) {
+            window.location.hash = "#/settings"
+        } else {
+            initialize()
+            getSeverityRules()
+        }
+
     }, [dataStoreDataState])
 
     if (initializerLoading || loadingRules) {
         return (
             <React.Fragment>
-                <ProgressContainer  progress={progress}  loading={initializerLoading || loadingRules} />
+                <ProgressContainer progress={progress} loading={initializerLoading || loadingRules} />
             </React.Fragment>
         )
     }

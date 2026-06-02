@@ -36,9 +36,10 @@ const useAuditApi = () => {
                 type: { success: true }
             });
             setTimeout(hide, 5000);
+            window.location.hash = "#/"
             window.location.reload()
         } catch (err) {
-      showError(err);
+            showError(err);
             const caught = err instanceof Error ? err : new Error(String(err))
             show({
                 message: `Unknown error: ${caught}`,
