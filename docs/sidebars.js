@@ -34,6 +34,7 @@ const sidebars = {
     'configuration/enable-audit-system',
     'configuration/integration-user',
     'configuration/sql-views',
+    'configuration/api-routes',
     'configuration/understanding-dhis2-audit',
     'configuration/configure-api-url',
   ],
