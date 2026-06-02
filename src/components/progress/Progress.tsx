@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react"
+import { Center, CircularLoader } from "@dhis2/ui"
 
 type StepStatus = "PENDING" | "SUCCESS" | "ERROR"
 
@@ -10,8 +11,8 @@ type ProgressStep = {
 
 type PropsContainer = {
     progress: Record<string, ProgressStep>
-    open: boolean
     onClose?: () => void
+    loading?: boolean
 }
 
 const statusConfig: Record<
@@ -66,16 +67,10 @@ const ProgressItem = ({ step }: { step: ProgressStep }) => {
     )
 }
 
-export const ProgressContainer = ({
-    progress,
-    open,
-    onClose,
-}: PropsContainer) => {
+export const ProgressContainer = ({ progress, onClose, loading }: PropsContainer) => {
     const scrollRef = useRef<HTMLDivElement | null>(null)
-
     const steps = Object.entries(progress)
 
-    // 👇 AUTO SCROLL TO LAST ITEM
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTo({
@@ -85,7 +80,17 @@ export const ProgressContainer = ({
         }
     }, [progress])
 
-    if (!open) return null
+    console.log(progress)
+
+    if (loading && !Object.keys(progress).length) {
+        return (
+            <React.Fragment>
+                <Center className='flex items-center justify-center'>
+                    <CircularLoader />
+                </Center>
+            </React.Fragment>
+        )
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

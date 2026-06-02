@@ -54,12 +54,12 @@ export const useInitializeEventHook = () => {
             if (existingHook) {
                 compareEventHooks(existingHook, hook)
             } else {
-                createEventHooks([hook])
+                await createEventHooks([hook])
             }
         } catch (error: any) {
             const err = error as { details?: { httpStatusCode?: number } }
             if (err.details?.httpStatusCode === 404) {
-                createEventHooks([hook])
+                await createEventHooks([hook])
             } else {
                 setErros((prev: any) => ({ ...prev, webHooks: [...prev.webHooks, { error: `Error checking Event Hook ${hook.id}: ${error.message}`, object: hook }] }))
                 // console.error(`Error checking Event Hook ${hook.id}:`, error)
@@ -91,7 +91,7 @@ export const useInitializeEventHook = () => {
                 webHooks: [...(prev?.webHooks || []),
                 { error: 'Error creating Event Hook:  ' + error?.details?.response?.typeReports?.[0]?.objectReports?.[0]?.errorReports?.[0]?.message || '', object: hooks[0] }]
             }))
-            console.log('Error creating Event Hooks:', hooks,error,error?.details)
+            console.log('Error creating Event Hooks:', hooks, error, error?.details)
         }
     }
 
