@@ -30,64 +30,63 @@ export const useInitializeRoutes = () => {
   const [loading, setLoading] = useState(false)
   const setErrors = useSetRecoilState(ErrorsSchema)
 
-  const buildRoutes = (baseUrl: string): Route[] => {
+  const buildRoutes = (baseUrl: string, token: string): Route[] => {
+    const auth = token ? {
+      type: 'api-headers',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    } : {
+      type: 'none',
+    }
+
     return [
       {
         name: 'Audit Metadata',
         code: 'audit-metadata',
         disabled: false,
         url: `${baseUrl}/api/audits/metadata/**`,
-        auth: {
-          type: 'none',
-        },
+        auth,
       },
       {
         name: 'Audits',
         code: 'audits',
         disabled: false,
         url: `${baseUrl}/api/audits/**`,
-        auth: {
-          type: 'none',
-        },
+        auth,
       },
       {
         name: 'Audit Objects',
         code: 'audit-objects',
         disabled: false,
         url: `${baseUrl}/api/auditObjects/**`,
-        auth: {
-          type: 'none',
-        },
+        auth,
       },
       {
         name: 'Create Notification',
         code: 'create-notification',
         disabled: false,
         url: `${baseUrl}/api/notifications/create`,
-        auth: {
-          type: 'none',
-        },
+        auth,
       },
       {
         name: 'Delete Notification',
         code: 'delete-notification',
         disabled: false,
         url: `${baseUrl}/api/notifications/*`,
-        auth: {
-          type: 'none',
-        },
+        auth,
       },
     ]
   }
 
-  const initializeRoutes = async (baseUrl: string) => {
+  const initializeRoutes = async (baseUrl: string, token: string) => {
     if (!baseUrl) {
       console.log('Audit API URL not configured, skipping route initialization')
       return
     }
 
     setLoading(true)
-    const routes = buildRoutes(baseUrl)
+    const routes = buildRoutes(baseUrl, token)
 
     try {
       await engine.mutate(CREATE_OR_UPDATE_ROUTES_MUTATION as any, {
