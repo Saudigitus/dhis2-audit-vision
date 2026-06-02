@@ -23,7 +23,7 @@ const CREATE_OR_UPDATE_EVENT_HOOK_MUTATION = {
     }),
 }
 
-export const useInitializeEventHook = () => {
+export const useInitializeEventHook = (updateProgress: (key: string, action: string, status: any, details?: string) => void) => {
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
     const dataStoreConfig = useRecoilValue(DataStoreConfigState)
@@ -78,14 +78,17 @@ export const useInitializeEventHook = () => {
     }
 
     const createEventHooks = async (hooks: EventHook[]) => {
+        updateProgress('event-hooks', 'Initializing Event Hooks', 'PENDING')
         try {
             await engine.mutate(CREATE_OR_UPDATE_EVENT_HOOK_MUTATION as any, {
                 variables: {
                     eventHooks: hooks,
                 },
             })
+            updateProgress('event-hooks', 'Initializing Event Hooks', 'SUCCESS')
             console.log(`Event Hooks created/updated successfully:`, hooks.map(h => h.name))
         } catch (error: any) {
+            updateProgress('event-hooks', 'Initializing Event Hooks', 'ERROR', error?.message || 'Unknown error')
             setErros((prev: any) => ({
                 ...prev,
                 webHooks: [...(prev?.webHooks || []),
