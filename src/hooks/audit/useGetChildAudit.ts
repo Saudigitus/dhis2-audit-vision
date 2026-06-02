@@ -1,6 +1,3 @@
- import axios from "axios"
-import { useRecoilValue } from "recoil"
-import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 import { useDataEngine } from "@dhis2/app-runtime"
 import { getMappingKey, RESOURCE_MAPPING } from "../../constants/common/dhis2Resources"
 
@@ -15,13 +12,24 @@ export interface DataProps {
 }
 
 export const useGetchildAudit = () => {
-    const dataStoreDataState = useRecoilValue(DataStoreConfigState)
     const engine = useDataEngine()
 
     const getAudit = async ({ page, pageSize, id, type }: { page: number, pageSize: number, id: string, type: string }) => {
         try {
-            const response = await axios.get(`${dataStoreDataState.auditApi}/api/audits/metadata/${id}?page=${page}&pageSize=${pageSize}&type=${type.toUpperCase()}`)
-            const auditItems = response?.data?.audits || []
+            const query = {
+                audits: {
+                    resource: `routes/audit-metadata/run/${id}`,
+                    params: {
+                        page,
+                        pageSize,
+                        type: type.toUpperCase()
+                    }
+                }
+            }
+            
+            const response = await engine.query(query)
+            const auditData = response as any
+            const auditItems = auditData?.audits?.audits || []
 
             const enrichedAudits = await Promise.all(
                 auditItems.map(async (item: any) => {
@@ -55,9 +63,8 @@ export const useGetchildAudit = () => {
             )
 
             return {
-                ...response,
                 data: {
-                    ...response.data,
+                    ...auditData?.audits,
                     audits: enrichedAudits
                 }
             }
