@@ -232,7 +232,7 @@ export default function SettingsPage() {
                                 Please copy this JSON payload and configure it manually:
                               </p>
                               <div className="relative">
-                                <pre className="text-sm text-gray-600 font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap bg-gray-800 text-gray-200 p-4 pt-12 rounded-lg border border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
+                                <pre className="text-sm text-white font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap bg-gray-800 p-4 pt-12 rounded-lg border border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
                                   {JSON.stringify(err.object, null, 2)}
                                 </pre>
                                 <CopyJsonButton data={err.object} />
@@ -277,7 +277,7 @@ export default function SettingsPage() {
                                 Please copy this JSON payload and configure it manually:
                               </p>
                               <div className="relative">
-                                <pre className="text-sm text-gray-600 font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap bg-gray-800 text-gray-200 p-4 pt-12 rounded-lg border border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
+                                <pre className="text-sm text-white font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap bg-gray-800 p-4 pt-12 rounded-lg border border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
                                   {JSON.stringify(err.object, null, 2)}
                                 </pre>
                                 <CopyJsonButton data={err.object} />

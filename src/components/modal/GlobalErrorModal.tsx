@@ -24,6 +24,42 @@ const CopyJsonButton = ({ data }: { data: any }) => {
   );
 };
 
+const WEBHOOK_PAYLOAD = {
+  "name": "webhook-audit-vision",
+  "translations": [],
+  "externalAccess": false,
+  "publicAccess": "rw------",
+  "userGroupAccesses": [],
+  "userAccesses": [],
+  "access": {
+    "manage": true,
+    "externalize": false,
+    "write": true,
+    "read": true,
+    "update": true,
+    "delete": true
+  },
+  "favorites": [],
+  "disabled": false,
+  "source": {
+    "path": "metadata",
+    "fields": "ALL"
+  },
+  "targets": [
+    {
+      "type": "webhook",
+      "clientId": "dhis2-webhook-YftAQBzIzTi",
+      "url": "https://your-server.com/api/webhooks/dhis2/event",
+      "contentType": "application/json",
+      "headers": {}
+    }
+  ],
+  "displayName": "webhook-audit-vision",
+  "favorite": false,
+  "id": "jThEpGkXaDc",
+  "attributeValues": []
+};
+
 export const GlobalErrorModal: React.FC = () => {
   const error = useRecoilValue(GlobalErrorState);
   const { clearError } = useGlobalError();
@@ -91,6 +127,19 @@ export const GlobalErrorModal: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              <div className="relative mt-6 pt-6 border-t border-gray-100">
+                <p className="text-[13px] font-medium text-blue-600 mb-2 flex items-center gap-1.5">
+                  <AlertCircle size={14} />
+                  Please copy this JSON payload and configure it manually:
+                </p>
+                <div className="relative">
+                  <pre className="text-sm text-white font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap bg-gray-800 p-4 pt-12 rounded-lg border border-gray-700 overflow-x-auto max-h-64 overflow-y-auto">
+                    {JSON.stringify(WEBHOOK_PAYLOAD, null, 2)}
+                  </pre>
+                  <CopyJsonButton data={WEBHOOK_PAYLOAD} />
+                </div>
+              </div>
             </div>
           </div>
 

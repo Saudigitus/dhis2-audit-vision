@@ -1,12 +1,13 @@
-import { useGlobalError } from '../error/useGlobalError';
+// import { useGlobalError } from '../error/useGlobalError';
 import { useState } from "react"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { DataStoreConfigState } from "../../packages/wrapper/types/DataStoreSchema"
 import { SeverityRulesSchema } from "../../schema/severityRulesSchema"
 import { useDataEngine } from "@dhis2/app-runtime"
+import { useGlobalError } from "../error/useGlobalError"
 
 export const useGetSeverityRules = () => {
-  const { showError } = useGlobalError();
+    const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState<boolean>(false)
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
@@ -17,7 +18,7 @@ export const useGetSeverityRules = () => {
             console.log('auditApi is not set in dataStoreDataState')
             return
         }
-        
+
         try {
             setLoading(true)
             const response: any = await engine.query({
@@ -28,7 +29,7 @@ export const useGetSeverityRules = () => {
 
             setSeverityRules(response.notifications)
         } catch (error) {
-      showError(error);
+            showError(error);
             throw error
         } finally {
             setLoading(false)

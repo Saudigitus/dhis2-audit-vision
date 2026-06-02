@@ -1,4 +1,4 @@
-import { useGlobalError } from '../error/useGlobalError';
+// import { useGlobalError } from '../error/useGlobalError';
 import { useState } from 'react'
 import { useSetRecoilState } from 'recoil'
 import { useDataEngine } from '@dhis2/app-runtime'
@@ -32,7 +32,7 @@ type progress = {
 }
 
 export const useInitializer = () => {
-  const { showError } = useGlobalError();
+    //   const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
     const setErros = useSetRecoilState(ErrorsSchema)
@@ -61,13 +61,13 @@ export const useInitializer = () => {
                 }
 
             } catch (error: any) {
-      showError(error);
+                //   showError(error);
                 const err = error as { details?: { httpStatusCode?: number } }
                 if (err.details?.httpStatusCode === 404) {
                     try {
                         await createSqlViews([view])
                     } catch (createError: any) {
-      showError(createError);
+                        //   showError(createError);
                         console.error(`Error checking SQL View ${view.id}:`, error)
                     }
                 }
@@ -100,7 +100,7 @@ export const useInitializer = () => {
 
         } catch (error: any) {
 
-      showError(error);
+            //   showError(error);
             setErros((prev: any) => ({
                 ...prev,
                 sqlViews: [...(prev?.sqlViews || []),
@@ -124,7 +124,7 @@ export const useInitializer = () => {
             await initializeEventHooks()
 
         } catch (error: any) {
-      showError(error);
+            //   showError(error);s
             updateProgress(eventHookKey, 'Initializing Event Hooks', 'ERROR', error?.message || 'Unknown error')
         }
 
