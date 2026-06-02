@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, AlertCircle, X, Database, ServerCrash, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Link, AlertCircle, X, Database, ServerCrash, CheckCircle2, ShieldAlert, Lock } from 'lucide-react';
 import { useAuditApi } from '../hooks/auditApi/useSaveAuditApi';
 import { DataStoreConfigState } from '../packages/wrapper/types/DataStoreSchema';
 import { useRecoilValue } from 'recoil';
@@ -8,13 +8,56 @@ import { ErrorsSchema } from '../schema/errorsSchema';
 
 export default function SettingsPage() {
   const dataStoreDataState = useRecoilValue(DataStoreConfigState)
-  const [retention, setRetention] = useState(dataStoreDataState?.auditApi ?? '');
+  const [auditApi, setAuditApi] = useState(dataStoreDataState?.auditApi ?? '');
+  const [auditApiToken, setAuditApiToken] = useState(dataStoreDataState?.auditApiToken ?? '');
+  const [errors, setFieldErrors] = useState<{ auditApi?: string; auditApiToken?: string }>({});
+
   const { hide, show } = useShowAlerts()
   const setErros = useRecoilValue(ErrorsSchema)
   const { loading, updateApi } = useAuditApi()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const totalErrors = (setErros?.sqlViews?.length || 0) + (setErros?.webHooks?.length || 0);
+
+  const validate = () => {
+    const newErrors: { auditApi?: string; auditApiToken?: string } = {};
+    if (!auditApi) {
+      newErrors.auditApi = 'Audit API Base URL is required';
+    } else {
+      try {
+        new URL(auditApi);
+      } catch {
+        newErrors.auditApi = 'Please enter a valid URL';
+      }
+    }
+
+    if (!auditApiToken) {
+      newErrors.auditApiToken = 'Audit API Token is required';
+    }
+
+    setFieldErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (validate()) {
+      try {
+        await updateApi(auditApi);
+      } catch (err) {
+        show({
+          message: `Failed to save settings`,
+          type: { critical: true }
+        });
+        setTimeout(hide, 5000);
+      }
+    } else {
+      show({
+        message: `Please correct the errors before saving`,
+        type: { critical: true }
+      });
+      setTimeout(hide, 5000);
+    }
+  };
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -43,21 +86,54 @@ export default function SettingsPage() {
       <div className="bg-white rounded-xl border border-[#e2e8f0] p-6">
         <div className="flex items-center gap-2 mb-5">
           <Link size={20} className="text-[#3b82f6]" />
-          <h3 className="font-bold text-[15px] text-[#0f172a]">Audit API</h3>
+          <h3 className="font-bold text-[15px] text-[#0f172a]">Audit API Configuration</h3>
         </div>
 
-        <div className="space-y-0 divide-y divide-[#e2e8f0]">
-          <div className="pb-4">
-            <label className="block text-sm font-medium text-[#0f172a] mb-1.5">Audit API Base URL</label>
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-[#0f172a] mb-1.5 flex items-center gap-1">
+              Audit API Base URL <span className="text-red-500">*</span>
+            </label>
             <input
-              value={retention}
+              value={auditApi}
               type='text'
-              onChange={(e) => setRetention(e.target.value)}
-              className="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+              onChange={(e) => {
+                setAuditApi(e.target.value);
+                if (errors.auditApi) setFieldErrors(prev => ({ ...prev, auditApi: undefined }));
+              }}
+              className={`w-full px-3 py-2.5 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 ${errors.auditApi ? 'border-red-500 focus:ring-red-200' : 'border-[#e2e8f0] focus:ring-[#3b82f6]'
+                }`}
+              placeholder="https://your-server.com"
             />
+            {errors.auditApi && <p className="text-xs text-red-500 mt-1.5 ml-1">{errors.auditApi}</p>}
             <p className="text-xs text-[#94a3b8] mt-2 ml-1">
-              Enter your base URL (e.g. <span className="font-mono text-[#64748b]">https://your-server.com</span>).
-              We'll automatically append <span className="font-mono text-[#64748b]">/api/endpoint?params</span> to make requests.
+              Enter your base URL. We'll automatically append the necessary endpoints to make requests.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#0f172a] mb-1.5 flex items-center gap-1">
+              Audit API Token <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <Lock size={16} />
+              </div>
+              <input
+                value={auditApiToken}
+                type='password'
+                onChange={(e) => {
+                  setAuditApiToken(e.target.value);
+                  if (errors.auditApiToken) setFieldErrors(prev => ({ ...prev, auditApiToken: undefined }));
+                }}
+                className={`w-full pl-10 pr-3 py-2.5 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 ${errors.auditApiToken ? 'border-red-500 focus:ring-red-200' : 'border-[#e2e8f0] focus:ring-[#3b82f6]'
+                  }`}
+                placeholder="Enter your API token"
+              />
+            </div>
+            {errors.auditApiToken && <p className="text-xs text-red-500 mt-1.5 ml-1">{errors.auditApiToken}</p>}
+            <p className="text-xs text-[#94a3b8] mt-2 ml-1">
+              Provide a secure token to authenticate requests to your audit API.
             </p>
           </div>
         </div>
@@ -66,18 +142,7 @@ export default function SettingsPage() {
       {/* Save Button */}
       <div className="flex justify-end pb-4">
         <button
-          onClick={async () => {
-            try {
-              new URL(retention);
-              await updateApi(retention);
-            } catch {
-              show({
-                message: `Please setup a valid URL`,
-                type: { critical: true }
-              });
-              setTimeout(hide, 5000);
-            }
-          }}
+          onClick={handleSave}
           disabled={loading}
           className="flex items-center gap-2 bg-[#3b82f6] text-white px-8 py-2.5 rounded-lg text-sm font-medium hover:bg-[#2563eb] disabled:opacity-60 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-sm"
         >
