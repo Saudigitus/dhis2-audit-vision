@@ -71,9 +71,16 @@ export const useInitializeRoutes = () => {
       },
       {
         name: 'Delete Notification',
-        code: 'delete-notification',
+        code: 'delete-notification',  
         disabled: false,
         url: `${baseUrl}/api/notifications/*`,
+        auth,
+      },
+      {
+        name: 'Notifications',
+        code: 'notifications',
+        disabled: false,
+        url: `${baseUrl}/api/notifications`,
         auth,
       },
     ]

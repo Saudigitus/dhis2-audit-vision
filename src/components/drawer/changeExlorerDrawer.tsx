@@ -15,7 +15,6 @@ export default function ChangeExplorerDrawer({ setSelectedChange, selectedChange
     const { getAuditDetails, auditDetails, loadingDetails } = useGetAuditDetails()
     const [refetch, setRefecth] = useState(false)
 
-    console.log(selectedChange)
     useEffect(() => {
         if (selectedChange) getAuditDetails(selectedChange.id)
     }, [selectedChange, refetch])
