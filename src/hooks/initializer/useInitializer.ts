@@ -35,15 +35,16 @@ export const useInitializer = () => {
   const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
-    const [progress, setProgress] = useState<Record<string, progress>>({})
-    const { initialize: initializeEventHooks, loading: eventHookLoading } = useInitializeEventHook()
     const setErros = useSetRecoilState(ErrorsSchema)
 
+    const [progress, setProgress] = useState<Record<string, progress>>({})
     const updateProgress = (key: string, action: string, status: 'PENDING' | 'SUCCESS' | 'ERROR', details?: string, object?: any) => {
         setProgress(prev => ({
             ...prev, [key]: { action, status, details, object, date: new Date().toISOString() }
         }))
     }
+    const { initialize: initializeEventHooks, loading: eventHookLoading } = useInitializeEventHook(updateProgress)
+
 
     const verifySqlViews = async () => {
         setLoading(true)
@@ -119,10 +120,8 @@ export const useInitializer = () => {
 
         try {
             await verifySqlViews()
-
-            updateProgress(eventHookKey, 'Initializing Event Hooks', 'PENDING')
             await initializeEventHooks()
-            updateProgress(eventHookKey, 'Initializing Event Hooks', 'SUCCESS')
+
         } catch (error: any) {
       showError(error);
             updateProgress(eventHookKey, 'Initializing Event Hooks', 'ERROR', error?.message || 'Unknown error')

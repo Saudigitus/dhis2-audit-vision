@@ -68,17 +68,8 @@ const ProgressItem = ({ step }: { step: ProgressStep }) => {
 }
 
 export const ProgressContainer = ({ progress, onClose, loading }: PropsContainer) => {
-    const scrollRef = useRef<HTMLDivElement | null>(null)
     const steps = Object.entries(progress)
 
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTo({
-                top: scrollRef.current.scrollHeight,
-                behavior: "smooth",
-            })
-        }
-    }, [progress])
 
     console.log(progress)
 
@@ -125,12 +116,14 @@ export const ProgressContainer = ({ progress, onClose, loading }: PropsContainer
                 </div>
 
                 <div
-                    ref={scrollRef}
                     className="flex-1 overflow-y-auto p-6 space-y-3"
                 >
-                    {steps.map(([key, step]) => (
+                    {steps?.map(([key, step]) => (
                         <ProgressItem key={key} step={step} />
                     ))}
+                    <div className='flex items-center justify-center'>
+                        <CircularLoader small />
+                    </div>
                     <div className="h-2" />
                 </div>
             </div>
