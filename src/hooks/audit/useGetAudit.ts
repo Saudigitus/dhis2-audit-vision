@@ -27,7 +27,7 @@ interface GetAuditProps {
 }
 
 export const useGetAudit = () => {
-  const { showError } = useGlobalError();
+    const { showError } = useGlobalError();
     const [data, setData] = useState<GetAuditProps | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const { group } = useParams()
@@ -51,7 +51,7 @@ export const useGetAudit = () => {
                         try {
                             const mappingKey = getMappingKey(item.type);
                             const mapping = RESOURCE_MAPPING[mappingKey];
-                            
+
                             const metadataQuery = mapping ? {
                                 metadata: {
                                     resource: mapping.resource,
@@ -90,7 +90,7 @@ export const useGetAudit = () => {
                                 enrichedItem.last5 = auditData.audit.audits.map((x: any) => x.auditType)
                             }
                         } catch (error) {
-      showError(error);
+                            // showError(error);
                             console.error(`Failed to enrich audit item ${item.id}:`, error)
                         }
 
@@ -145,7 +145,7 @@ export const useGetAudit = () => {
                                     }) as any
                                     enrichedItem.displayName = metadataResponse?.metadata?.displayName || metadataResponse?.metadata?.name || item.uid
                                 } catch (error) {
-      showError(error);
+                                    // showError(error);
                                     // Item might have been deleted or not found
                                     enrichedItem.displayName = item.uid
                                 }
@@ -162,7 +162,7 @@ export const useGetAudit = () => {
                 return { data: auditData?.audits }
             }
         } catch (error) {
-      showError(error);
+            showError(error);
             throw error
         } finally {
             setLoading(false)
