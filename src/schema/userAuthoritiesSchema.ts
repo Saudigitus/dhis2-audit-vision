@@ -1,6 +1,14 @@
 import { atom } from 'recoil'
 
-export const UserAuthoritiesSchema = atom<string[]>({
+export interface UserAuthoritiesType {
+    user: string[]
+    all: string[]
+}
+
+export const UserAuthoritiesSchema = atom<UserAuthoritiesType>({
     key: 'user-authorities-schema',
-    default: [],
+    default: {
+        user: [],
+        all: []
+    },
 })

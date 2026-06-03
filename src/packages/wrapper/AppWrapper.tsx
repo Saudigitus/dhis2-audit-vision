@@ -5,15 +5,17 @@ import useAppConfig from "./hooks/useAppConfig"
 import { AppWrapperInitializer } from "./AppWrapperInitializer"
 import { useRecoilValue } from "recoil"
 import { DataStoreConfigState } from "./types/DataStoreSchema"
-import { useGetUserAuthorities } from "../../hooks/users/useGetUserAthorities"
+import { useGetMyAuthorities } from "../../hooks/users/useGetMyAuthorities"
+import { useGetAllAuthorities } from "../../hooks/users/useGetAllAuthorities"
 
 const AppWrapper = (props: AppWrapperProps) => {
     const { children } = props
     const { loading, error } = useAppConfig()
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
-    const { loading: authoritiesLoading, error: authoritiesError } = useGetUserAuthorities()
+    const { loading: myAuthLoading, error: myAuthError } = useGetMyAuthorities()
+    const { loading: allAuthLoading, error: allAuthError } = useGetAllAuthorities()
 
-    if (error || authoritiesError) {
+    if (error || myAuthError || allAuthError) {
         return (
             <React.Fragment>
                 <div className='flex items-center justify-center'>
@@ -23,7 +25,7 @@ const AppWrapper = (props: AppWrapperProps) => {
         )
     }
 
-    if (loading && !dataStoreDataState && authoritiesLoading) {
+    if (loading && !dataStoreDataState && (myAuthLoading || allAuthLoading)) {
         return (
             <React.Fragment>
                 <div className='flex items-center justify-center'>

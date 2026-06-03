@@ -1,4 +1,133 @@
-import { ArrayPair } from "../../../types/diffTypes/diffTypes";
+import { ArrayPair, DiffArrayItem, DiffNode, DiffNodeType } from "../../../types/diffTypes/diffTypes";
+
+export function buildDiff(
+    before: Record<string, unknown>,
+    after: Record<string, unknown>,
+    isCreate = false,
+    parentPath = ""
+): DiffNode[] {
+    const allKeys = sortKeysWithIdentityFirst(
+        Array.from(new Set([...Object.keys(before), ...Object.keys(after)]))
+    );
+
+    return allKeys.map((key) => {
+        const path = parentPath ? `${parentPath}.${key}` : key;
+        const bVal = before[key];
+        const aVal = after[key];
+        // For CREATE operations, everything is considered "changed" (new)
+        const changed = isCreate || !valuesEqual(bVal, aVal);
+
+        if (isArrayOfObjects(bVal) || isArrayOfObjects(aVal)) {
+            const bArr = (isArrayOfObjects(bVal) ? bVal : []) as Record<string, unknown>[];
+            const aArr = (isArrayOfObjects(aVal) ? aVal : []) as Record<string, unknown>[];
+            const pairedItems: ArrayPair[] = pairArrayItems(bArr, aArr) ?? Array.from(
+                { length: Math.max(bArr.length, aArr.length) },
+                (_, index): ArrayPair => ({
+                    index,
+                    before: bArr[index],
+                    after: aArr[index],
+                })
+            );
+            const items: DiffArrayItem[] = [];
+
+            for (const pair of pairedItems) {
+                const itemPath = `${path}[${pair.identity ?? pair.index}]`;
+                const bItem = pair.before as Record<string, unknown> | undefined;
+                const aItem = pair.after as Record<string, unknown> | undefined;
+                const itemChanged = !valuesEqual(bItem, aItem);
+                const allItemKeys = sortKeysWithIdentityFirst(
+                    Array.from(new Set([...Object.keys(bItem ?? {}), ...Object.keys(aItem ?? {})]))
+                );
+
+                const fields: DiffNode[] = allItemKeys.map((ik) => {
+                    const childPath = `${itemPath}.${ik}`;
+                    const ibVal = bItem?.[ik];
+                    const iaVal = aItem?.[ik];
+                    const fieldChanged = !valuesEqual(ibVal, iaVal);
+
+                    if (isPlainObject(ibVal) || isPlainObject(iaVal)) {
+                        const children = buildDiff(
+                            (isPlainObject(ibVal) ? ibVal : {}) as Record<string, unknown>,
+                            (isPlainObject(iaVal) ? iaVal : {}) as Record<string, unknown>,
+                            isCreate,
+                            childPath
+                        );
+                        return {
+                            key: ik,
+                            path: childPath,
+                            type: "object" as DiffNodeType,
+                            before: ibVal,
+                            after: iaVal,
+                            changed: isCreate || fieldChanged,
+                            children,
+                            arrayItemCount: { before: 0, after: 0 },
+                        };
+                    }
+
+                    return {
+                        key: ik,
+                        path: childPath,
+                        type: "primitive" as DiffNodeType,
+                        before: ibVal,
+                        after: iaVal,
+                        changed: isCreate || fieldChanged,
+                        arrayItemCount: { before: 0, after: 0 },
+                    };
+                });
+
+                items.push({
+                    index: pair.index,
+                    path: itemPath,
+                    identity: pair.identity,
+                    fields,
+                    changed: isCreate || itemChanged,
+                    beforeExists: isCreate ? false : !!bItem,
+                    afterExists: !!aItem,
+                });
+            }
+
+            return {
+                key,
+                path,
+                type: "array",
+                before: bVal,
+                after: aVal,
+                changed,
+                items,
+                arrayItemCount: { before: bArr.length, after: aArr.length },
+            };
+        }
+
+        if (isPlainObject(bVal) || isPlainObject(aVal)) {
+            const children = buildDiff(
+                (isPlainObject(bVal) ? bVal : {}) as Record<string, unknown>,
+                (isPlainObject(aVal) ? aVal : {}) as Record<string, unknown>,
+                isCreate,
+                path
+            );
+            return {
+                key,
+                path,
+                type: "object",
+                before: bVal,
+                after: aVal,
+                changed,
+                children,
+                arrayItemCount: { before: 0, after: 0 },
+            };
+        }
+
+        return {
+            key,
+            path,
+            type: "primitive",
+            before: bVal,
+            after: aVal,
+            changed,
+            arrayItemCount: { before: 0, after: 0 },
+        };
+    });
+}
 
 export function formatDate(iso: string) {
     return new Date(iso).toLocaleString("en-US", {
