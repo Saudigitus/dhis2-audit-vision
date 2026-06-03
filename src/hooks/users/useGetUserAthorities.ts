@@ -4,7 +4,7 @@ import { useSetRecoilState } from 'recoil'
 import { UserAuthoritiesSchema } from '../../schema/userAuthoritiesSchema'
 
 const meQuery = {
-    me: { resource: 'me' },
+    me: { resource: 'me', params: { fields: 'authorities' } },
 }
 
 export const useGetUserAuthorities = () => {
