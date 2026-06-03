@@ -70,9 +70,6 @@ const ProgressItem = ({ step }: { step: ProgressStep }) => {
 export const ProgressContainer = ({ progress, onClose, loading }: PropsContainer) => {
     const steps = Object.entries(progress)
 
-
-    console.log(progress)
-
     if (loading && !Object.keys(progress).length) {
         return (
             <React.Fragment>
