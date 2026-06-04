@@ -5,6 +5,7 @@ import usePostDataStore from "../../packages/wrapper/hooks/dataStore/usePostData
 import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
 import { dataStoreKey } from "../../packages/wrapper/constants/config"
 import { useInitializeRoutes } from "./useInitializeRoutes"
+import { useInitializeEventHook } from '../initializer/useInitializeEventHook';
 
 const query = {
     dataStoreValues: {
@@ -20,6 +21,8 @@ const useAuditApi = () => {
     const [error, setError] = useState<Error | null>(null)
     const { hide, show } = useShowAlerts()
     const { initializeRoutes } = useInitializeRoutes()
+    const { initialize: initializeEventHooks } = useInitializeEventHook()
+
 
     const updateApi = useCallback(async (auditApi: string, auditApiToken: string) => {
         setLoading(true)
@@ -27,17 +30,18 @@ const useAuditApi = () => {
 
         try {
             const result: any = await engine.query(query)
-            await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi, auditApiToken } })
+            await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi } })
 
             await initializeRoutes(auditApi, auditApiToken)
-
+            await initializeEventHooks(auditApi, auditApiToken)
+            
             show({
                 message: `Configuration saved successfuly!`,
                 type: { success: true }
             });
             setTimeout(hide, 5000);
-            window.location.hash = "#/"
-            window.location.reload()
+            // window.location.hash = "#/"
+            // window.location.reload()
         } catch (err) {
             showError(err);
             const caught = err instanceof Error ? err : new Error(String(err))

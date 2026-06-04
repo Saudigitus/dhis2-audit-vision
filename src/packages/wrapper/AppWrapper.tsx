@@ -5,14 +5,17 @@ import useAppConfig from "./hooks/useAppConfig"
 import { AppWrapperInitializer } from "./AppWrapperInitializer"
 import { useRecoilValue } from "recoil"
 import { DataStoreConfigState } from "./types/DataStoreSchema"
+import { useGetMyAuthorities } from "../../hooks/users/useGetMyAuthorities"
+import { useGetAllAuthorities } from "../../hooks/users/useGetAllAuthorities"
 
 const AppWrapper = (props: AppWrapperProps) => {
     const { children } = props
     const { loading, error } = useAppConfig()
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
-    
+    const { loading: myAuthLoading, error: myAuthError } = useGetMyAuthorities()
+    const { loading: allAuthLoading, error: allAuthError } = useGetAllAuthorities()
 
-    if (error) {
+    if (error || myAuthError || allAuthError) {
         return (
             <React.Fragment>
                 <div className='flex items-center justify-center'>
@@ -22,7 +25,7 @@ const AppWrapper = (props: AppWrapperProps) => {
         )
     }
 
-    if (loading && !dataStoreDataState) {
+    if (loading && !dataStoreDataState && (myAuthLoading || allAuthLoading)) {
         return (
             <React.Fragment>
                 <div className='flex items-center justify-center'>

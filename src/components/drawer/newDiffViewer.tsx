@@ -1,142 +1,16 @@
 import { useState, useMemo, useEffect } from "react";
-import { displayValue, formatDate, isArrayOfObjects, isPlainObject, pairArrayItems, sortKeysWithIdentityFirst, valuesEqual } from "./utils/diffViewUtils";
-import { ArrayPair, DiffArrayItem, DiffNode, DiffNodeType } from "../../types/diffTypes/diffTypes";
-import { ActionIcon, BoxIcon, CalendarIcon, CollapseIcon, DocIcon, ExpandIcon, EyeIcon, EyeOffIcon, HashIcon, ResetExpandIcon, TagIcon, UserIcon } from "./components/icons";
+import { buildDiff, displayValue, formatDate } from "./utils/diffViewUtils";
+import { ActionIcon, BoxIcon, CalendarIcon, CollapseIcon, DocIcon, ExpandIcon, EyeIcon, EyeOffIcon, HashIcon, TagIcon, UserIcon } from "./components/icons";
 import UpdateHistory from "./components/updateHistory";
 import { format } from "date-fns";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, ShieldAlert } from "lucide-react";
 import useRollback from "../../hooks/rollback/rollback";
-import { CircularLoader } from "@dhis2/ui";
+import { CircularLoader, Tooltip } from "@dhis2/ui";
 import ConfirmDialog from "../confirm/confirmDialog";
-
-function buildDiff(
-    before: Record<string, unknown>,
-    after: Record<string, unknown>,
-    isCreate = false,
-    parentPath = ""
-): DiffNode[] {
-    const allKeys = sortKeysWithIdentityFirst(
-        Array.from(new Set([...Object.keys(before), ...Object.keys(after)]))
-    );
-
-    return allKeys.map((key) => {
-        const path = parentPath ? `${parentPath}.${key}` : key;
-        const bVal = before[key];
-        const aVal = after[key];
-        // For CREATE operations, everything is considered "changed" (new)
-        const changed = isCreate || !valuesEqual(bVal, aVal);
-
-        if (isArrayOfObjects(bVal) || isArrayOfObjects(aVal)) {
-            const bArr = (isArrayOfObjects(bVal) ? bVal : []) as Record<string, unknown>[];
-            const aArr = (isArrayOfObjects(aVal) ? aVal : []) as Record<string, unknown>[];
-            const pairedItems: ArrayPair[] = pairArrayItems(bArr, aArr) ?? Array.from(
-                { length: Math.max(bArr.length, aArr.length) },
-                (_, index): ArrayPair => ({
-                    index,
-                    before: bArr[index],
-                    after: aArr[index],
-                })
-            );
-            const items: DiffArrayItem[] = [];
-
-            for (const pair of pairedItems) {
-                const itemPath = `${path}[${pair.identity ?? pair.index}]`;
-                const bItem = pair.before as Record<string, unknown> | undefined;
-                const aItem = pair.after as Record<string, unknown> | undefined;
-                const itemChanged = !valuesEqual(bItem, aItem);
-                const allItemKeys = sortKeysWithIdentityFirst(
-                    Array.from(new Set([...Object.keys(bItem ?? {}), ...Object.keys(aItem ?? {})]))
-                );
-
-                const fields: DiffNode[] = allItemKeys.map((ik) => {
-                    const childPath = `${itemPath}.${ik}`;
-                    const ibVal = bItem?.[ik];
-                    const iaVal = aItem?.[ik];
-                    const fieldChanged = !valuesEqual(ibVal, iaVal);
-
-                    if (isPlainObject(ibVal) || isPlainObject(iaVal)) {
-                        const children = buildDiff(
-                            (isPlainObject(ibVal) ? ibVal : {}) as Record<string, unknown>,
-                            (isPlainObject(iaVal) ? iaVal : {}) as Record<string, unknown>,
-                            isCreate,
-                            childPath
-                        );
-                        return {
-                            key: ik,
-                            path: childPath,
-                            type: "object" as DiffNodeType,
-                            before: ibVal,
-                            after: iaVal,
-                            changed: isCreate || fieldChanged,
-                            children,
-                            arrayItemCount: { before: 0, after: 0 },
-                        };
-                    }
-
-                    return {
-                        key: ik,
-                        path: childPath,
-                        type: "primitive" as DiffNodeType,
-                        before: ibVal,
-                        after: iaVal,
-                        changed: isCreate || fieldChanged,
-                        arrayItemCount: { before: 0, after: 0 },
-                    };
-                });
-
-                items.push({
-                    index: pair.index,
-                    path: itemPath,
-                    identity: pair.identity,
-                    fields,
-                    changed: isCreate || itemChanged,
-                    beforeExists: isCreate ? false : !!bItem,
-                    afterExists: !!aItem,
-                });
-            }
-
-            return {
-                key,
-                path,
-                type: "array",
-                before: bVal,
-                after: aVal,
-                changed,
-                items,
-                arrayItemCount: { before: bArr.length, after: aArr.length },
-            };
-        }
-
-        if (isPlainObject(bVal) || isPlainObject(aVal)) {
-            const children = buildDiff(
-                (isPlainObject(bVal) ? bVal : {}) as Record<string, unknown>,
-                (isPlainObject(aVal) ? aVal : {}) as Record<string, unknown>,
-                isCreate,
-                path
-            );
-            return {
-                key,
-                path,
-                type: "object",
-                before: bVal,
-                after: aVal,
-                changed,
-                children,
-                arrayItemCount: { before: 0, after: 0 },
-            };
-        }
-
-        return {
-            key,
-            path,
-            type: "primitive",
-            before: bVal,
-            after: aVal,
-            changed,
-            arrayItemCount: { before: 0, after: 0 },
-        };
-    });
-}
+import { UserAuthoritiesSchema } from "../../schema/userAuthoritiesSchema";
+import { useRecoilValue } from "recoil";
+import { DiffArrayItem, DiffNode } from "../../types/diffTypes/diffTypes";
+import isOpAvailable from "./utils/opAvailability";
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -151,12 +25,14 @@ export default function AuditDiffViewer({ auditDetails, selectedChange, onClose,
     const [selected, setSelected] = useState<any>(null)
     const { rollback, loading } = useRollback()
     const [open, setOpen] = useState<boolean>(false)
-
+    const authorities = useRecoilValue(UserAuthoritiesSchema)
     const after = auditDetails?.[0]?.objectData ?? {}
     const before = auditDetails?.[1]?.objectData ?? {}
     const createMode = !before
     const disabled = (Object?.keys(before)?.length === 0 && !selected) || loading
-
+    const optionNotAvailable = isOpAvailable(authorities.all, authorities.user, selectedChange?.object)
+    const isDisabled = disabled || optionNotAvailable
+    
     const diffTree = useMemo(
         () =>
             buildDiff(
@@ -275,14 +151,32 @@ export default function AuditDiffViewer({ auditDetails, selectedChange, onClose,
                                 <span className={`text-[14px] font-bold tracking-widest uppercase ${selected?.auditType ? "text-amber-700 bg-amber-50 px-2 py-0.5" : createMode ? "text-slate-300" : "text-red-500 bg-red-50 px-2 py-0.5"}`}>
                                     {selected?.auditType ? `${selected?.auditType} - ${format(selected?.created_at, 'yyyy-MM-dd HH:mm:ss')}` : createMode ? "—" : "Before"}
                                 </span>
-                                <button
-                                    disabled={disabled}
-                                    onClick={() => setOpen(true)}
-                                    className={`inline-flex items-center gap-1.5 rounded-[5px] border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm active:scale-95 ${disabled ? "opacity-50 pointer-events-none cursor-not-allowed" : ""}`}
+                                <Tooltip
+                                    content={
+                                        optionNotAvailable ? (
+                                            <div className="flex items-center gap-2.5 px-1 py-0.5">
+                                                <div className="p-1 bg-red-500/20 rounded-md">
+                                                    <ShieldAlert size={16} className="text-red-400" />
+                                                </div>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-[11px] font-bold uppercase tracking-wider text-red-300">Access Denied</span>
+                                                    <span className="text-sm text-slate-200">
+                                                        You lack authority to change <span className="font-bold text-white underline decoration-red-500/50 underline-offset-2">{selectedChange?.object}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ) : ""
+                                    }
                                 >
-                                    {loading ? <CircularLoader small /> : <RotateCcw size={12} />}
-                                    Restore
-                                </button>
+                                    <button
+                                        disabled={isDisabled}
+                                        onClick={() => setOpen(true)}
+                                        className={`inline-flex items-center gap-1.5 rounded-[5px] border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm active:scale-95 ${isDisabled ? "opacity-50 pointer-events-none cursor-not-allowed" : ""}`}
+                                    >
+                                        {loading ? <CircularLoader small /> : <RotateCcw size={12} />}
+                                        Restore
+                                    </button>
+                                </Tooltip>
                             </div>
                             <div className="pl-4">
                                 <span className="text-[14px] font-bold tracking-widest uppercase text-green-600 bg-green-50 px-2 py-0.5">

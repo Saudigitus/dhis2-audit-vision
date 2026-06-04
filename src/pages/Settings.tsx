@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Link, AlertCircle, X, Database, ServerCrash, CheckCircle2, ShieldAlert, Lock, Copy, Check } from 'lucide-react';
 import { useAuditApi } from '../hooks/auditApi/useSaveAuditApi';
 import { DataStoreConfigState } from '../packages/wrapper/types/DataStoreSchema';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import useShowAlerts from '../packages/wrapper/hooks/alert/useShowAlert';
 import { ErrorsSchema } from '../schema/errorsSchema';
+import { UserAuthoritiesSchema } from '../schema/userAuthoritiesSchema';
 
 const CopyJsonButton = ({ data }: { data: any }) => {
   const [copied, setCopied] = useState(false);
@@ -28,16 +29,17 @@ const CopyJsonButton = ({ data }: { data: any }) => {
 
 export default function SettingsPage() {
   const dataStoreDataState = useRecoilValue(DataStoreConfigState)
+  const authorities = useRecoilValue(UserAuthoritiesSchema)
+  const [setErros, setErrorsState] = useRecoilState(ErrorsSchema)
   const [auditApi, setAuditApi] = useState(dataStoreDataState?.auditApi ?? '');
   const [auditApiToken, setAuditApiToken] = useState(dataStoreDataState?.auditApiToken ?? '');
   const [errors, setFieldErrors] = useState<{ auditApi?: string; auditApiToken?: string }>({});
 
   const { hide, show } = useShowAlerts()
-  const setErros = useRecoilValue(ErrorsSchema)
   const { loading, updateApi } = useAuditApi()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const totalErrors = (setErros?.sqlViews?.length || 0) + (setErros?.webHooks?.length || 0) + (setErros?.routes?.length || 0);
+  const totalErrors = (setErros?.sqlViews?.length || 0) + (setErros?.webHooks?.length || 0) + (setErros?.routes?.length || 0) + (setErros?.access?.length || 0);
 
   const validate = () => {
     const newErrors: { auditApi?: string; auditApiToken?: string } = {};
@@ -62,7 +64,31 @@ export default function SettingsPage() {
   const handleSave = async () => {
     if (validate()) {
       try {
-        await updateApi(auditApi, auditApiToken);
+        const hasEventHookAuth = authorities?.user?.some(auth => auth === 'F_EVENT_HOOK_PUBLIC_ADD' || auth === 'ALL');
+        const hasRouteAuth = authorities?.user?.some(auth => auth === 'F_ROUTE_PUBLIC_ADD' || auth === 'ALL');
+
+        if (hasEventHookAuth && hasRouteAuth) {
+          await updateApi(auditApi, auditApiToken);
+        } else {
+          const missingAuths: any = [];
+          if (!hasEventHookAuth) missingAuths.push('F_EVENT_HOOK_PUBLIC_ADD');
+          if (!hasRouteAuth) missingAuths.push('F_ROUTE_PUBLIC_ADD');
+
+          setErrorsState((prev: any) => ({
+            ...prev,
+            access: [
+              {
+                error: `You do not have the required authorities (${missingAuths.join(', ')}) to save these settings. Please contact your system administrator.`,
+                object: { name: "Event Hook and Route" }
+              }
+            ]
+          }));
+          show({
+            message: `Access denied: missing required authority`,
+            type: { critical: true }
+          });
+          setTimeout(hide, 5000);
+        }
       } catch (err) {
         show({
           message: `Failed to save settings`,
@@ -329,6 +355,37 @@ export default function SettingsPage() {
                               </div>
                             </div>
                           )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {setErros?.access && setErros.access.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 uppercase tracking-wider">
+                    <ShieldAlert size={16} className="text-orange-500" />
+                    Access Errors ({setErros.access.length})
+                  </h3>
+                  <div className="grid gap-3">
+                    {setErros.access.map((err, idx) => (
+                      <div key={idx} className="flex items-start gap-3 p-4 bg-white border border-orange-100 shadow-sm rounded-xl hover:border-orange-200 transition-colors">
+                        <div className="p-1.5 bg-orange-50 rounded-lg shrink-0 mt-0.5">
+                          <AlertCircle size={16} className="text-orange-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="mb-2">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                              {typeof err.object === 'object' ? (err.object?.name || 'Access') : String(err.object)}
+                            </span>
+                          </div>
+                          <div className="mb-3">
+                            <p className="text-[13px] font-semibold text-gray-700 mb-1">Error Message:</p>
+                            <p className="text-sm text-gray-600 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap bg-orange-50/50 p-3 rounded-lg border border-orange-50 overflow-x-auto">
+                              {typeof err.error === 'object' ? JSON.stringify(err.error, null, 2) : String(err.error)}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     ))}
