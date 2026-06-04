@@ -9,6 +9,10 @@ export interface EventHookTarget {
     url: string
     contentType: string
     headers: Record<string, string>
+    auth: {
+        type: string
+        token: string
+    }
 }
 
 export interface EventHookAccess {

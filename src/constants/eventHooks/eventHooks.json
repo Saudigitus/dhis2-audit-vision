@@ -1,5 +1,5 @@
 {
- "name": "webhook-audit-vision",
+    "name": "webhook-audit-vision",
     "translations": [],
     "externalAccess": false,
     "publicAccess": "rw------",
@@ -25,7 +25,9 @@
             "clientId": "dhis2-webhook-YftAQBzIzTi",
             "url": "",
             "contentType": "application/json",
-            "headers": {}
+            "headers": {
+                "Authorization": ""
+            }
         }
     ],
     "displayName": "webhook-audit-vision",
