@@ -2,6 +2,25 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.6.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.5.2...v1.6.0) (2026-06-04)
+
+
+### 🐛 Bug Fixes
+
+* **useGetUserAuthorities:** add fields param to me query ([1657851](https://github.com/Saudigitus/dhis2-audit-vision/commit/1657851f56d82a0099bb56922d82433b5d82a327))
+
+
+### ♻️ Code Refactoring
+
+* **auth:** add permission checks and refactor auth state ([93c2f14](https://github.com/Saudigitus/dhis2-audit-vision/commit/93c2f1410a03fa12425fcf80f0e69ae02b9a1bc7))
+
+
+### ✨ New Features
+
+* **auth:** add authorization checks and access control flows ([19dbac1](https://github.com/Saudigitus/dhis2-audit-vision/commit/19dbac11d586ac7c18800d623e3cb7e64cdad8b8))
+* **eventHooks:** add authenticated event hook integration ([2867866](https://github.com/Saudigitus/dhis2-audit-vision/commit/28678661e3743755451db723e34e09831a8f4216))
+* **user-authorities:** add user authorities fetch and state management ([573a516](https://github.com/Saudigitus/dhis2-audit-vision/commit/573a516f724e1d906e707bd68b8b1887319ca32a))
+
 ### [1.5.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.5.1...v1.5.2) (2026-06-02)
 
 
