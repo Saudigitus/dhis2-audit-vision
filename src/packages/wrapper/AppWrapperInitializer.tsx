@@ -5,15 +5,18 @@ import { DataStoreConfigState } from "./types/DataStoreSchema"
 import { useInitializer } from "../../hooks/initializer/useInitializer"
 import { useGetSeverityRules } from "../../hooks/severityRules/useGetSeverityRules"
 import { ProgressContainer } from "../../components/progress/Progress"
+import { AccessDenied } from "./components/AccessDenied"
+import { UserAuthoritiesSchema } from "../../schema/userAuthoritiesSchema"
 
 const AppWrapperInitializer = (props: AppWrapperProps) => {
     const { children } = props
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
-    const { initialize, loading: initializerLoading, progress } = useInitializer()
+    const { initialize, loading: initializerLoading, progress, hasAuthority } = useInitializer()
     const { getSeverityRules, loading: loadingRules } = useGetSeverityRules()
+    const authorities = useRecoilValue(UserAuthoritiesSchema)
 
     useEffect(() => {
-        if (!dataStoreDataState) return
+        if (!dataStoreDataState || authorities?.user?.length == 0) return
 
         const hasAuditApi = !!dataStoreDataState?.auditApi;
         const progressEntries = Object.values(progress);
@@ -31,7 +34,7 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
             getSeverityRules()
         }
 
-    }, [dataStoreDataState])
+    }, [dataStoreDataState, authorities?.user])
 
     if (initializerLoading || loadingRules) {
         return (
@@ -39,6 +42,10 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
                 <ProgressContainer progress={progress} loading={initializerLoading || loadingRules} />
             </React.Fragment>
         )
+    }
+
+    if (!hasAuthority) {
+        return <AccessDenied />
     }
 
     return (

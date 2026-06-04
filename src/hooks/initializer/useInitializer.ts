@@ -1,10 +1,11 @@
 import { useGlobalError } from '../error/useGlobalError';
 import { useState } from 'react'
-import { useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { useDataEngine } from '@dhis2/app-runtime'
 import { SqlView } from '../../types/sqlView/sqlView'
 import { ErrorsSchema } from '../../schema/errorsSchema'
 import sqlviews from '../../constants/sqlviews/sqlviews.json'
+import { UserAuthoritiesSchema } from '../../schema/userAuthoritiesSchema';
 
 const GET_SQL_VIEW_QUERY = (id: string) => ({
     sqlView: {
@@ -34,7 +35,9 @@ export const useInitializer = () => {
     const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
-    const setErros = useSetRecoilState(ErrorsSchema)
+    const [hasAuthority, setHasAuthority] = useState(true)
+    const authorities = useRecoilValue(UserAuthoritiesSchema)
+    const [_, setErrorsState] = useRecoilState(ErrorsSchema)
 
     const [progress, setProgress] = useState<Record<string, progress>>({})
     const updateProgress = (key: string, action: string, status: 'PENDING' | 'SUCCESS' | 'ERROR', details?: string, object?: any) => {
@@ -59,7 +62,6 @@ export const useInitializer = () => {
                 }
 
             } catch (error: any) {
-                showError(error);
                 const err = error as { details?: { httpStatusCode?: number } }
                 if (err.details?.httpStatusCode === 404) {
                     try {
@@ -84,6 +86,12 @@ export const useInitializer = () => {
     const createSqlViews = async (views: SqlView[]) => {
         const view = views[0]
         const key = `create-sqlview-${view.id}`
+        const hasSqlViewAuth = authorities?.user?.some(auth => auth === 'F_SQLVIEW_PUBLIC_ADD' || auth === 'ALL')
+
+        if (!hasSqlViewAuth) {
+            setHasAuthority(false)
+            return
+        }
 
         try {
             updateProgress(key, `Creating SQL View ${view.name}`, 'PENDING', undefined, view)
@@ -99,7 +107,7 @@ export const useInitializer = () => {
         } catch (error: any) {
 
             showError(error);
-            setErros((prev: any) => ({
+            setErrorsState((prev: any) => ({
                 ...prev,
                 sqlViews: [...(prev?.sqlViews || []),
                 { error: 'Error creating SQL View:  ' + error?.details?.response?.response?.typeReports?.[0]?.objectReports?.[0]?.errorReports?.[0]?.message || '', object: views[0] }]
@@ -119,8 +127,8 @@ export const useInitializer = () => {
 
         try {
             await verifySqlViews()
-
         } catch (error: any) {
+            console.log(error)
             showError(error);
             updateProgress(eventHookKey, 'Initializing Event Hooks', 'ERROR', error?.message || 'Unknown error')
         }
@@ -131,6 +139,7 @@ export const useInitializer = () => {
     return {
         initialize,
         loading: loading,
-        progress
+        progress,
+        hasAuthority
     }
 }
