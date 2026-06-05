@@ -2,7 +2,7 @@
     "name": "webhook-audit-vision",
     "translations": [],
     "externalAccess": false,
-    "publicAccess": "rw------",
+    "publicAccess": "r-------",
     "userGroupAccesses": [],
     "userAccesses": [],
     "access": {
