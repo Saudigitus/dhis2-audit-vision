@@ -15,7 +15,9 @@ DHIS2 Audit Vision **automatically creates and maintains** the required API Rout
   - If they do not exist, they are created automatically with the correct configuration
   - If they exist but are outdated or incompatible, they are updated automatically
   - If any errors occur during creation/updating, they are logged and displayed in the error modal
-  - Access is automatically restricted to the **Audit Vision Administrators** user group only
+  - Access is automatically granted to both user groups:
+    - **Audit Vision Administrators**: Full read/write access
+    - **Audit Vision Viewers**: Read-only access
 
 :::success No Manual Setup Required
 You do not need to create or manage API Routes manually. The system handles this for you automatically when you save the configuration in the frontend.
@@ -43,5 +45,5 @@ The following routes are automatically managed:
 
 ## Next Steps
 
-- [Audit Vision Administrators Group →](./user-group)
+- [Audit Vision User Groups →](./user-group)
 - [Configuring the Audit API URL and Token →](./configure-api-url)

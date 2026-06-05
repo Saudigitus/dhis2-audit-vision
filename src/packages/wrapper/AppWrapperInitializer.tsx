@@ -7,6 +7,10 @@ import { useGetSeverityRules } from "../../hooks/severityRules/useGetSeverityRul
 import { ProgressContainer } from "../../components/progress/Progress"
 import { AccessDenied } from "./components/AccessDenied"
 import { UserAuthoritiesSchema } from "../../schema/userAuthoritiesSchema"
+import { UserSchema } from "../../schema/userSchema"
+
+const ADMIN_GROUP_CODE = 'AUDIT_VISION_ADMINS'
+const VIEWER_GROUP_CODE = 'AUDIT_VISION_VIEWERS'
 
 const AppWrapperInitializer = (props: AppWrapperProps) => {
     const { children } = props
@@ -14,9 +18,17 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
     const { initialize, loading: initializerLoading, progress, hasAuthority } = useInitializer()
     const { getSeverityRules, loading: loadingRules } = useGetSeverityRules()
     const authorities = useRecoilValue(UserAuthoritiesSchema)
+    const user = useRecoilValue(UserSchema)
+
+    // Check if user has access: is in either group OR has ALL authority OR has necessary individual authorities
+    const hasAccess = 
+        (user?.userGroups.some(group => group.code === ADMIN_GROUP_CODE) ||
+        user?.userGroups.some(group => group.code === VIEWER_GROUP_CODE) ||
+        authorities?.user.some(auth => auth === 'ALL') ||
+        authorities?.user.some(auth => auth === 'F_SQLVIEW_PUBLIC_ADD'))
 
     useEffect(() => {
-        if (!dataStoreDataState || authorities?.user?.length == 0) return
+        if (!dataStoreDataState || authorities?.user?.length == 0 || !user) return
 
         const hasAuditApi = !!dataStoreDataState?.auditApi;
         const progressEntries = Object.values(progress);
@@ -34,7 +46,7 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
             getSeverityRules()
         }
 
-    }, [dataStoreDataState, authorities?.user])
+    }, [dataStoreDataState, authorities?.user, user])
 
     if (initializerLoading || loadingRules) {
         return (
@@ -44,7 +56,7 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
         )
     }
 
-    if (!hasAuthority) {
+    if (!hasAccess) {
         return <AccessDenied />
     }
 

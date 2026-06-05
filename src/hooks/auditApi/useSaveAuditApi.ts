@@ -23,7 +23,7 @@ const useAuditApi = () => {
     const { hide, show } = useShowAlerts()
     const { initializeRoutes } = useInitializeRoutes()
     const { initialize: initializeEventHooks } = useInitializeEventHook()
-    const { ensureAdminGroup } = useInitializeUserGroup()
+    const { ensureAdminGroup, ensureViewerGroup } = useInitializeUserGroup()
 
 
     const updateApi = useCallback(async (auditApi: string, auditApiToken: string) => {
@@ -34,10 +34,11 @@ const useAuditApi = () => {
             const result: any = await engine.query(query)
             await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi } })
 
-            // Ensure the admin group exists before wiring up the event hook
+            // Ensure the admin and viewer groups exist before wiring up the event hook
             const adminGroupUid = await ensureAdminGroup()
+            const viewerGroupUid = await ensureViewerGroup()
             await initializeRoutes(auditApi, auditApiToken)
-            await initializeEventHooks(auditApi, auditApiToken, adminGroupUid)
+            await initializeEventHooks(auditApi, auditApiToken, adminGroupUid, viewerGroupUid)
             
             show({
                 message: `Configuration saved successfuly!`,
@@ -58,7 +59,7 @@ const useAuditApi = () => {
         } finally {
             setLoading(false)
         }
-    }, [engine, createDataStore, initializeRoutes, initializeEventHooks, ensureAdminGroup])
+    }, [engine, createDataStore, initializeRoutes, initializeEventHooks, ensureAdminGroup, ensureViewerGroup])
 
     return { updateApi, loading, error }
 }
