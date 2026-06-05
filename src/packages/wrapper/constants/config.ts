@@ -6,7 +6,6 @@ export const dataStoreKey = `dataStore/${NAMESPACE}/${KEY}`
 export const defaultDataStoreConfig = {
     "key": "audit",
     "auditApi": "",
-    "auditApiToken": "",
     "monitoringGroups": [],
     "reports": {
         "changesByPeriod": "uOPaRDAtwFi",

@@ -6,6 +6,7 @@ import useShowAlerts from "../../packages/wrapper/hooks/alert/useShowAlert"
 import { dataStoreKey } from "../../packages/wrapper/constants/config"
 import { useInitializeRoutes } from "./useInitializeRoutes"
 import { useInitializeEventHook } from '../initializer/useInitializeEventHook';
+import { useInitializeUserGroup } from '../initializer/useInitializeUserGroup';
 
 const query = {
     dataStoreValues: {
@@ -22,6 +23,7 @@ const useAuditApi = () => {
     const { hide, show } = useShowAlerts()
     const { initializeRoutes } = useInitializeRoutes()
     const { initialize: initializeEventHooks } = useInitializeEventHook()
+    const { ensureAdminGroup, ensureViewerGroup } = useInitializeUserGroup()
 
 
     const updateApi = useCallback(async (auditApi: string, auditApiToken: string) => {
@@ -32,8 +34,11 @@ const useAuditApi = () => {
             const result: any = await engine.query(query)
             await createDataStore({ key: dataStoreKey, data: { ...result?.dataStoreValues, auditApi } })
 
+            // Ensure the admin and viewer groups exist before wiring up the event hook
+            const adminGroupUid = await ensureAdminGroup()
+            const viewerGroupUid = await ensureViewerGroup()
             await initializeRoutes(auditApi, auditApiToken)
-            await initializeEventHooks(auditApi, auditApiToken)
+            await initializeEventHooks(auditApi, auditApiToken, adminGroupUid, viewerGroupUid)
             
             show({
                 message: `Configuration saved successfuly!`,
@@ -54,7 +59,7 @@ const useAuditApi = () => {
         } finally {
             setLoading(false)
         }
-    }, [engine, createDataStore, initializeRoutes])
+    }, [engine, createDataStore, initializeRoutes, initializeEventHooks, ensureAdminGroup, ensureViewerGroup])
 
     return { updateApi, loading, error }
 }

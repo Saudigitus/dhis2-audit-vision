@@ -1,7 +1,7 @@
 ---
 id: sql-views
 title: SQL View Management
-sidebar_position: 4
+sidebar_position: 3
 ---
 
 # Automatic SQL View Management
@@ -13,6 +13,9 @@ DHIS2 Audit Vision **automatically creates and maintains** the required SQL View
 - On startup, the Audit API checks whether the required SQL Views exist in DHIS2.
 - If they do not exist, they are created automatically.
 - If they exist but are outdated or incompatible, they are updated automatically.
+- Access is automatically granted to both user groups:
+  - **Audit Vision Administrators**: Full read/write access
+  - **Audit Vision Viewers**: Read-only access
 
 :::success No Manual Setup Required
 You do not need to create or manage SQL Views manually. The system handles this for you.
@@ -30,4 +33,5 @@ Only change this value if you are managing multiple Audit Vision instances again
 
 ## Next Steps
 
+- [Audit Vision User Groups →](./user-group)
 - [Understanding DHIS2 Auditing →](./understanding-dhis2-audit)

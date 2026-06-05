@@ -3,7 +3,7 @@
         "name": "audit_with_filter",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {
@@ -31,7 +31,7 @@
         "name": "single_audit",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {
@@ -60,7 +60,7 @@
         "name": "audit_totals",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {
@@ -88,7 +88,7 @@
         "name": "audit_by_types",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {
@@ -116,7 +116,7 @@
         "name": "audit_daily",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {
@@ -144,7 +144,7 @@
         "name": "audit_total_per_user",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {
@@ -172,7 +172,7 @@
         "name": "audit_total_risk",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {
@@ -200,7 +200,7 @@
         "name": "audit_top_5_by_date",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {
@@ -228,7 +228,7 @@
         "name": "users_with_audits",
         "translations": [],
         "externalAccess": false,
-        "publicAccess": "rwrw----",
+        "publicAccess": "--------",
         "userGroupAccesses": [],
         "userAccesses": [],
         "access": {

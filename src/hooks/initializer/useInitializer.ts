@@ -6,6 +6,7 @@ import { SqlView } from '../../types/sqlView/sqlView'
 import { ErrorsSchema } from '../../schema/errorsSchema'
 import sqlviews from '../../constants/sqlviews/sqlviews.json'
 import { UserAuthoritiesSchema } from '../../schema/userAuthoritiesSchema';
+import { useInitializeUserGroup } from './useInitializeUserGroup';
 
 const GET_SQL_VIEW_QUERY = (id: string) => ({
     sqlView: {
@@ -38,6 +39,7 @@ export const useInitializer = () => {
     const [hasAuthority, setHasAuthority] = useState(true)
     const authorities = useRecoilValue(UserAuthoritiesSchema)
     const [_, setErrorsState] = useRecoilState(ErrorsSchema)
+    const { ensureAdminGroup, ensureViewerGroup } = useInitializeUserGroup()
 
     const [progress, setProgress] = useState<Record<string, progress>>({})
     const updateProgress = (key: string, action: string, status: 'PENDING' | 'SUCCESS' | 'ERROR', details?: string, object?: any) => {
@@ -46,8 +48,40 @@ export const useInitializer = () => {
         }))
     }
 
+    // Stamps correct permissions onto a view object before sending to DHIS2
+    const withPermissions = (view: SqlView, adminGroupUid: string, viewerGroupUid: string): SqlView => ({
+        ...view,
+        publicAccess: '--------',
+        userGroupAccesses: [
+            { id: adminGroupUid, access: 'rwrw----' },
+            { id: viewerGroupUid, access: 'r-------' }
+        ],
+    })
 
-    const verifySqlViews = async () => {
+    // Widened: re-apply permissions even if only access settings changed
+    const compareSqlViews = async (
+        existingView: SqlView,
+        newView: SqlView,
+        adminGroupUid: string,
+        viewerGroupUid: string
+    ) => {
+        const desired = withPermissions(newView, adminGroupUid, viewerGroupUid)
+
+        const sqlChanged = existingView.sqlQuery !== desired.sqlQuery
+        const accessChanged = existingView.publicAccess !== desired.publicAccess
+        const adminGroupMissing = !existingView.userGroupAccesses?.some(
+            (a: any) => a.id === adminGroupUid
+        )
+        const viewerGroupMissing = !existingView.userGroupAccesses?.some(
+            (a: any) => a.id === viewerGroupUid
+        )
+
+        if (sqlChanged || accessChanged || adminGroupMissing || viewerGroupMissing) {
+            await createSqlViews([desired])
+        }
+    }
+
+    const verifySqlViews = async (adminGroupUid: string, viewerGroupUid: string) => {
         setLoading(true)
 
         for (const view of sqlviews as SqlView[]) {
@@ -56,16 +90,16 @@ export const useInitializer = () => {
                 const existingView = response.sqlView
 
                 if (existingView) {
-                    await compareSqlViews(existingView, view)
+                    await compareSqlViews(existingView, view, adminGroupUid, viewerGroupUid)
                 } else {
-                    await createSqlViews([view])
+                    await createSqlViews([withPermissions(view, adminGroupUid, viewerGroupUid)])
                 }
 
             } catch (error: any) {
                 const err = error as { details?: { httpStatusCode?: number } }
                 if (err.details?.httpStatusCode === 404) {
                     try {
-                        await createSqlViews([view])
+                        await createSqlViews([withPermissions(view, adminGroupUid, viewerGroupUid)])
                     } catch (createError: any) {
                         showError(createError);
                         console.error(`Error checking SQL View ${view.id}:`, error)
@@ -75,12 +109,6 @@ export const useInitializer = () => {
         }
 
         setLoading(false)
-    }
-
-    const compareSqlViews = async (existingView: SqlView, newView: SqlView) => {
-        if (existingView.sqlQuery !== newView.sqlQuery) {
-            await createSqlViews([newView])
-        }
     }
 
     const createSqlViews = async (views: SqlView[]) => {
@@ -123,14 +151,18 @@ export const useInitializer = () => {
         setProgress({})
         setLoading(true)
 
-        const eventHookKey = 'event-hooks'
-
         try {
-            await verifySqlViews()
+            // Ensure the admin and viewer groups exist before anything else
+            updateProgress('user-groups', 'Ensuring admin and viewer user groups', 'PENDING')
+            const adminGroupUid = await ensureAdminGroup()
+            const viewerGroupUid = await ensureViewerGroup()
+            updateProgress('user-groups', 'Ensuring admin and viewer user groups', 'SUCCESS')
+
+            await verifySqlViews(adminGroupUid, viewerGroupUid)
         } catch (error: any) {
             console.log(error)
             showError(error);
-            updateProgress(eventHookKey, 'Initializing Event Hooks', 'ERROR', error?.message || 'Unknown error')
+            updateProgress('user-groups', 'Ensuring admin and viewer user groups', 'ERROR', error?.message || 'Unknown error')
         }
 
         setLoading(false)

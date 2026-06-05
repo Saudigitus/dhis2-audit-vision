@@ -16,7 +16,8 @@ For Audit Vision to read audit data from DHIS2, you need to:
 2. **Create a dedicated integration user** with the minimum required permissions
 3. **Understand how SQL Views are managed** (automatic)
 4. **Understand how API Routes are managed** (automatic)
-5. **Configure the Audit API URL and Token** in the frontend application
+5. **Configure the Audit Vision Administrators group** (automatic)
+6. **Configure the Audit API URL and Token** in the frontend application
 
 ## Minimum DHIS2 Version
 
@@ -30,5 +31,6 @@ DHIS2 Audit Vision requires **DHIS2 version 2.40 or higher**.
 - [Create the Integration User](./integration-user)
 - [SQL View Management](./sql-views)
 - [API Routes Management](./api-routes)
+- [Audit Vision Administrators Group](./user-group)
 - [Understanding DHIS2 Auditing](./understanding-dhis2-audit)
 - [Configuring the Audit API URL and Token](./configure-api-url)
