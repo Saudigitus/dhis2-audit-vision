@@ -13,60 +13,89 @@ const GET_EVENT_HOOK_QUERY = (id: string) => ({
 })
 
 export const useInitializeEventHook = () => {
-    const { showError } = useGlobalError();
+    const { showError } = useGlobalError()
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
-    const setErros = useSetRecoilState(ErrorsSchema)
+    const setErrors = useSetRecoilState(ErrorsSchema)
 
-    const buildEventHookWithUrl = (auditApi?: string, token?: string): EventHook => {
+    const buildEventHook = (
+        auditApi: string,
+        token: string,
+        adminGroupUid: string
+    ): EventHook => {
         const hook = { ...eventHooks } as unknown as EventHook
 
-        const baseUrl = auditApi
-        hook.targets[0].url = `${baseUrl}/api/webhooks/dhis2/event`
-        hook.targets[0].headers['Authorization'] = `Bearer ${token}`
+        hook.targets[0].url = `${auditApi}/api/webhooks/dhis2/event`
+
+        // Use DHIS2's structured auth field — encrypted at rest, never returned by GET /api/eventHooks
+        hook.targets[0].auth = { type: 'api-token', token }
+
+        // Restrict access to the admin group only
+        hook.publicAccess = '--------'
+        hook.userGroupAccesses = [{ id: adminGroupUid, access: 'rw------' }]
 
         return hook
     }
 
-    const verifyEventHooks = async (auditApi?: string, token?: string) => {
-        if (!auditApi) {
-            console.log('Audit API URL not configured, skipping event hook initialization')
-            return
-        }
+    const hookNeedsUpdate = (existing: EventHook, desired: EventHook): boolean => {
+        const urlChanged = existing.targets?.[0]?.url !== desired.targets?.[0]?.url
+        const accessChanged = existing.publicAccess !== desired.publicAccess
+        const groupMissing = !existing.userGroupAccesses?.some(
+            (a: any) => a.id === desired.userGroupAccesses?.[0]?.id
+        )
+        // Note: we cannot compare auth/token since DHIS2 never returns it in GET responses.
+        // Always recreate on URL or access change; otherwise leave the existing hook intact.
+        return urlChanged || accessChanged || groupMissing
+    }
+
+    const verifyEventHooks = async (
+        auditApi?: string,
+        token?: string,
+        adminGroupUid?: string
+    ) => {
+        if (!auditApi || !token || !adminGroupUid) return
 
         setLoading(true)
-        const hook = buildEventHookWithUrl(auditApi, token)
+        const desired = buildEventHook(auditApi, token, adminGroupUid)
+        console.log(desired, token, auditApi)
 
         try {
             let existingHook: EventHook | null = null
             try {
-                const response = await engine.query(GET_EVENT_HOOK_QUERY(hook.id)) as { eventHook: EventHook | null }
+                const response = await engine.query(GET_EVENT_HOOK_QUERY(desired.id)) as { eventHook: EventHook | null }
                 existingHook = response.eventHook
-            } catch (err) {
-                // If query fails, hook probably doesn't exist
+            } catch {
+                // 404 — hook does not exist yet
+            }
+
+            if (existingHook && !hookNeedsUpdate(existingHook, desired)) {
+                setLoading(false)
+                return  // already up to date, nothing to do
             }
 
             if (existingHook) {
                 console.log('Existing event hook found, deleting it')
-                await engine.delete(`eventHooks/${hook.id}`)
+                await engine.delete(`eventHooks/${desired.id}`)
             }
 
             console.log('Creating new event hook')
-            await engine.post(`eventHooks`, hook)
-
+            await engine.post('eventHooks', desired)
         } catch (error: any) {
-            showError(error);
-            setErros((prev: any) => ({ ...prev, webHooks: [...prev?.webHooks || [], { error: `Error initializing Event Hook ${hook.id}: ${error.message}`, object: hook }] }))
+            showError(error)
+            setErrors((prev: any) => ({
+                ...prev,
+                webHooks: [
+                    ...(prev?.webHooks || []),
+                    { error: `Error initializing Event Hook ${desired.id}: ${error.message}`, object: desired },
+                ],
+            }))
         }
         setLoading(false)
     }
 
-    const initialize = async (auditApi?: string, token?: string) => {
-        await verifyEventHooks(auditApi, token)
+    const initialize = async (auditApi?: string, token?: string, adminGroupUid?: string) => {
+        await verifyEventHooks(auditApi, token, adminGroupUid)
     }
 
-    return {
-        initialize,
-        loading
-    }
+    return { initialize, loading }
 }

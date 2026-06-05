@@ -2,7 +2,7 @@
     "name": "webhook-audit-vision",
     "translations": [],
     "externalAccess": false,
-    "publicAccess": "r-------",
+    "publicAccess": "--------",
     "userGroupAccesses": [],
     "userAccesses": [],
     "access": {
@@ -25,9 +25,7 @@
             "clientId": "dhis2-webhook-YftAQBzIzTi",
             "url": "",
             "contentType": "application/json",
-            "headers": {
-                "Authorization": ""
-            }
+            "headers": {}
         }
     ],
     "displayName": "webhook-audit-vision",
