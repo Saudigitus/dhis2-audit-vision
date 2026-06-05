@@ -2,6 +2,29 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.7.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.6.0...v1.7.0) (2026-06-05)
+
+
+### 🐛 Bug Fixes
+
+* restrict public access to read-only for configs ([cfc7d4c](https://github.com/Saudigitus/dhis2-audit-vision/commit/cfc7d4c1a6a20d28566cd9db2d93bf64609dfaac))
+
+
+### ♻️ Code Refactoring
+
+* clean up config, simplify router and refactor auth util ([f26d573](https://github.com/Saudigitus/dhis2-audit-vision/commit/f26d573d061d04b9d56a40a967eb448c13c237e0))
+
+
+### 📝 Documentation
+
+* **configuration:** add admin group docs and update config pages ([18ea77a](https://github.com/Saudigitus/dhis2-audit-vision/commit/18ea77a06b4acbb0bc55b1d4c527ca8eb0195f3a))
+
+
+### ✨ New Features
+
+* **audit:** add admin group and secure audit resources ([2a60124](https://github.com/Saudigitus/dhis2-audit-vision/commit/2a60124c7bdffb41681057c6fbffe7e6e906bee5))
+* **user-access:** add read-only viewer user group support ([6b2d6ab](https://github.com/Saudigitus/dhis2-audit-vision/commit/6b2d6ab08870f0344950b6000f71bc425def3dac))
+
 ## [1.6.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.5.2...v1.6.0) (2026-06-04)
 
 
