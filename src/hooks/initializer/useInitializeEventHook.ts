@@ -23,7 +23,7 @@ export const useInitializeEventHook = () => {
 
         const baseUrl = auditApi
         hook.targets[0].url = `${baseUrl}/api/webhooks/dhis2/event`
-        hook.targets[0].headers['Authorization'] = `Bearer ${token}`
+        hook.targets[0].auth = { type: 'api-token', token: token ?? '' }
 
         return hook
     }
