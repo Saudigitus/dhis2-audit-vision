@@ -6,10 +6,6 @@ import { DataStoreConfigState } from '../../packages/wrapper/types/DataStoreSche
 export default function Router() {
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
 
-    if (dataStoreDataState === undefined) {
-        return null;
-    }
-
     return (
         <HashRouter>
             <Routes>

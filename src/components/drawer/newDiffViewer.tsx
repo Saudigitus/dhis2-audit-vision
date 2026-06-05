@@ -10,7 +10,7 @@ import ConfirmDialog from "../confirm/confirmDialog";
 import { UserAuthoritiesSchema } from "../../schema/userAuthoritiesSchema";
 import { useRecoilValue } from "recoil";
 import { DiffArrayItem, DiffNode } from "../../types/diffTypes/diffTypes";
-import isOpAvailable from "./utils/opAvailability";
+import shouldDisableRollback from "./utils/disableChecker";
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -30,7 +30,7 @@ export default function AuditDiffViewer({ auditDetails, selectedChange, onClose,
     const before = auditDetails?.[1]?.objectData ?? {}
     const createMode = !before
     const disabled = (Object?.keys(before)?.length === 0 && !selected) || loading
-    const optionNotAvailable = isOpAvailable(authorities.all, authorities.user, selectedChange?.object)
+    const optionNotAvailable = shouldDisableRollback(authorities.all, authorities.user, selectedChange?.object)
     const isDisabled = disabled || optionNotAvailable
     
     const diffTree = useMemo(
