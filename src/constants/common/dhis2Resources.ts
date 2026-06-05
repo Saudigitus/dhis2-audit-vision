@@ -3,9 +3,11 @@ export const RESOURCE_MAPPING: Record<string, { resource: string, fields: string
     program: { resource: 'programs', fields: ['id', 'displayName', 'programType', 'programStages'] },
     dataSet: { resource: 'dataSets', fields: ['id', 'displayName', 'periodType', 'dataSetElements'] },
     dataSetElement: { resource: 'dataSetElements', fields: ['id', 'displayName'] },
+    dataValue: { resource: 'dataValues', fields: ['dataElement', 'period', 'orgUnit', 'value'] },
     
     // Data Elements & Indicators
     dataElement: { resource: 'dataElements', fields: ['id', 'displayName', 'valueType'] },
+    dataElementOperand: { resource: 'dataElementOperands', fields: ['id', 'displayName'] },
     dataElementGroup: { resource: 'dataElementGroups', fields: ['id', 'displayName'] },
     dataElementGroupSet: { resource: 'dataElementGroupSets', fields: ['id', 'displayName'] },
     indicator: { resource: 'indicators', fields: ['id', 'displayName', 'indicatorType'] },
@@ -27,6 +29,7 @@ export const RESOURCE_MAPPING: Record<string, { resource: string, fields: string
     programStageSection: { resource: 'programStageSections', fields: ['id', 'displayName'] },
     programTrackedEntityAttribute: { resource: 'programTrackedEntityAttributes', fields: ['id', 'displayName'] },
     relationshipType: { resource: 'relationshipTypes', fields: ['id', 'displayName'] },
+    relationship: { resource: 'relationships', fields: ['id', 'displayName'] },
     trackedEntityInstance: { resource: 'trackedEntityInstances', fields: ['id', 'attributes'] },
     enrollment: { resource: 'enrollments', fields: ['id', 'enrollmentDate'] },
     
@@ -60,7 +63,9 @@ export const RESOURCE_MAPPING: Record<string, { resource: string, fields: string
     
     // Analysis & Reports
     visualization: { resource: 'visualizations', fields: ['id', 'displayName', 'type'] },
+    eventVisualization: { resource: 'eventVisualizations', fields: ['id', 'displayName'] },
     map: { resource: 'maps', fields: ['id', 'displayName'] },
+    mapView: { resource: 'mapViews', fields: ['id', 'displayName'] },
     dashboard: { resource: 'dashboards', fields: ['id', 'displayName'] },
     dashboardItem: { resource: 'dashboardItems', fields: ['id'] },
     report: { resource: 'reports', fields: ['id', 'displayName'] },
@@ -68,6 +73,7 @@ export const RESOURCE_MAPPING: Record<string, { resource: string, fields: string
     chart: { resource: 'charts', fields: ['id', 'displayName'] },
     sqlView: { resource: 'sqlViews', fields: ['id', 'displayName', 'type'] },
     legendSet: { resource: 'legendSets', fields: ['id', 'displayName'] },
+    legend: { resource: 'legends', fields: ['id', 'displayName'] },
     colorSet: { resource: 'colorSets', fields: ['id', 'displayName'] },
     
     // Rules & Validation
