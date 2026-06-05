@@ -26,18 +26,19 @@ const sidebars = {
   ],
 
   configurationSidebar: [
-    {
-      type: 'doc',
-      id: 'configuration/intro',
-      label: 'Introduction',
-    },
-    'configuration/enable-audit-system',
-    'configuration/integration-user',
-    'configuration/sql-views',
-    'configuration/api-routes',
-    'configuration/understanding-dhis2-audit',
-    'configuration/configure-api-url',
-  ],
+        {
+            type: 'doc',
+            id: 'configuration/intro',
+            label: 'Introduction',
+        },
+        'configuration/enable-audit-system',
+        'configuration/integration-user',
+        'configuration/sql-views',
+        'configuration/api-routes',
+        'configuration/user-group',
+        'configuration/understanding-dhis2-audit',
+        'configuration/configure-api-url',
+    ],
 
   developmentSidebar: [
     {
