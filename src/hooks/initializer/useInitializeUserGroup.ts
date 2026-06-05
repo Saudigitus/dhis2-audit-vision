@@ -1,17 +1,19 @@
 import { useDataEngine } from '@dhis2/app-runtime'
 
-const USER_GROUP_NAME = 'Audit Vision Administrators'
-const USER_GROUP_CODE = 'AUDIT_VISION_ADMINS'
+const ADMIN_GROUP_NAME = 'Audit Vision Administrators'
+const ADMIN_GROUP_CODE = 'AUDIT_VISION_ADMINS'
+const VIEWER_GROUP_NAME = 'Audit Vision Viewers'
+const VIEWER_GROUP_CODE = 'AUDIT_VISION_VIEWERS'
 
-const FIND_USER_GROUP_QUERY = {
+const FIND_USER_GROUP_QUERY = (code: string) => ({
     userGroups: {
         resource: 'userGroups',
         params: {
-            filter: `code:eq:${USER_GROUP_CODE}`,
+            filter: `code:eq:${code}`,
             fields: 'id,name,code',
         },
     },
-}
+})
 
 const GET_NEW_UID_QUERY = {
     id: { resource: 'system/id', params: { limit: 1 } },
@@ -20,9 +22,9 @@ const GET_NEW_UID_QUERY = {
 export const useInitializeUserGroup = () => {
     const engine = useDataEngine()
 
-    const ensureAdminGroup = async (): Promise<string> => {
+    const ensureUserGroup = async (name: string, code: string): Promise<string> => {
         // 1. Look up by stable code — safe to call multiple times
-        const result: any = await engine.query(FIND_USER_GROUP_QUERY)
+        const result: any = await engine.query(FIND_USER_GROUP_QUERY(code))
         const existing = result?.userGroups?.userGroups?.[0]
         if (existing) {
             return existing.id
@@ -38,8 +40,8 @@ export const useInitializeUserGroup = () => {
             resource: 'userGroups',
             data: {
                 id: uid,
-                name: USER_GROUP_NAME,
-                code: USER_GROUP_CODE,
+                name,
+                code,
                 users: [],
             },
         } as any)
@@ -47,5 +49,13 @@ export const useInitializeUserGroup = () => {
         return uid
     }
 
-    return { ensureAdminGroup }
+    const ensureAdminGroup = async (): Promise<string> => {
+        return ensureUserGroup(ADMIN_GROUP_NAME, ADMIN_GROUP_CODE)
+    }
+
+    const ensureViewerGroup = async (): Promise<string> => {
+        return ensureUserGroup(VIEWER_GROUP_NAME, VIEWER_GROUP_CODE)
+    }
+
+    return { ensureAdminGroup, ensureViewerGroup }
 }
