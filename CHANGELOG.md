@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.8.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.7.2...v1.8.0) (2026-06-07)
+
+
+### ✨ New Features
+
+* **auditApi:** add group-based access controls to audit routes ([6b003e7](https://github.com/Saudigitus/dhis2-audit-vision/commit/6b003e71df11ca52aadc4d5f74d46be5e4431439))
+
 ### [1.7.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.7.1...v1.7.2) (2026-06-07)
 
 
