@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.7.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.7.0...v1.7.1) (2026-06-07)
+
+
+### 🐛 Bug Fixes
+
+* **useInitializeRoutes:** use token field instead of manual auth header ([1bdeedf](https://github.com/Saudigitus/dhis2-audit-vision/commit/1bdeedfbe466fb475cd4ffb5d67293cc6edc9260))
+
 ## [1.7.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.6.0...v1.7.0) (2026-06-05)
 
 
