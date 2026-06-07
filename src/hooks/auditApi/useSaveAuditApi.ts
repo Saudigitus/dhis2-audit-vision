@@ -37,7 +37,7 @@ const useAuditApi = () => {
             // Ensure the admin and viewer groups exist before wiring up the event hook
             const adminGroupUid = await ensureAdminGroup()
             const viewerGroupUid = await ensureViewerGroup()
-            await initializeRoutes(auditApi, auditApiToken)
+            await initializeRoutes(auditApi, auditApiToken, adminGroupUid, viewerGroupUid)
             await initializeEventHooks(auditApi, auditApiToken, adminGroupUid, viewerGroupUid)
             
             show({
