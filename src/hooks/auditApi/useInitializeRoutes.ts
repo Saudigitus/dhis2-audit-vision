@@ -55,7 +55,7 @@ export const useInitializeRoutes = () => {
         auth,
         publicAccess: '--------',
         userGroupAccesses: [
-          { id: adminGroupUid, access: 'rwrw----' },
+          { id: adminGroupUid, access: 'rw------' },
           { id: viewerGroupUid, access: 'r-------' }
         ],
       },
@@ -68,7 +68,7 @@ export const useInitializeRoutes = () => {
         auth,
         publicAccess: '--------',
         userGroupAccesses: [
-          { id: adminGroupUid, access: 'rwrw----' },
+          { id: adminGroupUid, access: 'rw------' },
           { id: viewerGroupUid, access: 'r-------' }
         ],
       },
@@ -81,7 +81,7 @@ export const useInitializeRoutes = () => {
         auth,
         publicAccess: '--------',
         userGroupAccesses: [
-          { id: adminGroupUid, access: 'rwrw----' },
+          { id: adminGroupUid, access: 'rw------' },
           { id: viewerGroupUid, access: 'r-------' }
         ],
       },
@@ -94,7 +94,7 @@ export const useInitializeRoutes = () => {
         auth,
         publicAccess: '--------',
         userGroupAccesses: [
-          { id: adminGroupUid, access: 'rwrw----' },
+          { id: adminGroupUid, access: 'rw------' },
           { id: viewerGroupUid, access: 'r-------' }
         ],
       },
@@ -107,7 +107,7 @@ export const useInitializeRoutes = () => {
         auth,
         publicAccess: '--------',
         userGroupAccesses: [
-          { id: adminGroupUid, access: 'rwrw----' },
+          { id: adminGroupUid, access: 'rw------' },
           { id: viewerGroupUid, access: 'r-------' }
         ],
       },
@@ -120,7 +120,7 @@ export const useInitializeRoutes = () => {
         auth,
         publicAccess: '--------',
         userGroupAccesses: [
-          { id: adminGroupUid, access: 'rwrw----' },
+          { id: adminGroupUid, access: 'rw------' },
           { id: viewerGroupUid, access: 'r-------' }
         ],
       },

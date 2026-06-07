@@ -53,7 +53,7 @@ export const useInitializer = () => {
         ...view,
         publicAccess: '--------',
         userGroupAccesses: [
-            { id: adminGroupUid, access: 'rwrw----' },
+            { id: adminGroupUid, access: 'rw------' },
             { id: viewerGroupUid, access: 'r-------' }
         ],
     })
@@ -84,7 +84,7 @@ export const useInitializer = () => {
     const verifySqlViews = async (adminGroupUid: string, viewerGroupUid: string) => {
         setLoading(true)
 
-        for (const view of sqlviews as SqlView[]) {
+        for (const view of sqlviews as any[]) {
             try {
                 const response = await engine.query(GET_SQL_VIEW_QUERY(view.id)) as { sqlView: SqlView | null }
                 const existingView = response.sqlView
