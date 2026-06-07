@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.8.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.8.0...v1.8.1) (2026-06-07)
+
+
+### 🐛 Bug Fixes
+
+* **hooks:** fix admin group permissions and code issues ([ee99735](https://github.com/Saudigitus/dhis2-audit-vision/commit/ee997352b4895fd88f2ef8a2572181616bdb3c57))
+
 ## [1.8.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.7.2...v1.8.0) (2026-06-07)
 
 
