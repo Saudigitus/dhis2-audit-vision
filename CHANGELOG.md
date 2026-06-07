@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.7.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.7.1...v1.7.2) (2026-06-07)
+
+
+### 🐛 Bug Fixes
+
+* **useInitializeRoutes:** use correct bearer auth header format ([22a20ef](https://github.com/Saudigitus/dhis2-audit-vision/commit/22a20efa030b4a9230f3815daf2a916800428595))
+
 ### [1.7.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.7.0...v1.7.1) (2026-06-07)
 
 
