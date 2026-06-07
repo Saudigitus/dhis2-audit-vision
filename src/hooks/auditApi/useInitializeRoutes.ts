@@ -14,6 +14,8 @@ interface Route {
     type: string
     headers?: Record<string, string>
   }
+  publicAccess: string
+  userGroupAccesses: { id: string; access: string }[]
 }
 
 const CREATE_OR_UPDATE_ROUTES_MUTATION = {
@@ -33,7 +35,7 @@ export const useInitializeRoutes = () => {
   const [loading, setLoading] = useState(false)
   const setErrors = useSetRecoilState(ErrorsSchema)
 
-  const buildRoutes = (baseUrl: string, token: string): Route[] => {
+  const buildRoutes = (baseUrl: string, token: string, adminGroupUid: string, viewerGroupUid: string): Route[] => {
     const auth = token ? {
       type: 'api-headers',
       headers: {
@@ -51,6 +53,11 @@ export const useInitializeRoutes = () => {
         disabled: false,
         url: `${baseUrl}/api/audits/metadata`,
         auth,
+        publicAccess: '--------',
+        userGroupAccesses: [
+          { id: adminGroupUid, access: 'rwrw----' },
+          { id: viewerGroupUid, access: 'r-------' }
+        ],
       },
       {
         id: 'HeJMXGf1K9J',
@@ -59,6 +66,11 @@ export const useInitializeRoutes = () => {
         disabled: false,
         url: `${baseUrl}/api/audits`,
         auth,
+        publicAccess: '--------',
+        userGroupAccesses: [
+          { id: adminGroupUid, access: 'rwrw----' },
+          { id: viewerGroupUid, access: 'r-------' }
+        ],
       },
       {
         id: 'rWbZpQenrTD',
@@ -67,6 +79,11 @@ export const useInitializeRoutes = () => {
         disabled: false,
         url: `${baseUrl}/api/auditObjects`,
         auth,
+        publicAccess: '--------',
+        userGroupAccesses: [
+          { id: adminGroupUid, access: 'rwrw----' },
+          { id: viewerGroupUid, access: 'r-------' }
+        ],
       },
       {
         id: 'd0sbsyw0xS8',
@@ -75,6 +92,11 @@ export const useInitializeRoutes = () => {
         disabled: false,
         url: `${baseUrl}/api/notifications/create`,
         auth,
+        publicAccess: '--------',
+        userGroupAccesses: [
+          { id: adminGroupUid, access: 'rwrw----' },
+          { id: viewerGroupUid, access: 'r-------' }
+        ],
       },
       {
         id: 'aayonvVCCBZ',
@@ -83,6 +105,11 @@ export const useInitializeRoutes = () => {
         disabled: false,
         url: `${baseUrl}/api/notifications`,
         auth,
+        publicAccess: '--------',
+        userGroupAccesses: [
+          { id: adminGroupUid, access: 'rwrw----' },
+          { id: viewerGroupUid, access: 'r-------' }
+        ],
       },
       {
         id: 'DTD2iDhH3mk',
@@ -91,18 +118,23 @@ export const useInitializeRoutes = () => {
         disabled: false,
         url: `${baseUrl}/api/notifications`,
         auth,
+        publicAccess: '--------',
+        userGroupAccesses: [
+          { id: adminGroupUid, access: 'rwrw----' },
+          { id: viewerGroupUid, access: 'r-------' }
+        ],
       },
     ]
   }
 
-  const initializeRoutes = async (baseUrl: string, token: string) => {
+  const initializeRoutes = async (baseUrl: string, token: string, adminGroupUid: string, viewerGroupUid: string) => {
     if (!baseUrl) {
       console.log('Audit API URL not configured, skipping route initialization')
       return
     }
 
     setLoading(true)
-    const routes = buildRoutes(baseUrl, token)
+    const routes = buildRoutes(baseUrl, token, adminGroupUid, viewerGroupUid)
 
     try {
       await engine.mutate(CREATE_OR_UPDATE_ROUTES_MUTATION as any, {
