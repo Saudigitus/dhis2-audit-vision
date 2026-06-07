@@ -36,7 +36,9 @@ export const useInitializeRoutes = () => {
   const buildRoutes = (baseUrl: string, token: string): Route[] => {
     const auth = token ? {
       type: 'api-headers',
-      token: token,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     } : {
       type: 'none',
     }
