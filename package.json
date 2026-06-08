@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.8.2",
   "scripts": {
-    "start": "d2-app-scripts start --proxy https://training.saudigitus.org/audit",
+    "start": "d2-app-scripts start",
     "test": "d2-app-scripts test",
     "deploy": "d2-app-scripts deploy",
     "build": "d2-app-scripts build --no-verify",

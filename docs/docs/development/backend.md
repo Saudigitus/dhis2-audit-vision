@@ -86,6 +86,16 @@ The API will be available at `http://localhost:8000`.
 - Docker and Docker Compose
 - Git
 
+### Option 3: Docker Compose with DHIS2 (Scenario 3, Dev/Test)
+
+### Quick start commands:
+```bash
+cd docker/scenario-3-dev-docker-compose
+docker compose --env-file ../../.env up --build -d
+docker compose --env-file ../../.env exec api alembic upgrade head
+docker compose --env-file ../../.env exec api python commands.py seed-superuser
+```
+
 ### Setup Instructions
 
 #### 1. Clone the Repository
