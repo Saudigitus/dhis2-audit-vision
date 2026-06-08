@@ -15,7 +15,7 @@ const VIEWER_GROUP_CODE = 'AUDIT_VISION_VIEWERS'
 const AppWrapperInitializer = (props: AppWrapperProps) => {
     const { children } = props
     const dataStoreDataState = useRecoilValue(DataStoreConfigState)
-    const { initialize, loading: initializerLoading, progress, hasAuthority } = useInitializer()
+    const { initialize, loading: initializerLoading, progress } = useInitializer()
     const { getSeverityRules, loading: loadingRules } = useGetSeverityRules()
     const authorities = useRecoilValue(UserAuthoritiesSchema)
     const user = useRecoilValue(UserSchema)
@@ -56,7 +56,7 @@ const AppWrapperInitializer = (props: AppWrapperProps) => {
         )
     }
 
-    if (!hasAccess) {
+    if (!hasAccess && !initializerLoading && !loadingRules) {
         return <AccessDenied />
     }
 

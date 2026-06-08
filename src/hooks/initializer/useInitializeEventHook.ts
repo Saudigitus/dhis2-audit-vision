@@ -68,7 +68,7 @@ export const useInitializeEventHook = () => {
 
         try {
             let existingHook: EventHook | null = null
-            try {
+            try  {
                 const response = await engine.query(GET_EVENT_HOOK_QUERY(desired.id)) as { eventHook: EventHook | null }
                 existingHook = response.eventHook
             } catch {

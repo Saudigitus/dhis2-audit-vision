@@ -28,7 +28,7 @@ const CopyJsonButton = ({ data }: { data: any }) => {
 };
 
 export default function SettingsPage() {
-  const dataStoreDataState = useRecoilValue(DataStoreConfigState)
+  const dataStoreDataState: any = useRecoilValue(DataStoreConfigState)
   const authorities = useRecoilValue(UserAuthoritiesSchema)
   const [setErros, setErrorsState] = useRecoilState(ErrorsSchema)
   const [auditApi, setAuditApi] = useState(dataStoreDataState?.auditApi ?? '');

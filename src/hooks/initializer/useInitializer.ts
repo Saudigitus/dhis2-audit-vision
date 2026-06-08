@@ -1,12 +1,12 @@
 import { useGlobalError } from '../error/useGlobalError';
 import { useState } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { useDataEngine } from '@dhis2/app-runtime'
 import { SqlView } from '../../types/sqlView/sqlView'
 import { ErrorsSchema } from '../../schema/errorsSchema'
 import sqlviews from '../../constants/sqlviews/sqlviews.json'
-import { UserAuthoritiesSchema } from '../../schema/userAuthoritiesSchema';
 import { useInitializeUserGroup } from './useInitializeUserGroup';
+import AccessDefiner from '../accessDefiner/useDefineAccess';
 
 const GET_SQL_VIEW_QUERY = (id: string) => ({
     sqlView: {
@@ -19,6 +19,7 @@ const CREATE_OR_UPDATE_SQL_VIEW_MUTATION = {
     resource: 'metadata',
     params: {
         importStrategy: 'CREATE_AND_UPDATE',
+        skipSharing: true
     },
     data: ({ sqlViews }: { sqlViews: SqlView[] }) => ({
         sqlViews,
@@ -36,10 +37,9 @@ export const useInitializer = () => {
     const { showError } = useGlobalError();
     const engine = useDataEngine()
     const [loading, setLoading] = useState(false)
-    const [hasAuthority, setHasAuthority] = useState(true)
-    const authorities = useRecoilValue(UserAuthoritiesSchema)
     const [_, setErrorsState] = useRecoilState(ErrorsSchema)
     const { ensureAdminGroup, ensureViewerGroup } = useInitializeUserGroup()
+    const { useDefineAccess } = AccessDefiner()
 
     const [progress, setProgress] = useState<Record<string, progress>>({})
     const updateProgress = (key: string, action: string, status: 'PENDING' | 'SUCCESS' | 'ERROR', details?: string, object?: any) => {
@@ -58,51 +58,34 @@ export const useInitializer = () => {
         ],
     })
 
-    // Widened: re-apply permissions even if only access settings changed
-    const compareSqlViews = async (
-        existingView: SqlView,
-        newView: SqlView,
-        adminGroupUid: string,
-        viewerGroupUid: string
-    ) => {
-        const desired = withPermissions(newView, adminGroupUid, viewerGroupUid)
-
-        const sqlChanged = existingView.sqlQuery !== desired.sqlQuery
-        const accessChanged = existingView.publicAccess !== desired.publicAccess
-        const adminGroupMissing = !existingView.userGroupAccesses?.some(
-            (a: any) => a.id === adminGroupUid
-        )
-        const viewerGroupMissing = !existingView.userGroupAccesses?.some(
-            (a: any) => a.id === viewerGroupUid
-        )
-
-        if (sqlChanged || accessChanged || adminGroupMissing || viewerGroupMissing) {
-            await createSqlViews([desired])
-        }
-    }
-
-    const verifySqlViews = async (adminGroupUid: string, viewerGroupUid: string) => {
+    const verifySqlViews = async () => {
         setLoading(true)
+        let adminGroupUid = null, viewerGroupUid = null
 
         for (const view of sqlviews as any[]) {
             try {
                 const response = await engine.query(GET_SQL_VIEW_QUERY(view.id)) as { sqlView: SqlView | null }
                 const existingView = response.sqlView
 
-                if (existingView) {
-                    await compareSqlViews(existingView, view, adminGroupUid, viewerGroupUid)
-                } else {
+                if (!existingView) {
+                    if (!adminGroupUid) adminGroupUid = await ensureAdminGroup()
+                    if (!viewerGroupUid) viewerGroupUid = await ensureViewerGroup()
+
                     await createSqlViews([withPermissions(view, adminGroupUid, viewerGroupUid)])
+                    await useDefineAccess(view.id, adminGroupUid, viewerGroupUid)
                 }
 
             } catch (error: any) {
                 const err = error as { details?: { httpStatusCode?: number } }
                 if (err.details?.httpStatusCode === 404) {
                     try {
-                        await createSqlViews([withPermissions(view, adminGroupUid, viewerGroupUid)])
+                        if (!adminGroupUid) adminGroupUid = await ensureAdminGroup()
+                        if (!viewerGroupUid) viewerGroupUid = await ensureViewerGroup()
+
+                        await createSqlViews([withPermissions(view, adminGroupUid!, viewerGroupUid!)])
+                        await useDefineAccess(view.id, adminGroupUid!, viewerGroupUid!)
                     } catch (createError: any) {
                         showError(createError);
-                        console.error(`Error checking SQL View ${view.id}:`, error)
                     }
                 }
             }
@@ -114,12 +97,6 @@ export const useInitializer = () => {
     const createSqlViews = async (views: SqlView[]) => {
         const view = views[0]
         const key = `create-sqlview-${view.id}`
-        const hasSqlViewAuth = authorities?.user?.some(auth => auth === 'F_SQLVIEW_PUBLIC_ADD' || auth === 'ALL')
-
-        if (!hasSqlViewAuth) {
-            setHasAuthority(false)
-            return
-        }
 
         try {
             updateProgress(key, `Creating SQL View ${view.name}`, 'PENDING', undefined, view)
@@ -142,7 +119,6 @@ export const useInitializer = () => {
             }))
 
             updateProgress(key, `Creating SQL View ${view.name}`, 'ERROR', error?.message || 'Unknown error', view)
-            console.error('Error creating SQL Views:', views, error)
             throw error
         }
     }
@@ -152,13 +128,7 @@ export const useInitializer = () => {
         setLoading(true)
 
         try {
-            // Ensure the admin and viewer groups exist before anything else
-            updateProgress('user-groups', 'Ensuring admin and viewer user groups', 'PENDING')
-            const adminGroupUid = await ensureAdminGroup()
-            const viewerGroupUid = await ensureViewerGroup()
-            updateProgress('user-groups', 'Ensuring admin and viewer user groups', 'SUCCESS')
-
-            await verifySqlViews(adminGroupUid, viewerGroupUid)
+            await verifySqlViews()
         } catch (error: any) {
             console.log(error)
             showError(error);
@@ -171,7 +141,6 @@ export const useInitializer = () => {
     return {
         initialize,
         loading: loading,
-        progress,
-        hasAuthority
+        progress
     }
 }
