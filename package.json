@@ -1,7 +1,7 @@
 {
   "name": "react-vite-tailwind",
   "private": true,
-  "version": "1.8.1",
+  "version": "1.8.2",
   "scripts": {
     "start": "d2-app-scripts start --proxy https://training.saudigitus.org/audit",
     "test": "d2-app-scripts test",

@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.8.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.8.1...v1.8.2) (2026-06-08)
+
+
+### ♻️ Code Refactoring
+
+* improve SQL view initialization and add access controls ([10ec011](https://github.com/Saudigitus/dhis2-audit-vision/commit/10ec011de47b45115e441a4ca812d61ca693da94))
+
 ### [1.8.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.8.0...v1.8.1) (2026-06-07)
 
 
