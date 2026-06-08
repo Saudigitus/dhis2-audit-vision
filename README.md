@@ -50,15 +50,385 @@ The DHIS2 Audit Vision frontend is a DHIS2 custom application.
 
 The Audit API provides the backend functionality for DHIS2 Audit Vision.
 
+### Deployment Scenarios
+
+There are three main scenarios for deploying the Audit API:
+
+---
+
+#### Scenario 1: DHIS2 and Audit API on the Same Server
+
+Use this when both DHIS2 and the Audit API run on the same machine. The API is only accessible locally, and Nginx handles external access.
+
+**`docker-compose.yml`**:
+
+```yaml
+services:
+  api:
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      DB_HOST: audit-db
+      DB_PORT: 5432
+      DATA_BASE_DIR: /app/data
+      CONTROL_FILE_PATH: /app/data/control_file.json
+      SERVER_DHIS2_URL: "http://localhost:8080"
+    ports:
+      - "127.0.0.1:8000:8000"  # only accessible locally
+    volumes:
+      - audit_data:/app/data
+      - audit_logs:/app/logs
+    depends_on:
+      audit-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - audit-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  audit-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: "${DB_NAME:-dhis2_audit_vision}"
+      POSTGRES_USER: "${DB_USER:-postgres}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-postgres}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-dhis2_audit_vision}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - audit-network
+
+networks:
+  audit-network:
+    driver: bridge
+
+volumes:
+  audit_data:
+  audit_logs:
+  postgres_data:
+```
+
+**Nginx configuration** — restrict webhook to localhost only:
+
+```nginx
+server {
+    listen 80;
+    server_name your_server_ip_or_domain;
+
+    # Webhook endpoint — only accessible from the local DHIS2 instance
+    location /api/webhooks/ {
+        allow 127.0.0.1;
+        deny all;
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # All other API endpoints
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+**In `.env`**:
+```
+SERVER_DHIS2_URL=http://localhost:8080
+```
+
+**EventHook URL in DHIS2**:
+```
+http://localhost:8000/api/webhooks/dhis2/event
+```
+
+---
+
+#### Scenario 2: DHIS2 and Audit API on Different Servers
+
+Use this when DHIS2 and the Audit API run on separate servers (connected via public internet or private network).
+
+**`docker-compose.yml`**:
+
+```yaml
+services:
+  api:
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      DB_HOST: audit-db
+      DB_PORT: 5432
+      DATA_BASE_DIR: /app/data
+      CONTROL_FILE_PATH: /app/data/control_file.json
+      SERVER_DHIS2_URL: "https://your-dhis2-instance-url"
+    ports:
+      - "127.0.0.1:8000:8000"  # exposed via Nginx only
+    volumes:
+      - audit_data:/app/data
+      - audit_logs:/app/logs
+    depends_on:
+      audit-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - audit-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  audit-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: "${DB_NAME:-dhis2_audit_vision}"
+      POSTGRES_USER: "${DB_USER:-postgres}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-postgres}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-dhis2_audit_vision}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - audit-network
+
+networks:
+  audit-network:
+    driver: bridge
+
+volumes:
+  audit_data:
+  audit_logs:
+  postgres_data:
+```
+
+**Nginx configuration** — restrict webhook to the DHIS2 server IP only:
+
+```nginx
+server {
+    listen 80;
+    server_name your_server_ip_or_domain;
+
+    # Webhook endpoint — only accessible from the DHIS2 server
+    # Replace <DHIS2_SERVER_IP> with the actual IP of your DHIS2 server
+    location /api/webhooks/ {
+        allow <DHIS2_SERVER_IP>;
+        deny all;
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # All other API endpoints
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+**In `.env`**:
+```
+SERVER_DHIS2_URL=https://your-dhis2-instance-url
+```
+
+**EventHook URL in DHIS2**:
+```
+https://your-audit-api-domain/api/webhooks/dhis2/event
+```
+
+---
+
+#### Scenario 3: DHIS2 and Audit API in the Same Docker Compose (Development / Testing)
+
+Use this when you want to run everything — DHIS2, its database, and the Audit API — together using Docker Compose. This is ideal for development, testing, or evaluation environments.
+
+> **Note**: This scenario is not recommended for production as it bundles DHIS2 and the Audit API in the same compose stack.
+
+**`docker-compose.yml`**:
+
+```yaml
+services:
+  api:
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      DB_HOST: audit-db
+      DB_PORT: 5432
+      DATA_BASE_DIR: /app/data
+      CONTROL_FILE_PATH: /app/data/control_file.json
+      SERVER_DHIS2_URL: "http://dhis2-web:8080"
+    volumes:
+      - audit_data:/app/data
+      - audit_logs:/app/logs
+    depends_on:
+      audit-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - dhis2-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  audit-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: "${DB_NAME:-dhis2_audit_vision}"
+      POSTGRES_USER: "${DB_USER:-postgres}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-postgres}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-dhis2_audit_vision}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - dhis2-network
+
+  dhis2-web:
+    image: "${DHIS2_IMAGE:-dhis2/core:2.42.5}"
+    user: root
+    entrypoint: >
+      sh -c "mkdir -p /opt/dhis2/logs &&
+             chmod 777 /opt/dhis2/logs &&
+             exec catalina.sh run"
+    environment:
+      DB_HOSTNAME: dhis2-db
+      DB_NAME: "${DHIS2_DB_NAME:-dhis}"
+      DB_USERNAME: "${DHIS2_DB_USER:-dhis}"
+      DB_PASSWORD: "${DHIS2_DB_PASSWORD:-dhis}"
+    ports:
+      - "${DHIS2_PORT:-8080}:8080"
+    volumes:
+      - ./dhis.conf:/opt/dhis2/dhis.conf:ro
+      - dhis2_logs:/opt/dhis2/logs
+    depends_on:
+      dhis2-db:
+        condition: service_healthy
+      dhis2-db-dump:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - dhis2-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+  dhis2-db:
+    image: ghcr.io/baosystems/postgis:12-3.3
+    environment:
+      POSTGRES_USER: "${DHIS2_DB_USER:-dhis}"
+      POSTGRES_DB: "${DHIS2_DB_NAME:-dhis}"
+      POSTGRES_PASSWORD: "${DHIS2_DB_PASSWORD:-dhis}"
+      PGPASSWORD: "${DHIS2_DB_PASSWORD:-dhis}"
+    volumes:
+      - dhis2_db_data:/var/lib/postgresql/data
+      - dhis2_db_dump:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: ["CMD-SHELL", "psql --no-password --quiet --username ${DHIS2_DB_USER:-dhis} postgres://127.0.0.1/${DHIS2_DB_NAME:-dhis} -p 5432 --command \"SELECT 'ok'\" > /dev/null"]
+      start_period: 120s
+      interval: 1s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "${DHIS2_DB_EXPOSED_PORT:-5434}:5432"
+    restart: unless-stopped
+    networks:
+      - dhis2-network
+
+  dhis2-db-dump:
+    image: busybox
+    command: sh -c '[ -f dump.sql.gz ] && echo "dump.sql.gz exists" || wget --output-document dump.sql.gz ${DHIS2_DB_DUMP_URL:-https://databases.dhis2.org/sierra-leone/2.42/dhis2-db-sierra-leone.sql.gz}'
+    environment:
+      DHIS2_DB_DUMP_URL: "${DHIS2_DB_DUMP_URL:-https://databases.dhis2.org/sierra-leone/2.42/dhis2-db-sierra-leone.sql.gz}"
+    working_dir: /opt/dump
+    volumes:
+      - dhis2_db_dump:/opt/dump
+
+networks:
+  dhis2-network:
+    driver: bridge
+
+volumes:
+  audit_data:
+  audit_logs:
+  postgres_data:
+  dhis2_db_data:
+  dhis2_db_dump:
+  dhis2_logs:
+```
+
+In this scenario, the API and DHIS2 communicate directly via the internal Docker network (`dhis2-network`) using the service name `dhis2-web`. No Nginx or port restrictions are needed since the webhook endpoint is not exposed externally.
+
+**In `.env`**:
+```
+SERVER_DHIS2_URL=http://dhis2-web:8080
+```
+
+**EventHook URL in DHIS2**:
+```
+http://api:8000/api/webhooks/dhis2/event
+```
+
+#### Quick Start with Scenario 3
+```bash
+cd docker/scenario-3-dev-docker-compose
+docker compose --env-file ../../.env up --build -d
+docker compose --env-file ../../.env exec api alembic upgrade head
+docker compose --env-file ../../.env exec api python commands.py seed-superuser
+```
+
+---
+
 ### Quick Start with Docker (Recommended)
 
 For a quick and easy setup, use Docker:
 
 1. Clone the repository
 2. Copy `.env.example` to `.env` and configure
-3. Build and start services: `docker compose up --build -d`
-4. Run migrations: `docker compose exec api alembic upgrade head`
-5. Create superuser and get access token: `docker compose exec api python commands.py seed-superuser`
+3. Choose the appropriate `docker-compose.yml` based on your deployment scenario above
+4. Build and start services: `docker compose up --build -d`
+5. Run migrations: `docker compose exec api alembic upgrade head`
+6. Create superuser and get access token: `docker compose exec api python commands.py seed-superuser`
 
 The API will be available at http://localhost:8000. **Save the generated access token** - you'll need it to configure DHIS2 Audit Vision's Settings page.
 
@@ -177,17 +547,29 @@ For manual installation, follow these steps:
    ```bash
    nano /etc/nginx/sites-available/default
    ```
-   ```bash
+   ```nginx
    server {
-        listen 80;
-        server_name your_server_ip_or_domain;
+       listen 80;
+       server_name your_server_ip_or_domain;
 
-        location / {
-            proxy_pass http://127.0.0.1:8000;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-        }
-    }
+       # Webhook endpoint — only accessible from the DHIS2 server
+       # Replace <DHIS2_SERVER_IP> with the IP address of your DHIS2 instance
+       # If DHIS2 and the Audit API are on the same server, use 127.0.0.1
+       location /api/webhooks/ {
+           allow <DHIS2_SERVER_IP>;
+           deny all;
+           proxy_pass http://127.0.0.1:8000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+
+       # All other API endpoints
+       location / {
+           proxy_pass http://127.0.0.1:8000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+   }
    ```
 
 11. **Validate and reload**:

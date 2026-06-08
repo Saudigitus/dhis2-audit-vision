@@ -26,6 +26,12 @@ Before deploying, ensure you have:
 - **Git** access to the repository
 - A running DHIS2 instance accessible from this server
 
+### Option 3: Docker Compose with DHIS2 (Scenario 3, Dev/Test)
+Before deploying, ensure you have:
+- **Docker** and **Docker Compose** installed
+- **Git** access to the repository
+- This scenario runs DHIS2, its database, and the Audit API together in Docker Compose for development and testing
+
 ---
 
 ## Option 1: Manual Deployment Steps (Ubuntu 22.04 LTS)
@@ -94,6 +100,18 @@ docker compose down
 ```
 
 The PostgreSQL data, audit files, and logs are persisted in Docker volumes.
+
+---
+
+## Option 3: Docker Compose with DHIS2 (Scenario 3, Dev/Test)
+
+### Quick start commands:
+```bash
+cd docker/scenario-3-dev-docker-compose
+docker compose --env-file ../../.env up --build -d
+docker compose --env-file ../../.env exec api alembic upgrade head
+docker compose --env-file ../../.env exec api python commands.py seed-superuser
+```
 
 ---
 
