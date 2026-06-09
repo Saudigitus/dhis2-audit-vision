@@ -47,7 +47,7 @@ const buildParams = ({ startDate, endDate, actionType, offset }: any) => {
     if (actionType) params.push(`actionType:${actionType}`);
     if (offset !== undefined) params.push(`offset:${offset}`);
 
-    return params;
+    return params?.join('&var=');
 };
 
 const countRiskChanges = (severityRules: SeverityRuleType[], rows: any[]) => {
