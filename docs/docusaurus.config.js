@@ -53,12 +53,6 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'userGuideSidebar',
-            position: 'left',
-            label: 'User Guide',
-          },
-          {
-            type: 'docSidebar',
             sidebarId: 'deploymentSidebar',
             position: 'left',
             label: 'Deployment',
@@ -68,6 +62,12 @@ const config = {
             sidebarId: 'configurationSidebar',
             position: 'left',
             label: 'Configuration',
+          },
+          {
+            type: 'docSidebar',
+            sidebarId: 'userGuideSidebar',
+            position: 'left',
+            label: 'User Guide',
           },
           {
             type: 'docSidebar',

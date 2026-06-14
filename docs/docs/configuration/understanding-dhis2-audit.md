@@ -26,15 +26,12 @@ DHIS2 records audit logs directly into your **PostgreSQL database** in the follo
 | Table | Contents |
 |---|---|
 | `audit` | Metadata and general object audit logs |
-| `trackedentityaudit` | Tracker-specific audit logs |
 
-These tables are queried by the Audit API via SQL Views to expose the data to the frontend.
+This table is queried by the Audit API via SQL Views to expose the data to the frontend.
 
 ## Audit Vision's Approach
 
 Audit Vision reads directly from these PostgreSQL tables through the DHIS2 SQL View mechanism and the DHIS2 API. This gives it:
 
 - **Complete history** of all audited changes
-- **No dependency** on DHIS2's own audit UI
-- **Fast queries** using indexed database access
 - **Diff visualization** by comparing consecutive audit entries

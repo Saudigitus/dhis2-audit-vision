@@ -30,9 +30,6 @@ Go to the [DHIS2 Audit Vision Releases page](https://github.com/Saudigitus/dhis2
 4. Select the `.zip` file you downloaded and confirm the upload.
 5. The app will appear in your DHIS2 app list once installed.
 
-:::tip
-If you see a warning about the app not being from the DHIS2 App Hub, you can safely proceed — Audit Vision is distributed as a standalone release.
-:::
 
 ## Next Steps
 
