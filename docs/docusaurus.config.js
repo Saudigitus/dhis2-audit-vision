@@ -88,6 +88,7 @@ const config = {
           {
             title: 'Docs',
             items: [
+              { label: 'User Guide', to: '/docs/user-guide/intro' },
               { label: 'Deployment', to: '/docs/deployment/intro' },
               { label: 'Configuration', to: '/docs/configuration/intro' },
               { label: 'Development guide', to: '/docs/development/intro' },
