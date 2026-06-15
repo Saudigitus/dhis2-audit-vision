@@ -24,7 +24,8 @@ Create a user in DHIS2 with the following authorities:
 3. Fill in the user details (username, password, email).
 4. Under **Roles**, assign a role that includes `F_METADATA_EXPORT` and `F_AUDIT_READ`.  
    You can create a dedicated role named `Audit Vision Integration`.
-5. Save the user.
+5. Under **User Groups**, add the user to the `AUDIT_VISION_ADMINS` group.
+6. Save the user.
 
 ## Configure Credentials in the API
 

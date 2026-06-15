@@ -20,7 +20,7 @@ Your DHIS2 configuration file is typically located at:
 Open the file and add or modify the `audit` property. For example, to audit Metadata and Tracker data:
 
 ```properties title="dhis.conf"
-audit = METADATA, TRACKER
+audit = METADATA
 ```
 
 ### Supported Audit Scopes
@@ -28,7 +28,6 @@ audit = METADATA, TRACKER
 | Value | Description |
 |---|---|
 | `METADATA` | Changes to metadata objects (data elements, indicators, etc.) |
-| `TRACKER` | Changes to tracked entity instances and enrollments |
 | `READ` | Read operations |
 | `CREATE` | Creation of new objects |
 | `UPDATE` | Updates to existing objects |

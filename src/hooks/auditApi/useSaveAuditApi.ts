@@ -45,8 +45,8 @@ const useAuditApi = () => {
                 type: { success: true }
             });
             setTimeout(hide, 5000);
-            // window.location.hash = "#/"
-            // window.location.reload()
+            window.location.hash = "#/"
+            window.location.reload()
         } catch (err) {
             showError(err);
             const caught = err instanceof Error ? err : new Error(String(err))

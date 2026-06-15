@@ -14,7 +14,6 @@ import {
 const sqlView = (id: string, vars?: Record<string, any>) => ({
     resource: `sqlViews/${id}/data`,
     params: {
-        paging: false,
         var: buildParams(vars || {}),
     },
 });

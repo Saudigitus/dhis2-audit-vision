@@ -38,14 +38,23 @@ const mapUserActivity = (rows: any[]): UserActivity[] => {
     return Object.values(users);
 };
 
-const buildParams = ({ startDate, endDate, actionType, offset }: any) => {
+const buildParams = ({ startDate, endDate, actionType, offset, limit }: any) => {
     const params = [
         `startDate:${startDate}`,
         `endDate:${endDate}`,
     ];
 
-    if (actionType) params.push(`actionType:${actionType}`);
-    if (offset !== undefined) params.push(`offset:${offset}`);
+    if (actionType) {
+        params.push(`actionType:${actionType}`);
+    }
+
+    if (offset !== undefined) {
+        params.push(`offset:${offset}`);
+    }
+
+    if (limit  !== undefined) {
+        params.push(`limit:${limit}`)
+    }
 
     return params;
 };
