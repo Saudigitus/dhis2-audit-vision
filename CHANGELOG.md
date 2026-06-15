@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.9.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.8.3...v1.9.0) (2026-06-15)
+
+
+### ✨ New Features
+
+* **user-detail-panel:** add pagination to user audit logs ([83072c5](https://github.com/Saudigitus/dhis2-audit-vision/commit/83072c5cc4d926c9f881c4ddda667e13c0c58030))
+
 ### [1.8.3](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.8.2...v1.8.3) (2026-06-08)
 
 ### [1.8.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.8.1...v1.8.2) (2026-06-08)
