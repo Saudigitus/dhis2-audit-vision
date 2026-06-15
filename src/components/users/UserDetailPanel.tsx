@@ -1,9 +1,10 @@
 import { X } from 'lucide-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { User } from '../../types/users/users';
 import { Center, CircularLoader } from '@dhis2/ui';
 import { useGetAudit } from '../../hooks/audit/useGetAudit';
 import { rowsFormatter } from '../../utils/table/rowFormatter';
+import Pagination from '../table/components/Pagination';
 
 interface UserDetailPanelProps {
   user: User;
@@ -13,6 +14,16 @@ interface UserDetailPanelProps {
 
 const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onClose, actionColors }) => {
   const { getAudit, data, loading } = useGetAudit();
+  const [pager, setPager] = useState({ page: 1, pageSize: 50, })
+
+
+  useEffect(() => {
+    getAudit({
+      page: pager.page,
+      pageSize: pager.pageSize,
+      filterQuery: new URLSearchParams({ ['createdBy']: user.username as string })?.toString()
+    });
+  }, [user.username, pager.page, pager.pageSize])
 
   const header = [
     { id: 'date', displayName: 'Date', },
@@ -21,20 +32,20 @@ const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onClose, action
     { id: 'action', displayName: 'Action', },
   ];
 
-  useEffect(() => {
-    getAudit({
-      page: 1,
-      pageSize: user?.changes,
-      filterQuery: new URLSearchParams({ ['createdBy']: user.username as string })?.toString()
-    });
-  }, [user.username])
+  const onPageChange = (page: number) => {
+    setPager({ ...pager, page });
+  }
+
+  const onPageSizeChange = (pageSize: number) => {
+    setPager({ ...pager, pageSize });
+  }
 
   return (
     <>
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
       {/* Panel */}
-      <div className="fixed top-0 right-0 bottom-0 w-[560px] bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
+      <div className="fixed top-0 right-0 bottom-0 w-[60vw] bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
         {/* Panel Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[#e2e8f0]">
           <div className="flex items-center gap-3">
@@ -79,7 +90,6 @@ const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onClose, action
                 </tr>
               </thead>
               <tbody>
-
                 {
                   loading ?
                     <tr className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] cursor-pointer">
@@ -100,9 +110,37 @@ const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onClose, action
                           </span>
                         </td>
                       </tr>
-                    ))}
+                    ))
+                }
+
+                {
+                  !loading && !data?.audits?.length ?
+                    <tr className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] cursor-pointer">
+                      <td colSpan={header?.length} className="px-4 py-3 text-xs text-[#64748b]">
+                        No activity found.
+                      </td>
+                    </tr>
+                    : null
+                }
               </tbody>
             </table>
+
+            {
+              !loading && data?.audits?.length ?
+                <div className="flex justify-end px-4 py-3">
+                  <Pagination
+                    pagination={{
+                      page: pager.page,
+                      setPage: onPageChange,
+                      pageSize: pager.pageSize,
+                      total: user?.changes || 0,
+                      setPageSize: onPageSizeChange,
+                      pageCount: Math.ceil(user?.changes || 0 / pager.pageSize),
+                    }}
+                  />
+                </div>
+                : null
+            }
           </div>
         </div>
       </div>
