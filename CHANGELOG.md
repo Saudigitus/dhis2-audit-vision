@@ -2,6 +2,21 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.9.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.9.0...v1.9.1) (2026-06-15)
+
+
+### 🐛 Bug Fixes
+
+* **auditApi:** re-enable page redirect and reload after successful audit save ([98373ef](https://github.com/Saudigitus/dhis2-audit-vision/commit/98373ef3bfe7c443ac96ac7e5222edd2452d0e22))
+* **dashboard:** correct API parameter formatting for dashboard data ([9095adb](https://github.com/Saudigitus/dhis2-audit-vision/commit/9095adb9a2122dcdd95942a2595dbd1a64acd6a3))
+* updating audit summary url ([52920c5](https://github.com/Saudigitus/dhis2-audit-vision/commit/52920c5320c079cd1788878dc7bec926c8c4abfe))
+
+
+### 📝 Documentation
+
+* add user guide nav item to docs navigation ([d287570](https://github.com/Saudigitus/dhis2-audit-vision/commit/d2875701c1244d5e930f4b8c98b683eb7aca5f36))
+* overhaul documentation and update dev server proxy ([d10054e](https://github.com/Saudigitus/dhis2-audit-vision/commit/d10054ea532c8233feaa3f5089662beffc6fe521))
+
 ## [1.9.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.8.3...v1.9.0) (2026-06-15)
 
 
