@@ -35,7 +35,8 @@ export const useGetUsersAuditSummary = (pageSize: number = 10) => {
         id: dataStoreConfig?.reports?.mostActiveUsers,
         startDate: startDate,
         endDate: endDate,
-        offset: offset.toString()
+        offset: offset.toString(),
+        limit: 10
       }));
 
       const rows = response.summary?.listGrid?.rows || response.summary?.rows || [];
