@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.9.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.9.1...v1.9.2) (2026-07-08)
+
+
+### 🐛 Bug Fixes
+
+* **sqlviews:** correct timestamp format in audit query ([bc1ab95](https://github.com/Saudigitus/dhis2-audit-vision/commit/bc1ab950ab437503fb566fd9a62db5f68a9ddb7e))
+
 ### [1.9.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.9.0...v1.9.1) (2026-06-15)
 
 
