@@ -19,7 +19,7 @@
             }
         },
         "favorites": [],
-        "sqlQuery": "WITH latest AS (\n    SELECT *,\n           ROW_NUMBER() OVER (PARTITION BY uid ORDER BY createdat DESC) AS rn\n    FROM audit\n    WHERE createdat >= TO_TIMESTAMP('${since_datetime}', 'YYYY-MM-DD HH24:MI:SS') - INTERVAL '${offset_hours} hours'\n)\nSELECT *\nFROM latest\nWHERE rn = 1\n  AND createdby <> 'system-process'\nORDER BY createdat DESC\n",
+        "sqlQuery": "WITH latest AS (\n    SELECT *,\n           ROW_NUMBER() OVER (PARTITION BY uid ORDER BY createdat DESC) AS rn\n    FROM audit\n    WHERE createdat >= TO_TIMESTAMP('${since_epoch}') - INTERVAL '${offset_hours} hours'\n)\nSELECT *\nFROM latest\nWHERE rn = 1\n  AND createdby <> 'system-process'\nORDER BY createdat DESC\n",
         "type": "QUERY",
         "cacheStrategy": "NO_CACHE",
         "displayName": "audit_with_filter",
