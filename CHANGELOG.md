@@ -2,6 +2,13 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+## [1.10.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.9.2...v1.10.0) (2026-10-14)
+
+
+### ✨ New Features
+
+* add base64 encoded audit data to sql views ([1167a19](https://github.com/Saudigitus/dhis2-audit-vision/commit/1167a194e25719db85738d6460c2a5106632c49c))
+
 ### [1.9.2](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.9.1...v1.9.2) (2026-07-08)
 
 
