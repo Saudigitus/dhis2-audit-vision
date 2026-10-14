@@ -2,6 +2,8 @@
 
 All notable changes to DHIS2 Audit Vision will be documented in this file.
 
+### [1.10.1](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.10.0...v1.10.1) (2026-10-14)
+
 ## [1.10.0](https://github.com/Saudigitus/dhis2-audit-vision/compare/v1.9.2...v1.10.0) (2026-10-14)
 
 
