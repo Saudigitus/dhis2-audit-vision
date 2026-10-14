@@ -19,7 +19,7 @@
             }
         },
         "favorites": [],
-        "sqlQuery": "WITH latest AS (\n    SELECT *,\n           ROW_NUMBER() OVER (PARTITION BY uid ORDER BY createdat DESC) AS rn\n    FROM audit\n    WHERE createdat >= TO_TIMESTAMP('${since_epoch}') - INTERVAL '${offset_hours} hours'\n)\nSELECT *\nFROM latest\nWHERE rn = 1\n  AND createdby <> 'system-process'\nORDER BY createdat DESC\n",
+        "sqlQuery": "WITH latest AS (\n    SELECT *,\n           encode(data, 'base64') AS encoded_data,\n           ROW_NUMBER() OVER (PARTITION BY uid ORDER BY createdat DESC) AS rn\n    FROM audit\n    WHERE createdat >= TO_TIMESTAMP('${since_epoch}') - INTERVAL '${offset_hours} hours'\n)\nSELECT *\nFROM latest\nWHERE rn = 1\n  AND createdby <> 'system-process'\nORDER BY createdat DESC\n",
         "type": "QUERY",
         "cacheStrategy": "NO_CACHE",
         "displayName": "audit_with_filter",
@@ -48,7 +48,7 @@
         },
         "favorites": [],
         "description": "single_audit",
-        "sqlQuery": "SELECT *\nFROM audit\nWHERE uid = '${resource_uid}'\n  AND createdby <> 'system-process'\nORDER BY createdat DESC\nLIMIT 1\n",
+        "sqlQuery": "SELECT *,\n    encode(data, 'base64') AS encoded_data\nFROM audit\nWHERE uid = '${resource_uid}'\n  AND createdby <> 'system-process'\nORDER BY createdat DESC\nLIMIT 1\n",
         "type": "QUERY",
         "cacheStrategy": "NO_CACHE",
         "displayName": "single_audit",
